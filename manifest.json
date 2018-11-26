@@ -1,0 +1,20 @@
+{
+    "id": "610bbc96-10dc-4874-a9fc-ecf0edf4260b",
+    "name": "YearEndFactory",
+    "desc": "Year End Factory",
+    "badge": "yf",
+    "bundleName": "yefBundle.js",
+    "version": "1",
+    "buildNo":"2018_06_05_YEF",
+    "renderFunction": "renderYEFApplication",
+    "macVersion":"1.0", 
+    "areas": [ {
+        "id":"b9f6848d-30a7-451d-d2fa-86f3afa4df67",
+        "groupId":"Group1", 
+        "title": "Year End Tax Documents",
+        "icon": "fas fa-file-alt fa-sm",
+        "tooltip": "Year End Tax Docs",
+        "renderName": "yearEndTaxDocList",
+        "visible": true
+    }]
+}
