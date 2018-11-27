@@ -15,7 +15,7 @@ const put = 'PUT';
 /**
  * app router constants
  */
-const host  = 'http://localhost:'; // REST Web Service HOST 
+const host  = 'http://ssdev01:'; // REST Web Service HOST 
 const port  = '9090';            // REST Web Service PORT
 const username = 'CFWSUSERXXX';  // REST Web Service USER
 const password = 'CFWSUSERXXX';  // REST Web Service PASS
@@ -44,7 +44,7 @@ approuter = (app) => {
  */
 callServiceRequestGet = (requrl, res) => {
     var url = requrl.replace("/api", "");
-    let auth = yefauth();
+    let auth = eew2auth();
     const options = {
         url: `${host}${port}${url}`,
         method: get,
@@ -65,7 +65,7 @@ callServiceRequestGet = (requrl, res) => {
  */
 callServiceRequestPost = (requrl, postData, res) => {
     var url = requrl.replace("/api", "");
-    let auth = yefauth();
+    let auth = eew2auth();
     const options = {
         method: post,
         body: postData,
@@ -132,9 +132,9 @@ callServiceRequestPut = (requrl, putData, res) => {
     }).pipe(res);
 }
 /**
- * yefauth
+ * eew2auth
  */
-yefauth = ()=> {
+eew2auth = ()=> {
     let auth = 'Basic ' + new Buffer(username + ':' + password).toString('base64');
     return auth
 }

@@ -1,20 +1,20 @@
 {
-    "id": "610bbc96-10dc-4874-a9fc-ecf0edf4260b",
-    "name": "YearEndFactory",
-    "desc": "Year End Factory",
-    "badge": "yf",
-    "bundleName": "yefBundle.js",
+    "id": "dd4282b1-0544-4ad1-8e0b-6a8d278ffd5c",
+    "name": "EeW2AdminFactory",
+    "desc": "Employee W2 Administration Factory",
+    "badge": "wf",
+    "bundleName": "eeW2AdmBundle.js",
     "version": "1",
-    "buildNo":"2018_06_05_YEF",
-    "renderFunction": "renderYEFApplication",
+    "buildNo":"2018_11_26_W2F",
+    "renderFunction": "renderW2AdmApplication",
     "macVersion":"1.0", 
     "areas": [ {
-        "id":"b9f6848d-30a7-451d-d2fa-86f3afa4df67",
+        "id":"b55f51a1-0273-4457-8226-013a35d32080",
         "groupId":"Group1", 
-        "title": "Year End Tax Documents",
+        "title": "Manage EE W2 Records",
         "icon": "fas fa-file-alt fa-sm",
-        "tooltip": "Year End Tax Docs",
-        "renderName": "yearEndTaxDocList",
+        "tooltip": "Manage EE W2 Records",
+        "renderName": "filterpayrolldata",
         "visible": true
     }]
 }

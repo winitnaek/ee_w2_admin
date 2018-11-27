@@ -1,5 +1,4 @@
 {
-    "/cfws/v1/YearEndTaxDocService/getYearEndTaxDocsList/*":"/getYearEndTaxDocsList?dataset=DATASET001&empId=1",
-    "/cfws/v1/YearEndTaxDocService/getYearEndTaxDocConsent/*":"/getYearEndTaxDocConsent?dataset=DATASET001&empId=1",
-    "/cfws/v1/YearEndTaxDocService/getYearEndTaxDoc/*":"/getYearEndTaxDoc?dataset=DATASET001&fein=123456789&empId=1&reqNo=123"
+    "/cfws/v1/EEW2AdminService/getEEW2Records/*":"/getEEW2Records",
+    "/cfws/v1/EEW2AdminService/getEEW2Pdf/*":"/getEEW2Pdf"
 }

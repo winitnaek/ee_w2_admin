@@ -1,4 +1,2 @@
-export const GETYEAREND_TAXDOCSLIST_URL='/getYearEndTaxDocsList'
-export const GETTAXDOC_CONSENT_URL='/getYearEndTaxDocConsent'
-export const SAVEEMP_CONSENT_URL='/saveYearEndTaxDocConsent'
-export const GET_YEAREND_TAXDOC_URL='/getYearEndTaxDoc'
+export const GET_EEW2RECORDS='/getEEW2Records/'
+export const GET_EE_W2_PDF_URL ='/getEEW2Pdf'

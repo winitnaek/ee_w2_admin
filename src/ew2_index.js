@@ -4,11 +4,9 @@ import { Provider } from 'react-redux';
 
 import configureStore from './base/config/configureStore';
 
-import TaxDocsContainer from './app/taxdocs/TaxDocsContainer';
+import FilterPayrollData from './app/eew2docs/FilterPayrollData';
 
-import {taxDocConsentReset,loadTaxDocConsent} from './app/taxdocs/taxdocsAction';
-
-import ViewPDF from './app/taxdocs/ViewPDF';
+import EEW2RecordsGrid from './app/eew2docs/EEW2RecordsGrid';
 
 import * as rname from './base/constants/RenderNames';
 
@@ -20,60 +18,48 @@ let store = configureStore();
 
 let usrobj = JSON.parse(sessionStorage.getItem('up'));
 
-var dataset = usrobj.dataset;
-var empId = usrobj.userId;
+//var dataset = usrobj.dataset;
+//var empId = usrobj.userId;
+const dataset = '00_EE_W2_DATA';
+const empId = '001488';
 
 
 /**
- * renderYEFApplication TEST
+ * renderW2AdmApplication TEST
  * master branch
  * @param {*} elem 
  * @param {*} renderName 
  */
-function renderYEFApplication(elem, renderName) {
+function renderW2AdmApplication(elem, renderName) {
     setAppAnchor(elem);
-    
-    if (renderName === rname.RN_TAXDOCLIST) {
-        store.dispatch(loadTaxDocConsent(dataset, empId)).then((taxDocConsent) => {
-            console.log('Year End Tax Doc Consent Loaded.');
-            console.log('taxDocConsent');
-            console.log(taxDocConsent);
-            renderYetiTaxDocList(elem)
-        }).catch(error => {
-            return error;
-        });
-    }else if(renderName === rname.RN_TAXDOCSRCH){
-        store.dispatch(loadTaxDocConsent(dataset, empId)).then(() => {
-            console.log('Year End Tax Doc Consent Search.');
-            renderYefTaxDocSearch(elem)
-        });
+    if(renderName===rname.RN_FILTER_PAYROLL_DATA){
+        renderFilterPayrollData(elem);
+    }else if(renderName===rname.RN_EEW2_RECORDS){
+        renderEEW2RecordsGrid(elem)
     }
 }
 /**
- * renderPeriodicAuthTaxTypeTotal
+ * renderEEW2RecordsGrid
  * @param {*} elem 
  */
-function renderYetiTaxDocList(elem){
-    $('#searchIdd').val('');
+function renderEEW2RecordsGrid(elem){
     ReactDOM.render(
         <Provider store={store}>
-        <TaxDocsContainer/>
+        <EEW2RecordsGrid/>
         </Provider>,
-       document.querySelector('#'+elem));
+        document.querySelector('#'+elem));
 }
 /**
- * renderPeriodicAuthTaxTypeTotal
+ * renderFilterPayrollData
  * @param {*} elem 
  */
-function renderYefTaxDocSearch(elem){
-    let searchQuery = $('#searchIdd').val();
+function renderFilterPayrollData(elem) {
     ReactDOM.render(
         <Provider store={store}>
-        <TaxDocsContainer searchQuery={searchQuery} />
+        <FilterPayrollData/>
         </Provider>,
        document.querySelector('#'+elem));
 }
-
 var APP_ANCHOR;
 function setAppAnchor(elem){
    APP_ANCHOR = elem;
@@ -172,8 +158,8 @@ const unMountNMountContainerNode = () => {
     $('<div id="' + c.appContentId + '" class="main-content p-5 m-5"></div>').insertAfter($("#" + c.navId));
 };
 
-module.exports = renderYEFApplication;
-window.renderYEFApplication = renderYEFApplication;
+module.exports = renderW2AdmApplication;
+window.renderW2AdmApplication = renderW2AdmApplication;
 
 module.exports = appAnchor;
 window.appAnchor = appAnchor;

@@ -9,10 +9,10 @@ const APP_DIR = path.resolve(__dirname, 'src');
 
 module.exports = {
     entry: [
-        APP_DIR + '/yef_index.js' // Your appʼs entry point
+        APP_DIR + '/ew2_index.js' // Your appʼs entry point
     ],
     output: {
-        filename: 'yefBundle.js',
+        filename: 'eeW2AdmBundle.js',
         path: path.resolve(__dirname, 'dist'),
         publicPath: '/'
     },
@@ -91,7 +91,7 @@ module.exports = {
             }
         ]),
         new CleanWebpackPlugin(['dist/*.*', 'dist/res', 'dist/src','dist/pdfjs']),
-        new ExtractTextPlugin({ filename: 'yefBundle.css', allChunks: true }),
+        new ExtractTextPlugin({ filename: 'eeW2AdmBundle.css', allChunks: true }),
         new ProgressBarPlugin(),
         new IndexGeneratorPlugin()
     ]

@@ -1,2 +1,2 @@
-export const RN_TAXDOCLIST='yearEndTaxDocList';
-export const RN_TAXDOCSRCH='yearEndTaxDocSrch';
+export const RN_FILTER_PAYROLL_DATA='filterpayrolldata'
+export const RN_EEW2_RECORDS='eew2records'
