@@ -25,7 +25,7 @@ class EEW2Records extends React.Component {
                     { name: 'tranFein', type: 'int' },
                     { name: 'compName', type: 'string' },
                     { name: 'compFein', type: 'int' },
-                    { name: 'empId', type: 'int' },
+                    { name: 'empId', type: 'string' },
                     { name: 'empFname', type: 'string' },
                     { name: 'empLname', type: 'string' },
                     { name: 'reportId', type: 'string' },
@@ -299,6 +299,9 @@ class EEW2Records extends React.Component {
                 return '';
             }
         }
+        let formatssn = (row, column, value) => {
+            return '<div style="text-align:center;">XXX-XX-'+value.substring(5, 9)+'</div>';
+        }
         const getCompInfo = (id) => {
             alert(this.refs.eew2Grid.getrowdata(id).compFein);
         }
@@ -308,18 +311,18 @@ class EEW2Records extends React.Component {
         }
         let columns =
             [
-                { text: 'Company Name', datafield: 'compName',  cellsalign: 'center', align: 'center', columntype: 'button', cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
+                { text: 'Company Name', datafield: 'compName',  cellsalign: 'center',width: 'auto', align: 'center', columntype: 'button', cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
                     return rowdata.compName;
                    }, buttonclick: function (id) {
                        getCompInfo(id);
-                   } ,width: 'auto', filtertype: 'input'},
+                   } ,filtertype: 'input'},
                 { text: 'Run Date/Time', datafield: 'generatedDateTime', width: 'auto', cellsformat: 'MM-dd-yyyy hh:mm:00 tt', filtertype: 'range' },
-                { text: 'Employee Name', cellsalign: 'center', align: 'center',  columntype: 'button', cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
+                { text: 'Employee Name', cellsalign: 'center', align: 'center',width: 'auto', columntype: 'button', cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
                     return rowdata.empFname+' '+rowdata.empLname;
                    }, buttonclick: function (id) {
                        getEEW2PDF(id);
-                   } ,width: 'auto',filtertype: 'input'},
-                { text: 'SSN', datafield: 'empId', cellsalign: 'center', align: 'center', width: 'auto', filtertype: 'input' },
+                   } ,filtertype: 'input'},
+                { text: '  SSN  ', datafield: 'empId', cellsalign: 'center', align: 'center', width: 'auto', filtertype: 'input',cellsrenderer:formatssn},
                 { text: 'Published', datafield: 'isPublished',cellsalign: 'center', align: 'center', cellsrenderer: pubrenderer,  width: 'auto',filtertype: 'bool', },
                 { text: 'Printed', datafield: 'isPrinted', cellsalign: 'center', align: 'center', cellsrenderer: printrenderer, width: 'auto', filtertype: 'bool',},
             ];
