@@ -37,6 +37,7 @@ class EEW2Records extends React.Component {
                 localdata: data
 
             };
+            this.toggleSuccess = this.toggleSuccess.bind(this);
             this.toggleExpExl=this.toggleExpExl.bind(this);
             this.toggleExpCsv=this.toggleExpCsv.bind(this);
             this.toggleSelAll=this.toggleSelAll.bind(this);
@@ -60,7 +61,7 @@ class EEW2Records extends React.Component {
             exptoCsvTip:false,
             selectAll:false,
             resetAll:false,
-            postSelected:false,
+            generateOutput:false,
             publishW2:false,
             unpublishW2:false,
             printW2s:false,
@@ -75,7 +76,8 @@ class EEW2Records extends React.Component {
             cheader:'',
             cbody:'',
             showPDF: false,
-            title:''
+            title:'',
+            outputSuccess:false,
         };
     }
     hoverOn(){
@@ -108,17 +110,51 @@ class EEW2Records extends React.Component {
     printW2s(){
         alert('printW2s');
     }
-    postSelected(){
+    toggleSuccess(){
+        this.setState({
+            outputSuccess: !this.state.outputSuccess
+        });
+    }
+    generateOutput(){
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
         if(selIndexes.length >0){
+            var eew2recordInput ={  
+                "dataset":"00_EE_W2_DATA",
+                "isCorrection":false,
+                "w2RequestInputs":[  
+                   {  
+                      "transmitterid":"123456789",
+                      "companyId":"123456789",
+                      "empid":"123456789",
+                      "allRecs":true,
+                      "requestno":0
+                   }
+                ]
+             }
+
             selIndexes.forEach(index => {
                 let data = this.refs.eew2Grid.getrowdata(index);
-                alert('Selected for Post : '+ Object.values(data));
+                //alert('Selected for Post : '+ Object.values(data));
             });
+            this.props.actions.generateOutputs(eew2recordInput).then(response => {
+                this.state.source.localdata=this.props.eew2data.eew2ecords;
+                this.refs.eew2Grid.updatebounddata('data');
+                this.refs.eew2Grid.sortby('requestno', 'desc');
+                this.toggleSuccess();
+                this.interval = setInterval(this.tick.bind(this), 3000);
+                return response
+            }).catch(error => {
+                throw new SubmissionError(error)
+            })
         }else{
-            this.showAlert(true,'Post','Please select at least one payroll record to post.');
+            this.showAlert(true,'Post','Please select at least one employee record to generate output.');
         }
     }
+    tick(){
+        clearInterval(this.interval);
+        this.toggleSuccess();
+    }
+    
     deleteSelected(){
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
         if(selIndexes.length >0){
@@ -163,7 +199,7 @@ class EEW2Records extends React.Component {
     }
     togglePstSel(){
         this.setState({
-            postSelected: !this.state.postSelected
+            generateOutput: !this.state.generateOutput
         });
     }
     toggleUnPubW2Sel(){
@@ -337,6 +373,9 @@ class EEW2Records extends React.Component {
                 <Alert color="primary">
                     {data.filterlabel}
                 </Alert>
+                <Alert color="success" isOpen={this.state.outputSuccess}>
+                    Employee W2 Output Generated Successfully!
+                </Alert>
                 <a href="#"  style={divStyleFirst}  onClick={() => this.selectAllClk()} id="selectAllid"><i class='fas fa-check-square fa-lg'></i></a>
                 <Tooltip placement="top" isOpen={this.state.selectAll} target="selectAllid" toggle={this.toggleSelAll}>
                     Select All
@@ -361,8 +400,8 @@ class EEW2Records extends React.Component {
                 <Tooltip placement="top" isOpen={this.state.deleSelected} target="deleteSelected" toggle={this.toggleDelSel}>
                     Generate W2 Correction
                 </Tooltip> 
-                <a href="#" style={divStyleR} onClick={() => this.postSelected()} id="postSelected"><i class='fas fa-calculator fa-lg'></i></a>
-                <Tooltip placement="right" isOpen={this.state.postSelected} target="postSelected" toggle={this.togglePstSel}>
+                <a href="#" style={divStyleR} onClick={() => this.generateOutput()} id="generateOutput"><i class='fas fa-calculator fa-lg'></i></a>
+                <Tooltip placement="right" isOpen={this.state.generateOutput} target="generateOutput" toggle={this.togglePstSel}>
                     Generate W2
                 </Tooltip>
                 <JqxGrid ref='eew2Grid'

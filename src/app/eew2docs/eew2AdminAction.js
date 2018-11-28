@@ -11,7 +11,7 @@ export function loadEEW2Records(eew2data) {
             if(eew2ecords.status && eew2ecords.message){
                 let arr = [];
                 arr.push([]);
-                dispatch(loadEEW2RecordsSuccessFailed(arr));
+                dispatch(loadEEW2RecordsFailed(arr));
                 throw eew2ecords;
             }else{
                 if(eew2ecords){
@@ -27,7 +27,7 @@ export function loadEEW2Records(eew2data) {
 export function loadEEW2RecordsSuccess(eew2data) {
     return { type: types.GET_EEW2RECORDS_SUCCESS, eew2data };
 }
-export function loadEEW2RecordsSuccessFailed(eew2data) {
+export function loadEEW2RecordsFailed(eew2data) {
     return { type: types.GET_EEW2RECORDS_ERROR, eew2data };
 }
 export function getEEW2Pdf(dataset, reqNo, fein, empId) {
@@ -53,6 +53,31 @@ export function getEEW2PdfSuccess(eew2pdf) {
 }
 export function getEEW2PdfError(eew2pdf) {
     return { type: types.GET_EEW2PDF_ERROR, eew2pdf };
+}
+export function generateOutputs(eew2recordInput) {
+    return function (dispatch, getState) {
+        const state = getState();
+        return eew2AdminAPI.generateOutputs(eew2recordInput).then(eew2ecords => {
+            if(eew2ecords.status && eew2ecords.message){
+                let arr = [];
+                arr.push([]);
+                dispatch(generateOutputsFailed(arr));
+                throw eew2ecords;
+            }else{
+                if(eew2ecords){
+                   dispatch(generateOutputsSuccess(eew2ecords));
+                }
+            }
+        }).catch(error => {
+            generateAppErrorEvent(error.type,error.status,error.message,error);
+        });
+    };
+}
+export function generateOutputsSuccess(eew2ecords) {
+    return { type: types.POST_GENERATE_OUTPUTS_SUCCESS, eew2ecords };
+}
+export function generateOutputsFailed(eew2ecords) {
+    return { type: types.POST_GENERATE_OUTPUTS_ERROR, eew2ecords };
 }
 export function testaction(periodicdata) {
     return {type:'TESTACTION', periodicdata};

@@ -33,9 +33,17 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         eew2pdf: {}
       });
     }
-    case 'TESTACTION':{
-      console.log('Inside action...');
-      return state;    
+    case types.POST_GENERATE_OUTPUTS_SUCCESS:{
+      return Object.assign({}, ...state, {
+        filtertype:state.filtertype,
+        filterby:state.filterby,
+        startdt:state.startdt,
+        enddate:state.enddate,
+        viewtype:state.viewtype,
+        filterlabel:state.filterlabel,
+        eew2ecords: Object.assign([], ...state.eew2ecords, action.eew2ecords),
+        eew2pdf: {} 
+      });
     }
     default: 
       return state;

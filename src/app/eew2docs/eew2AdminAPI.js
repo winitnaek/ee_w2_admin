@@ -19,7 +19,7 @@ class eew2AdminAPI {
           return response.json();
         }else{
           var errorCode =  response.status;
-          var errorMsg  =  'Unable to EE W2 Admin Records. '+ADMIN_ERROR_MSG;
+          var errorMsg  =  'Unable to get EE W2 Admin Records. '+ADMIN_ERROR_MSG;
           return new AppError(errorMsg, errorCode);
         } 
       })
@@ -43,6 +43,30 @@ class eew2AdminAPI {
     }).catch(error => {
       return error;
     });
+  }
+  static generateOutputs(eew2recordInput) {
+    let tt = JSON.stringify(eew2recordInput);
+    var svcs_url = `${svcs.POST_GENERATE_OUTPUTS}`;
+    return fetch(URLUtils.buildURL(svcs_url), {
+      method: 'POST',
+      body: tt,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin'
+    })
+      .then(response => {
+        if(response.ok){
+          return response.json();
+        }else{
+          var errorCode =  response.status;
+          var errorMsg  =  'Unable to post EE W2 Generate Outputs. '+ADMIN_ERROR_MSG;
+          return new AppError(errorMsg, errorCode);
+        } 
+      })
+      .catch(error => {
+        return error;
+      });
   }
 }
 export default eew2AdminAPI;
