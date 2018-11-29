@@ -78,6 +78,7 @@ class EEW2Records extends React.Component {
             showPDF: false,
             title:'',
             outputSuccess:false,
+            outputMessage:false,
         };
     }
     hoverOn(){
@@ -110,9 +111,10 @@ class EEW2Records extends React.Component {
     printW2s(){
         alert('printW2s');
     }
-    toggleSuccess(){
+    toggleSuccess(message){
         this.setState({
-            outputSuccess: !this.state.outputSuccess
+            outputSuccess: !this.state.outputSuccess,
+            outputMessage:message
         });
     }
     generateOutput(){
@@ -131,36 +133,65 @@ class EEW2Records extends React.Component {
                    }
                 ]
              }
-
             selIndexes.forEach(index => {
                 let data = this.refs.eew2Grid.getrowdata(index);
                 //alert('Selected for Post : '+ Object.values(data));
             });
             this.props.actions.generateOutputs(eew2recordInput).then(response => {
                 this.state.source.localdata=this.props.eew2data.eew2ecords;
+                this.refs.eew2Grid.clearselection();
                 this.refs.eew2Grid.updatebounddata('data');
                 this.refs.eew2Grid.sortby('requestno', 'desc');
-                this.toggleSuccess();
+                this.toggleSuccess('Employee W2 Output Generated Successfully!');
                 this.interval = setInterval(this.tick.bind(this), 3000);
                 return response
             }).catch(error => {
                 throw new SubmissionError(error)
             })
         }else{
-            this.showAlert(true,'Post','Please select at least one employee record to generate output.');
+            this.showAlert(true,'Generate W2','Please select at least one employee record to generate output.');
         }
     }
     tick(){
         clearInterval(this.interval);
-        this.toggleSuccess();
+        this.toggleSuccess('');
     }
     
-    deleteSelected(){
+    generateOutputCorrection(){
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
         if(selIndexes.length >0){
-            this.showConfirm(true,'Confirm?', 'Are you sure you want to delete payroll record(s)?');
+            //this.showConfirm(true,'Confirm?', 'Are you sure you want to W2 correction(s)?');
+            var eew2recordInput ={  
+                "dataset":"00_EE_W2_DATA",
+                "isCorrection":true,
+                "w2RequestInputs":[  
+                   {  
+                      "transmitterid":"123456789",
+                      "companyId":"123456789",
+                      "empid":"123456789",
+                      "allRecs":true,
+                      "requestno":0
+                   }
+                ]
+             }
+            selIndexes.forEach(index => {
+                let data = this.refs.eew2Grid.getrowdata(index);
+                //alert('Selected for Post : '+ Object.values(data));
+            });
+            this.props.actions.generateOutputs(eew2recordInput).then(response => {
+                this.state.source.localdata=this.props.eew2data.eew2ecords;
+                this.refs.eew2Grid.clearselection();
+                this.refs.eew2Grid.updatebounddata('data');
+                this.refs.eew2Grid.sortby('requestno', 'desc');
+                this.toggleSuccess('Employee W2 Correction Generated Successfully!');
+                this.interval = setInterval(this.tick.bind(this), 3000);
+                return response
+            }).catch(error => {
+                throw new SubmissionError(error)
+            })
+            
         }else{
-            this.showAlert(true,'Delete','Please select at least one payroll record to delete.');
+            this.showAlert(true,'Generate W2 Correction','Please select at least one employee record for W2 correction.');
         }
     }
     showConfirm(cshow, cheader, cbody){
@@ -374,7 +405,7 @@ class EEW2Records extends React.Component {
                     {data.filterlabel}
                 </Alert>
                 <Alert color="success" isOpen={this.state.outputSuccess}>
-                    Employee W2 Output Generated Successfully!
+                    {this.state.outputMessage}
                 </Alert>
                 <a href="#"  style={divStyleFirst}  onClick={() => this.selectAllClk()} id="selectAllid"><i class='fas fa-check-square fa-lg'></i></a>
                 <Tooltip placement="top" isOpen={this.state.selectAll} target="selectAllid" toggle={this.toggleSelAll}>
@@ -396,8 +427,8 @@ class EEW2Records extends React.Component {
                 <Tooltip placement="right" isOpen={this.state.publishW2} target="publishW2" toggle={this.togglePubW2Sel}>
                    Publish W2
                 </Tooltip>
-                <a href="#" style={divStyleR} onClick={() => this.deleteSelected()} id="deleteSelected"><i class='fas fa-calendar-check fa-lg'></i></a>
-                <Tooltip placement="top" isOpen={this.state.deleSelected} target="deleteSelected" toggle={this.toggleDelSel}>
+                <a href="#" style={divStyleR} onClick={() => this.generateOutputCorrection()} id="generateOutputCorrection"><i class='fas fa-calendar-check fa-lg'></i></a>
+                <Tooltip placement="top" isOpen={this.state.deleSelected} target="generateOutputCorrection" toggle={this.toggleDelSel}>
                     Generate W2 Correction
                 </Tooltip> 
                 <a href="#" style={divStyleR} onClick={() => this.generateOutput()} id="generateOutput"><i class='fas fa-calculator fa-lg'></i></a>
