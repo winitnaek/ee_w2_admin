@@ -68,5 +68,29 @@ class eew2AdminAPI {
         return error;
       });
   }
+  static publishUnpublishEEW2Records(eew2recordInput) {
+    let tt = JSON.stringify(eew2recordInput);
+    var svcs_url = `${svcs.POST_PUBUNPUB_RECORDS}`;
+    return fetch(URLUtils.buildURL(svcs_url), {
+      method: 'POST',
+      body: tt,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin'
+    })
+      .then(response => {
+        if(response.ok){
+          return response.json();
+        }else{
+          var errorCode =  response.status;
+          var errorMsg  =  'Unable to Publish or Unpublish EE W2 Records. '+ADMIN_ERROR_MSG;
+          return new AppError(errorMsg, errorCode);
+        } 
+      })
+      .catch(error => {
+        return error;
+      });
+  }
 }
 export default eew2AdminAPI;

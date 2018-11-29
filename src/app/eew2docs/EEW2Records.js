@@ -103,10 +103,74 @@ class EEW2Records extends React.Component {
         this.refs.eew2Grid.clearselection();
     }
     unpublishW2(){
-        alert('unpublishW2');
+        let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
+        if(selIndexes.length >0){
+            var eew2recordInput ={
+                "dataset": "00_EE_W2_DATA",
+                "toUnpublish": true,
+                "w2RequestInputs": [
+                  {
+                    "transmitterid": "123456789",
+                    "companyId": "123456789",
+                    "empid": "123456789",
+                    "allRecs": true,
+                    "requestno": 0
+                  }
+                ]
+              }
+            selIndexes.forEach(index => {
+                let data = this.refs.eew2Grid.getrowdata(index);
+                //alert('Selected for Post : '+ Object.values(data));
+            });
+            this.props.actions.publishUnpublishEEW2Records(eew2recordInput).then(response => {
+                this.state.source.localdata=this.props.eew2data.eew2ecords;
+                this.refs.eew2Grid.clearselection();
+                this.refs.eew2Grid.updatebounddata('data');
+                this.refs.eew2Grid.sortby('requestno', 'desc');
+                this.toggleSuccess('Employee W2 Output Un-Published Successfully!');
+                this.interval = setInterval(this.tick.bind(this), 3000);
+                return response
+            }).catch(error => {
+                throw new SubmissionError(error)
+            })
+        }else{
+            this.showAlert(true,'Publish W2','Please select at least one employee record to Un-Publish W2 output.');
+        }
      }
     publishW2(){
-       alert('publishW2');
+        let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
+        if(selIndexes.length >0){
+            var eew2recordInput ={
+                "dataset": "00_EE_W2_DATA",
+                "toUnpublish": false,
+                "w2RequestInputs": [
+                  {
+                    "transmitterid": "123456789",
+                    "companyId": "123456789",
+                    "empid": "123456789",
+                    "allRecs": true,
+                    "requestno": 0
+                  }
+                ]
+              }
+            selIndexes.forEach(index => {
+                let data = this.refs.eew2Grid.getrowdata(index);
+                //alert('Selected for Post : '+ Object.values(data));
+            });
+            this.props.actions.publishUnpublishEEW2Records(eew2recordInput).then(response => {
+                this.state.source.localdata=this.props.eew2data.eew2ecords;
+                this.refs.eew2Grid.clearselection();
+                this.refs.eew2Grid.updatebounddata('data');
+                this.refs.eew2Grid.sortby('requestno', 'desc');
+                this.toggleSuccess('Employee W2 Output Published Successfully!');
+                this.interval = setInterval(this.tick.bind(this), 3000);
+                return response
+            }).catch(error => {
+                throw new SubmissionError(error)
+            })
+        }else{
+            this.showAlert(true,'Publish W2','Please select at least one employee record to Publish W2 output.');
+        }
     }
     printW2s(){
         alert('printW2s');

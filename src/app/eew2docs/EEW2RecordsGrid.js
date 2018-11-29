@@ -4,7 +4,7 @@ import { Alert } from 'reactstrap';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import EEW2Records from './EEW2Records'
-import {getEEW2Pdf,generateOutputs}  from './eew2AdminAction';
+import {getEEW2Pdf,generateOutputs,publishUnpublishEEW2Records}  from './eew2AdminAction';
 
 class EEW2RecordsGrid extends React.Component {
     renderGrid(eew2data){
@@ -29,6 +29,6 @@ function mapStateToProps(state) {
     }
 }
 function mapDispatchToProps(dispatch) {
-    return { actions: bindActionCreators({getEEW2Pdf,generateOutputs}, dispatch) }
+    return { actions: bindActionCreators({getEEW2Pdf,generateOutputs,publishUnpublishEEW2Records}, dispatch) }
  }
 export default connect(mapStateToProps,mapDispatchToProps, null, { withRef: true })(EEW2RecordsGrid);

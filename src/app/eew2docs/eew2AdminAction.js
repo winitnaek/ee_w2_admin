@@ -79,6 +79,28 @@ export function generateOutputsSuccess(eew2ecords) {
 export function generateOutputsFailed(eew2ecords) {
     return { type: types.POST_GENERATE_OUTPUTS_ERROR, eew2ecords };
 }
-export function testaction(periodicdata) {
-    return {type:'TESTACTION', periodicdata};
+export function publishUnpublishEEW2Records(eew2recordInput) {
+    return function (dispatch, getState) {
+        const state = getState();
+        return eew2AdminAPI.publishUnpublishEEW2Records(eew2recordInput).then(eew2ecords => {
+            if(eew2ecords.status && eew2ecords.message){
+                let arr = [];
+                arr.push([]);
+                dispatch(publishUnpublishEEW2Failed(arr));
+                throw eew2ecords;
+            }else{
+                if(eew2ecords){
+                   dispatch(publishUnpublishEEW2Success(eew2ecords));
+                }
+            }
+        }).catch(error => {
+            generateAppErrorEvent(error.type,error.status,error.message,error);
+        });
+    };
+}
+export function publishUnpublishEEW2Success(eew2ecords) {
+    return { type: types.POST_PUBUNPUB_OUTPUTS_SUCCESS, eew2ecords };
+}
+export function publishUnpublishEEW2Failed(eew2ecords) {
+    return { type: types.POST_PUBUNPUB_OUTPUTS_ERROR, eew2ecords };
 }
