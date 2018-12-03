@@ -135,7 +135,6 @@ class EEW2Records extends React.Component {
                 this.refs.eew2Grid.sortby('requestno', 'desc');
                 this.toggleSuccess('Employee W2 Output Un-Published Successfully!');
                 this.interval = setInterval(this.tick.bind(this), 3000);
-                //alert(this.props.isoutinprogress);
                 return response
             }).catch(error => {
                 throw new SubmissionError(error)
