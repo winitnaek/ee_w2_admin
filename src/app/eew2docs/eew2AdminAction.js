@@ -2,6 +2,13 @@ import * as types from '../../base/constants/ActionTypes'
 import eew2AdminAPI from './eew2AdminAPI';
 import {generateAppErrorEvent} from '../../base/utils/AppErrorEvent';
 export function loadPeriodicData(eew2data) {
+    return function (dispatch, getState) {
+        const state = getState();
+        dispatch(loadInitData(eew2data));
+        dispatch(isOutputGenerationSuccess(false));
+    }
+}
+export function loadInitData(eew2data) {
     return {type:types.LOAD_EEW2_DATA,eew2data};
 }
 export function loadEEW2Records(eew2data) {
@@ -103,4 +110,29 @@ export function publishUnpublishEEW2Success(eew2ecords) {
 }
 export function publishUnpublishEEW2Failed(eew2ecords) {
     return { type: types.POST_PUBUNPUB_OUTPUTS_ERROR, eew2ecords };
+}
+export function isOutputGenerationInprogress(dataset) {
+    return function (dispatch, getState) {
+        const state = getState();
+        return eew2AdminAPI.isOutputGenerationInprogress(dataset).then(outputgeninprogress => {
+            if(outputgeninprogress.status && outputgeninprogress.message){
+                let arr = [];
+                arr.push([]);
+                dispatch(isOutputGenerationSuccessFailed(arr));
+                throw outputgeninprogress;
+            }else{
+                if(outputgeninprogress){
+                   dispatch(isOutputGenerationSuccess(outputgeninprogress));
+                }
+            }
+        }).catch(error => {
+            generateAppErrorEvent(error.type,error.status,error.message,error);
+        });
+    };
+}
+export function isOutputGenerationSuccess(outputgeninprogress) {
+    return { type: types.POST_OUTPUTGEN_INPROGRESS_SUCCESS, outputgeninprogress };
+}
+export function isOutputGenerationSuccessFailed(outputgeninprogress) {
+    return { type: types.POST_OUTPUTGEN_INPROGRESS_ERROR, outputgeninprogress };
 }

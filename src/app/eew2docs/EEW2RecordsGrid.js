@@ -4,12 +4,12 @@ import { Alert } from 'reactstrap';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import EEW2Records from './EEW2Records'
-import {getEEW2Pdf,generateOutputs,publishUnpublishEEW2Records}  from './eew2AdminAction';
+import {getEEW2Pdf,generateOutputs,publishUnpublishEEW2Records,isOutputGenerationInprogress}  from './eew2AdminAction';
 
 class EEW2RecordsGrid extends React.Component {
     renderGrid(eew2data){
         if(eew2data && eew2data.eew2ecords && eew2data.eew2ecords.length >0){
-            return(<EEW2Records eew2data={this.props.eew2data} actions={this.props.actions}/>);
+            return(<EEW2Records eew2data={this.props.eew2data} isoutinprogress={this.props.isoutinprogress} actions={this.props.actions}/>);
         }else {
             return(<div>
                 <Alert color="primary">
@@ -25,10 +25,11 @@ class EEW2RecordsGrid extends React.Component {
 };
 function mapStateToProps(state) {
     return {
-        eew2data: state.eew2data
+        eew2data: state.eew2data,
+        isoutinprogress: state.outputgeninprogress
     }
 }
 function mapDispatchToProps(dispatch) {
-    return { actions: bindActionCreators({getEEW2Pdf,generateOutputs,publishUnpublishEEW2Records}, dispatch) }
+    return { actions: bindActionCreators({getEEW2Pdf,generateOutputs,publishUnpublishEEW2Records,isOutputGenerationInprogress}, dispatch) }
  }
 export default connect(mapStateToProps,mapDispatchToProps, null, { withRef: true })(EEW2RecordsGrid);

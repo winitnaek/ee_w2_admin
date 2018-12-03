@@ -55,6 +55,7 @@ class EEW2Records extends React.Component {
             this.handleConfirmCancel = this.handleConfirmCancel.bind(this);
             this.handleHidePDF = this.handleHidePDF.bind(this);
             this.handleShowPDF = this.handleShowPDF.bind(this);
+            this.handleInProgress = this.handleInProgress.bind(this);
         this.state = {
             source: source,
             exptoExlTip:false,
@@ -80,6 +81,11 @@ class EEW2Records extends React.Component {
             outputSuccess:false,
             outputMessage:false,
         };
+        this.interval = setInterval(this.handleInProgress.bind(this), 60000);
+    }
+    handleInProgress(){
+        let dataset ="00_EE_W2_DATA";
+        this.props.actions.isOutputGenerationInprogress(dataset)
     }
     hoverOn(){
         this.setState({ hover: true });
@@ -129,6 +135,7 @@ class EEW2Records extends React.Component {
                 this.refs.eew2Grid.sortby('requestno', 'desc');
                 this.toggleSuccess('Employee W2 Output Un-Published Successfully!');
                 this.interval = setInterval(this.tick.bind(this), 3000);
+                //alert(this.props.isoutinprogress);
                 return response
             }).catch(error => {
                 throw new SubmissionError(error)
@@ -172,6 +179,7 @@ class EEW2Records extends React.Component {
             this.showAlert(true,'Publish W2','Please select at least one employee record to Publish W2 output.');
         }
     }
+    
     printW2s(){
         alert('printW2s');
     }
@@ -513,6 +521,7 @@ class EEW2Records extends React.Component {
                 <Tooltip placement="right" isOpen={this.state.exptoCsvTip} target="exportToCsv" toggle={this.toggleExpCsv}>
                     Export To CSV
                 </Tooltip>
+                {this.props.isoutinprogress ? (<span href="#"  style={divStyleR} id="inProgressSpinner"> <i class="fas fa-spinner fa-spin"></i> Output Generation is in Progress..</span>) : null}
                 {uiAlert}
                 {uiDelConfirm}
                 {this.state.showPDF ? (<ViewPDF view={this.state.showPDF} title={this.state.title} handleHidePDF={this.handleHidePDF} />) : null}

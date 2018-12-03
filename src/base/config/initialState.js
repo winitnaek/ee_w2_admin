@@ -1,4 +1,5 @@
 export default {
+  outputgeninprogress:false,
   eew2data: {
     filtertype: '',
     filterby: '',

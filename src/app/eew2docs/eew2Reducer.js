@@ -77,7 +77,7 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         enddate:state.enddate,
         viewtype:state.viewtype,
         filterlabel:state.filterlabel,
-        eew2ecords: [],
+        eew2ecords: Object.assign([], ...state.eew2ecords, state.eew2ecords),
         eew2pdf: {} 
       });
     }
