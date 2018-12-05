@@ -11,6 +11,12 @@ export function loadPeriodicData(eew2data) {
 export function loadInitData(eew2data) {
     return {type:types.LOAD_EEW2_DATA,eew2data};
 }
+export function loadCompData(compdata) {
+    return {type:types.LOAD_COMP_DATA,compdata};
+}
+export function loadPdfData(w2data){
+    return {type:types.LOAD_PDF_DATA,w2data};
+}
 export function loadEEW2Records(eew2data) {
     return function (dispatch, getState) {
         const state = getState();

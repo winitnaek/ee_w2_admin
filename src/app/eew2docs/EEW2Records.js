@@ -227,7 +227,25 @@ class EEW2Records extends React.Component {
         clearInterval(this.interval);
         this.toggleSuccess('');
     }
-    
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.w2data && nextProps.w2data.loadeew2) {
+            var w2data = {
+                loadeew2: false,
+                eew2id: ''
+            }
+            this.props.actions.loadPdfData(w2data);
+            let data = this.refs.eew2Grid.getrowdata(nextProps.w2data.eew2id);
+            this.handleShowPDF(data);
+        }else if(nextProps.compdata && nextProps.compdata.loadcomp){
+            var compdata = {
+                loadcomp:false,
+                compid:''
+              }
+            this.props.actions.loadCompData(compdata);
+            let data = this.refs.eew2Grid.getrowdata(nextProps.compdata.compid);
+            alert('Selected Company Data, load Company popup from there : '+ Object.values(data));
+        }
+    }
     generateOutputCorrection(){
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
         if(selIndexes.length >0){
@@ -425,20 +443,20 @@ class EEW2Records extends React.Component {
 
         let printrenderer = (row, column, value) => {
             if(value){
-                return '<div style="text-align:center;"><i class="fas fa-check"></i></div>';
+                return '<div style="text-align:center;padding-top:5px;" class="align-self-center align-middle"><i class="fas fa-check"></i></div>';
             }else{
                 return '';
             }
         }
         let pubrenderer= (row, column, value) => {
             if(value){
-                return '<div style="text-align:center;"><i class="fas fa-check"></i></div>';
+                return '<div style="text-align:center;padding-top:5px;" class="align-self-center align-middle"><i class="fas fa-check"></i></div>';
             }else{
                 return '';
             }
         }
         let formatssn = (row, column, value) => {
-            return '<div style="text-align:center;">XXX-XX-'+value.substring(5, 9)+'</div>';
+            return '<div style="text-align:center;padding-top:5px;" class="align-self-center align-middle">XXX-XX-'+value.substring(5, 9)+'</div>';
         }
         const getCompInfo = (id) => {
             alert(this.refs.eew2Grid.getrowdata(id).compFein);
@@ -449,17 +467,13 @@ class EEW2Records extends React.Component {
         }
         let columns =
             [
-                { text: 'Company Name', datafield: 'compName',  cellsalign: 'center',width: 'auto', align: 'center', columntype: 'button', cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
-                    return rowdata.compName;
-                   }, buttonclick: function (id) {
-                       getCompInfo(id);
-                   } ,filtertype: 'input'},
+                { text: 'Company Name', datafield: 'compName',  cellsalign: 'center',width: 'auto', align: 'center', cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
+                    return `<div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadCompData('${ndex}')}>${rowdata.compName}</button></div>`;
+                   },filtertype: 'input'},
                 { text: 'Run Date/Time', datafield: 'generatedDateTime', width: 'auto', cellsformat: 'MM-dd-yyyy hh:mm:00 tt', filtertype: 'range' },
-                { text: 'Employee Name', cellsalign: 'center', align: 'center',width: 'auto', columntype: 'button', cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
-                    return rowdata.empFname+' '+rowdata.empLname;
-                   }, buttonclick: function (id) {
-                       getEEW2PDF(id);
-                   } ,filtertype: 'input'},
+                { text: 'Employee Name', cellsalign: 'center', align: 'center',width: 'auto',cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
+                    return `<div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadPdfData('${ndex}')}>${rowdata.empFname+' '+rowdata.empLname}</button></div>`;
+                   },filtertype: 'input'},
                 { text: '  SSN  ', datafield: 'empId', cellsalign: 'center', align: 'center', width: 'auto', filtertype: 'input',cellsrenderer:formatssn},
                 { text: 'Published', datafield: 'isPublished',cellsalign: 'center', align: 'center', cellsrenderer: pubrenderer,  width: 'auto',filtertype: 'bool', },
                 { text: 'Printed', datafield: 'isPrinted', cellsalign: 'center', align: 'center', cellsrenderer: printrenderer, width: 'auto', filtertype: 'bool',},

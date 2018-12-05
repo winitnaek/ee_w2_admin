@@ -13,7 +13,7 @@ import * as rname from './base/constants/RenderNames';
 import * as manifest from '../build/_manifest';
 import * as c from './base/constants/IndexConstants';
 import {makeNavs,makeSearch} from './base/template/navGenerator';
-
+import {loadPdfData,loadCompData} from './app/eew2docs/eew2AdminAction';
 let store = configureStore();
 
 let usrobj = JSON.parse(sessionStorage.getItem('up'));
@@ -67,7 +67,21 @@ function setAppAnchor(elem){
 }
 function appAnchor(){
    return APP_ANCHOR;
- }
+}
+function onloadPdfData(id) {
+    var w2data = {
+        loadeew2: true,
+        eew2id: id
+    }
+    store.dispatch(loadPdfData(w2data));
+}
+function onloadCompData(id){
+    var compdata = {
+        loadcomp: true,
+        compid: id
+    }
+    store.dispatch(loadCompData(compdata));
+}
 
 const resolveTemplates = async () => {
     let response = await fetch('templates.html');
@@ -163,6 +177,12 @@ window.renderW2AdmApplication = renderW2AdmApplication;
 
 module.exports = appAnchor;
 window.appAnchor = appAnchor;
+
+module.exports = onloadPdfData;
+window.onloadPdfData = onloadPdfData;
+
+module.exports = onloadCompData;
+window.onloadCompData = onloadCompData;
 
 let yefIndex = {
     'resolveTemplates': resolveTemplates,
