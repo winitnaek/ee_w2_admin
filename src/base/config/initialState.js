@@ -6,7 +6,11 @@ export default {
     enddate: '',
     viewtype: '',
     filterlabel: '',
-    eew2pdf:{},
+    eew2pdf: {},
     eew2ecords: []
+  },
+  compdata: {
+    messages: [],
+    outputDoc: {}
   }
 }

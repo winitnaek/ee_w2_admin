@@ -1,4 +1,5 @@
 {
-    "/cfws/v1/EEW2AdminService/getEEW2Records/*":"/getEEW2Records",
-    "/cfws/v1/EEW2AdminService/getEEW2Pdf/*":"/getEEW2Pdf"
+    "/cfws/v1/EEW2AdminService/getRecords/*": "/getRecords",
+    "/cfws/v1/EEW2AdminService/getEEW2Pdf/*": "/getEEW2Pdf",
+    "/cfws/v1/EEW2AdminService/getAuditFiles/*": "/getAuditFiles"
 }

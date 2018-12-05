@@ -1,15 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Alert,Tooltip} from 'reactstrap';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
 import JqxButton from '../../deps/jqwidgets-react/react_jqxbuttons.js';
 import JqxButtonGroup from '../../deps/jqwidgets-react/react_jqxbuttongroup.js';
 import { RN_FILTER_PAYROLL_DATA } from '../../base/constants/RenderNames';
-import {divStyle,divStyleFirst,divStyleBot,divStyleFirstBot,divStyleR} from '../../base/constants/AppConstants';
+import {
+    divStyle,
+    divStyleFirst,
+    divStyleBot,
+    divStyleFirstBot,
+    divStyleR,
+    OUTPUT_CLIENT_SUM,
+    OUTPUT_CLIENT_DTL
+} from '../../base/constants/AppConstants';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import UIAlert from '../common/UIAlert';
 import UIConfirm from '../common/UIConfirm';
 import ViewPDF from '../common/ViewPDF';
+import ViewCompanyAuditFiles from '../comp_outputs/ViewCompanyAuditFiles';
+
 const viewer_path ='/pdfjs/web/viewer.html?file=';
 const viewer_url  = window.location.protocol+'//'+window.location.host+viewer_path;
 const dataset = 'test';
@@ -55,6 +67,8 @@ class EEW2Records extends React.Component {
             this.handleConfirmCancel = this.handleConfirmCancel.bind(this);
             this.handleHidePDF = this.handleHidePDF.bind(this);
             this.handleShowPDF = this.handleShowPDF.bind(this);
+            this.handleHideAuditPDF = this.handleHideAuditPDF.bind(this);
+            this.handleShowAuditPDF = this.handleShowAuditPDF.bind(this);
         this.state = {
             source: source,
             exptoExlTip:false,
@@ -77,7 +91,12 @@ class EEW2Records extends React.Component {
             cbody:'',
             showPDF: false,
             title:'',
-            outputSuccess:false,
+            outputSuccess: false,
+            showAudits: false,
+            audits: {
+                showClientKitSumPdf: false,
+                showClientKitDetPdf: false
+            }
         };
     }
     hoverOn(){
@@ -293,6 +312,37 @@ class EEW2Records extends React.Component {
             }
         });
     }
+    handleShowAuditPDF(rowdata, title, pdfType) {
+        let isSumPdf = (OUTPUT_CLIENT_SUM === pdfType);
+        let isDetPdf = (OUTPUT_CLIENT_DTL === pdfType);
+        this.setState({
+            title: (!title ? `Showing Viewable/Downloadable Artifacts for ${rowdata.compName}` : title),
+            audits: {
+                showClientKitSumPdf: isSumPdf,
+                showClientKitDetPdf: isDetPdf
+            },
+            showAudits: isSumPdf || isDetPdf
+        });
+    }
+    handleHideAuditPDF() {
+        this.setState({
+            audits: {
+                showClientKitSumPdf: false,
+                showClientKitDetPdf: false
+            },
+            showAudits: false
+        });
+    }
+    getOutputFilters() {
+        let reqNo = 123;
+        let compId = '123456789';
+        let outputFilters = {
+            "dataset": dataset,
+            "compId": compId,
+            "reqNo": reqNo
+        };
+        return outputFilters;
+    }
     renderPDFData(eew2pdf){
         var raw = window.atob(eew2pdf.docData);
         //var raw = window.atob(eew2pdf);
@@ -339,7 +389,8 @@ class EEW2Records extends React.Component {
             return '<div style="text-align:center;">XXX-XX-'+value.substring(5, 9)+'</div>';
         }
         const getCompInfo = (id) => {
-            alert(this.refs.eew2Grid.getrowdata(id).compFein);
+            let data =this.refs.eew2Grid.getrowdata(id);
+            this.handleShowAuditPDF(data, null, OUTPUT_CLIENT_SUM);
         }
         const getEEW2PDF = (id)=>{
             let data =this.refs.eew2Grid.getrowdata(id);
@@ -421,6 +472,9 @@ class EEW2Records extends React.Component {
                 {uiAlert}
                 {uiDelConfirm}
                 {this.state.showPDF ? (<ViewPDF view={this.state.showPDF} title={this.state.title} handleHidePDF={this.handleHidePDF} />) : null}
+                {this.state.showAudits ? (<ViewCompanyAuditFiles isOpen="true" title={this.state.title} view="true" actions={this.props.actions}
+                                                audits={this.state.audits} compdata={this.props.compdata} getOutputFilters={this.getOutputFilters} 
+                                                handleShowAuditPDF={this.handleShowAuditPDF} handleHideAuditPDF={this.handleHideAuditPDF} />) : null}
             </div>
         );
     }
