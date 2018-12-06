@@ -15,7 +15,7 @@ const put = 'PUT';
 /**
  * app router constants
  */
-const host  = 'http://ssdev01:'; // REST Web Service HOST 
+const host  = 'http://localhost:'; // REST Web Service HOST 
 const port  = '9090';            // REST Web Service PORT
 const username = 'CFWSUSERXXX';  // REST Web Service USER
 const password = 'CFWSUSERXXX';  // REST Web Service PASS

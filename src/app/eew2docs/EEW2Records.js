@@ -69,6 +69,8 @@ class EEW2Records extends React.Component {
             this.handleShowPDF = this.handleShowPDF.bind(this);
             this.handleHideAuditPDF = this.handleHideAuditPDF.bind(this);
             this.handleShowAuditPDF = this.handleShowAuditPDF.bind(this);
+            this.handleInProgress = this.handleInProgress.bind(this);
+            this.getCompInfo = this.getCompInfo.bind(this);
         this.state = {
             source: source,
             exptoExlTip:false,
@@ -93,11 +95,17 @@ class EEW2Records extends React.Component {
             title:'',
             outputSuccess: false,
             showAudits: false,
+            outputMessage: false,
             audits: {
                 showClientKitSumPdf: false,
                 showClientKitDetPdf: false
             }
         };
+        this.interval = setInterval(this.handleInProgress.bind(this), 60000);
+    }
+    handleInProgress(){
+        let dataset ="00_EE_W2_DATA";
+        this.props.actions.isOutputGenerationInprogress(dataset)
     }
     hoverOn(){
         this.setState({ hover: true });
@@ -121,17 +129,83 @@ class EEW2Records extends React.Component {
         this.refs.eew2Grid.clearselection();
     }
     unpublishW2(){
-        alert('unpublishW2');
+        let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
+        if(selIndexes.length >0){
+            var eew2recordInput ={
+                "dataset": "00_EE_W2_DATA",
+                "toUnpublish": true,
+                "w2RequestInputs": [
+                  {
+                    "transmitterid": "123456789",
+                    "companyId": "123456789",
+                    "empid": "123456789",
+                    "allRecs": true,
+                    "requestno": 0
+                  }
+                ]
+              }
+            selIndexes.forEach(index => {
+                let data = this.refs.eew2Grid.getrowdata(index);
+                //alert('Selected for Post : '+ Object.values(data));
+            });
+            this.props.actions.publishUnpublishEEW2Records(eew2recordInput).then(response => {
+                this.state.source.localdata=this.props.eew2data.eew2ecords;
+                this.refs.eew2Grid.clearselection();
+                this.refs.eew2Grid.updatebounddata('data');
+                this.refs.eew2Grid.sortby('requestno', 'desc');
+                this.toggleSuccess('Employee W2 Output Un-Published Successfully!');
+                this.interval = setInterval(this.tick.bind(this), 3000);
+                return response
+            }).catch(error => {
+                throw new SubmissionError(error)
+            })
+        }else{
+            this.showAlert(true,'Publish W2','Please select at least one employee record to Un-Publish W2 output.');
+        }
      }
     publishW2(){
-       alert('publishW2');
+        let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
+        if(selIndexes.length >0){
+            var eew2recordInput ={
+                "dataset": "00_EE_W2_DATA",
+                "toUnpublish": false,
+                "w2RequestInputs": [
+                  {
+                    "transmitterid": "123456789",
+                    "companyId": "123456789",
+                    "empid": "123456789",
+                    "allRecs": true,
+                    "requestno": 0
+                  }
+                ]
+              }
+            selIndexes.forEach(index => {
+                let data = this.refs.eew2Grid.getrowdata(index);
+                //alert('Selected for Post : '+ Object.values(data));
+            });
+            this.props.actions.publishUnpublishEEW2Records(eew2recordInput).then(response => {
+                this.state.source.localdata=this.props.eew2data.eew2ecords;
+                this.refs.eew2Grid.clearselection();
+                this.refs.eew2Grid.updatebounddata('data');
+                this.refs.eew2Grid.sortby('requestno', 'desc');
+                this.toggleSuccess('Employee W2 Output Published Successfully!');
+                this.interval = setInterval(this.tick.bind(this), 3000);
+                return response
+            }).catch(error => {
+                throw new SubmissionError(error)
+            })
+        }else{
+            this.showAlert(true,'Publish W2','Please select at least one employee record to Publish W2 output.');
+        }
     }
+    
     printW2s(){
         alert('printW2s');
     }
-    toggleSuccess(){
+    toggleSuccess(message){
         this.setState({
-            outputSuccess: !this.state.outputSuccess
+            outputSuccess: !this.state.outputSuccess,
+            outputMessage:message
         });
     }
     generateOutput(){
@@ -150,36 +224,84 @@ class EEW2Records extends React.Component {
                    }
                 ]
              }
-
             selIndexes.forEach(index => {
                 let data = this.refs.eew2Grid.getrowdata(index);
                 //alert('Selected for Post : '+ Object.values(data));
             });
             this.props.actions.generateOutputs(eew2recordInput).then(response => {
                 this.state.source.localdata=this.props.eew2data.eew2ecords;
+                this.refs.eew2Grid.clearselection();
                 this.refs.eew2Grid.updatebounddata('data');
                 this.refs.eew2Grid.sortby('requestno', 'desc');
-                this.toggleSuccess();
+                this.toggleSuccess('Employee W2 Output Generated Successfully!');
                 this.interval = setInterval(this.tick.bind(this), 3000);
                 return response
             }).catch(error => {
                 throw new SubmissionError(error)
             })
         }else{
-            this.showAlert(true,'Post','Please select at least one employee record to generate output.');
+            this.showAlert(true,'Generate W2','Please select at least one employee record to generate output.');
         }
     }
     tick(){
         clearInterval(this.interval);
-        this.toggleSuccess();
+        this.toggleSuccess('');
     }
-    
-    deleteSelected(){
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.w2data && nextProps.w2data.loadeew2) {
+            var w2data = {
+                loadeew2: false,
+                eew2id: ''
+            }
+            this.props.actions.loadPdfData(w2data);
+            let data = this.refs.eew2Grid.getrowdata(nextProps.w2data.eew2id);
+            this.handleShowPDF(data);
+        }else if(nextProps.compdata && nextProps.compdata.loadcomp){
+            var compdata = {
+                loadcomp:false,
+                compid:''
+              }
+            this.props.actions.loadCompData(compdata);
+            let data = this.refs.eew2Grid.getrowdata(nextProps.compdata.compid);
+            // alert('Selected Company Data, load Company popup from there : '+ Object.values(data));
+            this.getCompInfo(data);
+        }
+    }
+    generateOutputCorrection(){
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
         if(selIndexes.length >0){
-            this.showConfirm(true,'Confirm?', 'Are you sure you want to delete payroll record(s)?');
+            //this.showConfirm(true,'Confirm?', 'Are you sure you want to W2 correction(s)?');
+            var eew2recordInput ={  
+                "dataset":"00_EE_W2_DATA",
+                "isCorrection":true,
+                "w2RequestInputs":[  
+                   {  
+                      "transmitterid":"123456789",
+                      "companyId":"123456789",
+                      "empid":"123456789",
+                      "allRecs":true,
+                      "requestno":0
+                   }
+                ]
+             }
+            selIndexes.forEach(index => {
+                let data = this.refs.eew2Grid.getrowdata(index);
+                //alert('Selected for Post : '+ Object.values(data));
+            });
+            this.props.actions.generateOutputs(eew2recordInput).then(response => {
+                this.state.source.localdata=this.props.eew2data.eew2ecords;
+                this.refs.eew2Grid.clearselection();
+                this.refs.eew2Grid.updatebounddata('data');
+                this.refs.eew2Grid.sortby('requestno', 'desc');
+                this.toggleSuccess('Employee W2 Correction Generated Successfully!');
+                this.interval = setInterval(this.tick.bind(this), 3000);
+                return response
+            }).catch(error => {
+                throw new SubmissionError(error)
+            })
+            
         }else{
-            this.showAlert(true,'Delete','Please select at least one payroll record to delete.');
+            this.showAlert(true,'Generate W2 Correction','Please select at least one employee record for W2 correction.');
         }
     }
     showConfirm(cshow, cheader, cbody){
@@ -343,6 +465,9 @@ class EEW2Records extends React.Component {
         };
         return outputFilters;
     }
+    getCompInfo(data) {
+        this.handleShowAuditPDF(data, null, OUTPUT_CLIENT_SUM);
+    }
     renderPDFData(eew2pdf){
         var raw = window.atob(eew2pdf.docData);
         //var raw = window.atob(eew2pdf);
@@ -373,24 +498,20 @@ class EEW2Records extends React.Component {
 
         let printrenderer = (row, column, value) => {
             if(value){
-                return '<div style="text-align:center;"><i class="fas fa-check"></i></div>';
+                return '<div style="text-align:center;padding-top:5px;" class="align-self-center align-middle"><i class="fas fa-check"></i></div>';
             }else{
                 return '';
             }
         }
         let pubrenderer= (row, column, value) => {
             if(value){
-                return '<div style="text-align:center;"><i class="fas fa-check"></i></div>';
+                return '<div style="text-align:center;padding-top:5px;" class="align-self-center align-middle"><i class="fas fa-check"></i></div>';
             }else{
                 return '';
             }
         }
         let formatssn = (row, column, value) => {
-            return '<div style="text-align:center;">XXX-XX-'+value.substring(5, 9)+'</div>';
-        }
-        const getCompInfo = (id) => {
-            let data =this.refs.eew2Grid.getrowdata(id);
-            this.handleShowAuditPDF(data, null, OUTPUT_CLIENT_SUM);
+            return '<div style="text-align:center;padding-top:5px;" class="align-self-center align-middle">XXX-XX-'+value.substring(5, 9)+'</div>';
         }
         const getEEW2PDF = (id)=>{
             let data =this.refs.eew2Grid.getrowdata(id);
@@ -398,17 +519,13 @@ class EEW2Records extends React.Component {
         }
         let columns =
             [
-                { text: 'Company Name', datafield: 'compName',  cellsalign: 'center',width: 'auto', align: 'center', columntype: 'button', cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
-                    return rowdata.compName;
-                   }, buttonclick: function (id) {
-                       getCompInfo(id);
-                   } ,filtertype: 'input'},
+                { text: 'Company Name', datafield: 'compName',  cellsalign: 'center',width: 'auto', align: 'center', cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
+                    return `<div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadCompData('${ndex}')}>${rowdata.compName}</button></div>`;
+                   },filtertype: 'input'},
                 { text: 'Run Date/Time', datafield: 'generatedDateTime', width: 'auto', cellsformat: 'MM-dd-yyyy hh:mm:00 tt', filtertype: 'range' },
-                { text: 'Employee Name', cellsalign: 'center', align: 'center',width: 'auto', columntype: 'button', cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
-                    return rowdata.empFname+' '+rowdata.empLname;
-                   }, buttonclick: function (id) {
-                       getEEW2PDF(id);
-                   } ,filtertype: 'input'},
+                { text: 'Employee Name', cellsalign: 'center', align: 'center',width: 'auto',cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
+                    return `<div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadPdfData('${ndex}')}>${rowdata.empFname+' '+rowdata.empLname}</button></div>`;
+                   },filtertype: 'input'},
                 { text: '  SSN  ', datafield: 'empId', cellsalign: 'center', align: 'center', width: 'auto', filtertype: 'input',cellsrenderer:formatssn},
                 { text: 'Published', datafield: 'isPublished',cellsalign: 'center', align: 'center', cellsrenderer: pubrenderer,  width: 'auto',filtertype: 'bool', },
                 { text: 'Printed', datafield: 'isPrinted', cellsalign: 'center', align: 'center', cellsrenderer: printrenderer, width: 'auto', filtertype: 'bool',},
@@ -425,7 +542,7 @@ class EEW2Records extends React.Component {
                     {data.filterlabel}
                 </Alert>
                 <Alert color="success" isOpen={this.state.outputSuccess}>
-                    Employee W2 Output Generated Successfully!
+                    {this.state.outputMessage}
                 </Alert>
                 <a href="#"  style={divStyleFirst}  onClick={() => this.selectAllClk()} id="selectAllid"><i class='fas fa-check-square fa-lg'></i></a>
                 <Tooltip placement="top" isOpen={this.state.selectAll} target="selectAllid" toggle={this.toggleSelAll}>
@@ -447,8 +564,8 @@ class EEW2Records extends React.Component {
                 <Tooltip placement="right" isOpen={this.state.publishW2} target="publishW2" toggle={this.togglePubW2Sel}>
                    Publish W2
                 </Tooltip>
-                <a href="#" style={divStyleR} onClick={() => this.deleteSelected()} id="deleteSelected"><i class='fas fa-calendar-check fa-lg'></i></a>
-                <Tooltip placement="top" isOpen={this.state.deleSelected} target="deleteSelected" toggle={this.toggleDelSel}>
+                <a href="#" style={divStyleR} onClick={() => this.generateOutputCorrection()} id="generateOutputCorrection"><i class='fas fa-calendar-check fa-lg'></i></a>
+                <Tooltip placement="top" isOpen={this.state.deleSelected} target="generateOutputCorrection" toggle={this.toggleDelSel}>
                     Generate W2 Correction
                 </Tooltip> 
                 <a href="#" style={divStyleR} onClick={() => this.generateOutput()} id="generateOutput"><i class='fas fa-calculator fa-lg'></i></a>
@@ -469,11 +586,12 @@ class EEW2Records extends React.Component {
                 <Tooltip placement="right" isOpen={this.state.exptoCsvTip} target="exportToCsv" toggle={this.toggleExpCsv}>
                     Export To CSV
                 </Tooltip>
+                {this.props.isoutinprogress ? (<span href="#"  style={divStyleR} id="inProgressSpinner"> <i class="fas fa-spinner fa-spin"></i> Output Generation is in Progress..</span>) : null}
                 {uiAlert}
                 {uiDelConfirm}
                 {this.state.showPDF ? (<ViewPDF view={this.state.showPDF} title={this.state.title} handleHidePDF={this.handleHidePDF} />) : null}
                 {this.state.showAudits ? (<ViewCompanyAuditFiles isOpen="true" title={this.state.title} view="true" actions={this.props.actions}
-                                                audits={this.state.audits} compdata={this.props.compdata} getOutputFilters={this.getOutputFilters} 
+                                                audits={this.state.audits} viewcompdata={this.props.viewcompdata} getOutputFilters={this.getOutputFilters} 
                                                 handleShowAuditPDF={this.handleShowAuditPDF} handleHideAuditPDF={this.handleHideAuditPDF} />) : null}
             </div>
         );

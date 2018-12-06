@@ -1,7 +1,7 @@
 import * as types from '../../base/constants/ActionTypes';
 import initialState from '../../base/config/initialState';
 
-export default function compdataReducer(state = initialState.compdata, action) {
+export default function viewcompdataReducer(state = initialState.viewcompdata, action) {
   switch (action.type) {
     case types.GET_COMPANY_FILE_SUCCESS:
       {

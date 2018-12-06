@@ -1,4 +1,13 @@
 export default {
+  outputgeninprogress:false,
+  w2data:{
+    loadeew2:false,
+    eew2id:''
+  },
+  compdata:{
+    loadcomp:false,
+    compid:''
+  },
   eew2data: {
     filtertype: '',
     filterby: '',
@@ -9,7 +18,7 @@ export default {
     eew2pdf: {},
     eew2ecords: []
   },
-  compdata: {
+  viewcompdata: {
     messages: [],
     outputDoc: {}
   }

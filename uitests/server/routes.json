@@ -1,5 +1,9 @@
 {
-    "/cfws/v1/EEW2AdminService/getRecords/*": "/getRecords",
-    "/cfws/v1/EEW2AdminService/getEEW2Pdf/*": "/getEEW2Pdf",
-    "/cfws/v1/EEW2AdminService/getAuditFiles/*": "/getAuditFiles"
+    "/cfws/v1/EEW2AdminService/getRecords/*":"/getRecords",
+    "/cfws/v1/EEW2AdminService/getEEW2Pdf/*":"/getEEW2Pdf",
+    "/cfws/v1/EEW2AdminService/getAuditFiles/*": "/getAuditFiles",
+    "/cfws/v1/EEW2AdminService/getMessages/*": "/getMessages",
+    "/cfws/v1/EEW2AdminService/generateOutputs/*":"/generateOutputs",
+    "/cfws/v1/EEW2AdminService/publishUnpublishEEW2Records/*":"/publishUnpublishEEW2Records",
+    "/cfws/v1/EEW2AdminService/isOutputGenerationInprogress/*":"/isOutputGenerationInprogress"
 }

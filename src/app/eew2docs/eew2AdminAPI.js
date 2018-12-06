@@ -2,8 +2,7 @@ import * as svcs from '../../base/constants/ServiceUrls';
 import URLUtils from '../../base/utils/urlUtils';
 import AppError from '../../base/utils/AppError';
 import {ADMIN_ERROR_MSG} from '../../base/utils/AppErrorEvent';
-class eew2AdminAPI {
-  static geteew2records(eew2recordInput) {
+class eew2AdminAPI {  static geteew2records(eew2recordInput) {
     let tt = JSON.stringify(eew2recordInput);
     var svcs_url = `${svcs.GET_EEW2RECORDS}`;
     return fetch(URLUtils.buildURL(svcs_url), {
@@ -61,6 +60,54 @@ class eew2AdminAPI {
         }else{
           var errorCode =  response.status;
           var errorMsg  =  'Unable to post EE W2 Generate Outputs. '+ADMIN_ERROR_MSG;
+          return new AppError(errorMsg, errorCode);
+        } 
+      })
+      .catch(error => {
+        return error;
+      });
+  }
+  static publishUnpublishEEW2Records(eew2recordInput) {
+    let tt = JSON.stringify(eew2recordInput);
+    var svcs_url = `${svcs.POST_PUBUNPUB_RECORDS}`;
+    return fetch(URLUtils.buildURL(svcs_url), {
+      method: 'POST',
+      body: tt,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin'
+    })
+      .then(response => {
+        if(response.ok){
+          return response.json();
+        }else{
+          var errorCode =  response.status;
+          var errorMsg  =  'Unable to Publish or Unpublish EE W2 Records. '+ADMIN_ERROR_MSG;
+          return new AppError(errorMsg, errorCode);
+        } 
+      })
+      .catch(error => {
+        return error;
+      });
+  }
+  static isOutputGenerationInprogress(dataset) {
+    let paramurl = `${'?dataset='}${dataset}`;
+    var svcs_url = `${svcs.POST_ISOUTPUT_GEN_INPROGRESS}${paramurl}`;
+    
+    return fetch(URLUtils.buildURL(svcs_url), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin'
+    })
+      .then(response => {
+        if(response.ok){
+          return response.json();
+        }else{
+          var errorCode =  response.status;
+          var errorMsg  =  'Unable to Publish or Unpublish EE W2 Records. '+ADMIN_ERROR_MSG;
           return new AppError(errorMsg, errorCode);
         } 
       })

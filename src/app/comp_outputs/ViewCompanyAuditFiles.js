@@ -72,13 +72,13 @@ class ViewCompanyAuditFiles extends Component {
         this.props.actions.getAuditOutput(dataset, compId, reqNo, fileType).then(() => {
             console.log('Get Company Output Done.');
 
-            if (this.props.compdata.outputDoc) {
+            if (this.props.viewcompdata.outputDoc) {
                 if (OUTPUT_CLIENT_SUM === fileType || OUTPUT_CLIENT_DTL === fileType) {
-                    this.renderPDFData(this.props.compdata.outputDoc);
+                    this.renderPDFData(this.props.viewcompdata.outputDoc);
                 } else if (OUTPUT_AUDIT === fileType) {
-                    this.downloadAuditZip(this.props.compdata.outputDoc);
+                    this.downloadAuditZip(this.props.viewcompdata.outputDoc);
                 } else { // Messages
-                    this.renderMessages(this.props.compdata.messages);
+                    this.renderMessages(this.props.viewcompdata.messages);
                 }
             } else {
                 this.renderErrorPDF();
@@ -136,7 +136,7 @@ class ViewCompanyAuditFiles extends Component {
     }
     createMsgRows() {
         let rows = [];
-        this.props.compdata.messages.forEach(r => {
+        this.props.viewcompdata.messages.forEach(r => {
             rows.push(
             <tr>
                 <td>{r.msg}</td>
