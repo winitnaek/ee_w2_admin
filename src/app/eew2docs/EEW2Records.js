@@ -248,6 +248,7 @@ class EEW2Records extends React.Component {
         this.toggleSuccess('');
     }
     componentWillReceiveProps(nextProps) {
+        $('[data-toggle="tooltip"]').tooltip('hide');
         if (nextProps.w2data && nextProps.w2data.loadeew2) {
             var w2data = {
                 loadeew2: false,
