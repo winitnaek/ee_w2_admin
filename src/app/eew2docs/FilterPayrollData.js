@@ -80,16 +80,16 @@ class FilterPayrollData extends Component {
         var fLabel;
         var eew2data={};
         var eew2recordInput = {
-            "dataset": "abc",
+            "dataset": "00_EE_W2_DATA",
             "latestonly": true,
-            "year": 2018,
+            "year": 2017,
             "w2RequestInputs": [
                 {
                     "transmitterid": "123456789",
                     "companyId": "123456789",
                     "empid": "12345",
-                    "allRecs": false,
-                    "requestno": 123
+                    "allRecs": true,
+                    "requestno": 0
                 }
             ]
         };
