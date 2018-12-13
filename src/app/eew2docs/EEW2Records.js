@@ -248,8 +248,8 @@ class EEW2Records extends React.Component {
         this.toggleSuccess('');
     }
     componentWillReceiveProps(nextProps) {
-        $('[data-toggle="tooltip"]').tooltip('hide');
         if (nextProps.w2data && nextProps.w2data.loadeew2) {
+            //$('[data-toggle="tooltip"]').tooltip('hide');
             var w2data = {
                 loadeew2: false,
                 eew2id: ''
@@ -258,13 +258,13 @@ class EEW2Records extends React.Component {
             let data = this.refs.eew2Grid.getrowdata(nextProps.w2data.eew2id);
             this.handleShowPDF(data);
         }else if(nextProps.compdata && nextProps.compdata.loadcomp){
+            //$('[data-toggle="tooltip"]').tooltip('hide');
             var compdata = {
                 loadcomp:false,
                 compid:''
               }
             this.props.actions.loadCompData(compdata);
             let data = this.refs.eew2Grid.getrowdata(nextProps.compdata.compid);
-            // alert('Selected Company Data, load Company popup from there : '+ Object.values(data));
             this.getCompInfo(data);
         }
     }
@@ -370,10 +370,12 @@ class EEW2Records extends React.Component {
         }); 
     }
     componentDidMount() {
-        $('[data-toggle="tooltip"]').tooltip();
+        //$('.tooltipempw2').tooltip({trigger : 'hover'});
+        //$('.tooltipcomp2').tooltip({trigger : 'hover'});
     }
     componentDidUpdate(){
-        $('[data-toggle="tooltip"]').tooltip();
+        //$('.tooltipempw2').tooltip({trigger : 'hover'});
+        //$('.tooltipcomp2').tooltip({trigger : 'hover'});
     }
     hideUIAlert(){
         this.setState({
@@ -528,11 +530,11 @@ class EEW2Records extends React.Component {
         let columns =
             [
                 { text: 'Company Name', datafield: 'compName',  cellsalign: 'center',width: 'auto', align: 'center', cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
-                    return `<a href="#" data-toggle="tooltip" title="View Company Artifacts"><div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadCompData('${ndex}')}>${rowdata.compName}</button></div></a>`;
+                    return `<a href="#" data-toggle="tooltip" class="tooltipcomp2" title="View Company Artifacts"><div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadCompData('${ndex}')}>${rowdata.compName}</button></div></a>`;
                    },filtertype: 'input'},
                 { text: 'Run Date/Time', datafield: 'generatedDateTime', width: 'auto', cellsformat: 'MM-dd-yyyy hh:mm:00 tt', filtertype: 'range' },
                 { text: 'Employee Name', cellsalign: 'center', align: 'center',width: 'auto',cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
-                    return `<a href="#" data-toggle="tooltip" title="View W2 PDF"><div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadPdfData('${ndex}')}>${rowdata.empFname+' '+rowdata.empLname}</button></div></a>`;
+                    return `<a href="#" data-toggle="tooltip" class="tooltipempw2" title="View W2 PDF"><div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadPdfData('${ndex}')}>${rowdata.empFname+' '+rowdata.empLname}</button></div></a>`;
                    },filtertype: 'input'},
                 { text: '  SSN  ', datafield: 'empId', cellsalign: 'center', align: 'center', width: 'auto', filtertype: 'input',cellsrenderer:formatssn},
                 { text: 'Published', datafield: 'isPublished',cellsalign: 'center', align: 'center', cellsrenderer: pubrenderer,  width: 'auto',filtertype: 'bool', },
