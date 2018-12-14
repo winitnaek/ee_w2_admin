@@ -9,7 +9,7 @@ const APP_DIR = path.resolve(__dirname, 'src');
 
 module.exports = {
     entry: [
-        APP_DIR + '/ew2_index.js' // Your appʼs entry point
+        APP_DIR + '/w2a_index.js' // Your appʼs entry point
     ],
     output: {
         filename: 'w2AdminBundle.js',
