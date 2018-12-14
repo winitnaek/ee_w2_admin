@@ -12,7 +12,7 @@ module.exports = {
         APP_DIR + '/ew2_index.js' // Your appʼs entry point
     ],
     output: {
-        filename: 'eeW2AdmBundle.js',
+        filename: 'w2AdminBundle.js',
         path: path.resolve(__dirname, 'dist'),
         publicPath: '/'
     },

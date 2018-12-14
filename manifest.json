@@ -3,7 +3,7 @@
     "name": "W2Administration",
     "desc": "W2 Administration",
     "badge": "wa",
-    "bundleName": "eeW2AdmBundle.js",
+    "bundleName": "w2AdminBundle.js",
     "version": "1",
     "buildNo":"2018_12_12_WA",
     "renderFunction": "renderW2AdmApplication",
