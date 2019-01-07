@@ -142,3 +142,78 @@ export function isOutputGenerationSuccess(outputgeninprogress) {
 export function isOutputGenerationSuccessFailed(outputgeninprogress) {
     return { type: types.POST_OUTPUTGEN_INPROGRESS_ERROR, outputgeninprogress };
 }
+export function getTransmitters(dataset) {
+    return function (dispatch, getState) {
+        const state = getState();
+        return eew2AdminAPI.getTransmitters(dataset).then(transmitters => {
+            if(transmitters.status && transmitters.message){
+                let arr = [];
+                arr.push([]);
+                dispatch(getTransmittersFailed(arr));
+                throw transmitters;
+            }else{
+                if(transmitters){
+                   dispatch(getTransmittersSuccess(transmitters));
+                }
+            }
+        }).catch(error => {
+            generateAppErrorEvent(error.type,error.status,error.message,error);
+        });
+    };
+}
+export function getTransmittersSuccess(transmitters) {
+    return { type: types.GET_TRANSMITTER_SUCCESS, transmitters };
+}
+export function getTransmittersFailed(transmitters) {
+    return { type: types.GET_TRANSMITTER_ERROR, transmitters };
+}
+export function getCompaniesByTransmitter(dataset,tfein) {
+    return function (dispatch, getState) {
+        const state = getState();
+        return eew2AdminAPI.getCompaniesByTransmitter(dataset,tfein).then(tcompanies => {
+            if(tcompanies.status && tcompanies.message){
+                let arr = [];
+                arr.push([]);
+                dispatch(getCompaniesByTransmitterFailed(arr));
+                throw tcompanies;
+            }else{
+                if(tcompanies){
+                   dispatch(getCompaniesByTransmitterSuccess(tcompanies));
+                }
+            }
+        }).catch(error => {
+            generateAppErrorEvent(error.type,error.status,error.message,error);
+        });
+    };
+}
+export function getCompaniesByTransmitterSuccess(tcompanies) {
+    return { type: types.GET_COMP_BY_TRANSMITTER_SUCCESS, tcompanies };
+}
+export function getCompaniesByTransmitterFailed(tcompanies) {
+    return { type: types.GET_COMP_BY_TRANSMITTER_ERROR, tcompanies };
+}
+export function getEmployees(eedata) {
+    return function (dispatch, getState) {
+        const state = getState();
+        return eew2AdminAPI.getEmployees(eedata).then(cemployees => {
+            if(cemployees.status && cemployees.message){
+                let arr = [];
+                arr.push([]);
+                dispatch(getEmployeesFailed(arr));
+                throw cemployees;
+            }else{
+                if(cemployees){
+                   dispatch(getEmployeesSuccess(cemployees));
+                }
+            }
+        }).catch(error => {
+            generateAppErrorEvent(error.type,error.status,error.message,error);
+        });
+    };
+}
+export function getEmployeesSuccess(cemployees) {
+    return { type: types.GET_EMPLOYEES_SUCCESS, cemployees };
+}
+export function getEmployeesFailed(cemployees) {
+    return { type: types.GET_EMPLOYEES_ERROR, cemployees };
+}

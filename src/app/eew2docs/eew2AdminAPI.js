@@ -27,7 +27,7 @@ class eew2AdminAPI {  static geteew2records(eew2recordInput) {
       });
   }
   static getEEW2Pdf(dataset, reqNo, fein, empId) {
-    let paramurl = `${'?dataset='}${dataset}${'&ssn='}${empId}${'&fein='}${fein}${'&requestno='}${reqNo}`;
+    let paramurl = `${'?dataset='}${dataset}${'&empId='}${empId}${'&compId='}${fein}${'&requestno='}${reqNo}`;
     var svcs_url = `${svcs.GET_EE_W2_PDF_URL}${paramurl}`;
     return fetch(URLUtils.buildURL(svcs_url),{
         credentials: 'same-origin'
@@ -108,6 +108,78 @@ class eew2AdminAPI {  static geteew2records(eew2recordInput) {
         }else{
           var errorCode =  response.status;
           var errorMsg  =  'Unable to Publish or Unpublish EE W2 Records. '+ADMIN_ERROR_MSG;
+          return new AppError(errorMsg, errorCode);
+        } 
+      })
+      .catch(error => {
+        return error;
+      });
+  }
+  static getTransmitters(dataset) {
+    let paramurl = `${'?dataset='}${dataset}`;
+    var svcs_url = `${svcs.GET_TRANSMITTER}${paramurl}`;
+    
+    return fetch(URLUtils.buildURL(svcs_url), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin'
+    })
+      .then(response => {
+        if(response.ok){
+          return response.json();
+        }else{
+          var errorCode =  response.status;
+          var errorMsg  =  'Unable to Get Transmitters. '+ADMIN_ERROR_MSG;
+          return new AppError(errorMsg, errorCode);
+        } 
+      })
+      .catch(error => {
+        return error;
+      });
+  }
+  static getCompaniesByTransmitter(dataset,tfein) {
+    let paramurl = `${'?dataset='}${dataset}${'&tfein='}${tfein}`;
+    var svcs_url = `${svcs.GET_COMPANY_BY_TRANSMITTER}${paramurl}`;
+    
+    return fetch(URLUtils.buildURL(svcs_url), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin'
+    })
+      .then(response => {
+        if(response.ok){
+          return response.json();
+        }else{
+          var errorCode =  response.status;
+          var errorMsg  =  'Unable to Get Companies By Transmitter. '+ADMIN_ERROR_MSG;
+          return new AppError(errorMsg, errorCode);
+        } 
+      })
+      .catch(error => {
+        return error;
+      });
+  }
+  static getEmployees(eew2empInput) {
+    let tt = JSON.stringify(eew2empInput);
+    var svcs_url = `${svcs.POST_EMPLOYEES}`;
+    return fetch(URLUtils.buildURL(svcs_url), {
+      method: 'POST',
+      body: tt,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin'
+    })
+      .then(response => {
+        if(response.ok){
+          return response.json();
+        }else{
+          var errorCode =  response.status;
+          var errorMsg  =  'Unable to Get Employees. '+ADMIN_ERROR_MSG;
           return new AppError(errorMsg, errorCode);
         } 
       })
