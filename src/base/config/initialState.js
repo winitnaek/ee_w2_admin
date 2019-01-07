@@ -16,6 +16,7 @@ export default {
     viewtype: '',
     filterlabel: '',
     eew2pdf: {},
+    transmitters:[],
     eew2ecords: []
   },
   viewcompdata: {
