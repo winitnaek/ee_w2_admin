@@ -18,6 +18,9 @@ button {
     height: 60px;
     width: 120px;
 }
+.zindx{
+    z-index: 99;
+}
 .gridbtn {
     background-color:none; /* Blue background */
     border: none; /* Remove borders */
