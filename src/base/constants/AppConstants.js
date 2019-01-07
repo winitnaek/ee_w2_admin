@@ -1,3 +1,4 @@
+
 export const BY_CHECK_DATE = '1'
 export const BY_PAYROLLRUN_DATE = '2'
 
@@ -65,4 +66,20 @@ export const divPrnStyle = {
     fontSize: '24px',
     paddingTop:'10px',
     float:'right'
+};
+export const divStyleep = {
+    display: 'block',
+    paddingTop: '0.1em',
+    transition: 'all 0.3s ease',
+    textAling: 'center',
+    fontSize: '24px',
+    float: 'left',
+    marginLeft: '0px',
+    paddingLeft:'5px'
+};
+export const selZindx ={
+    zIndex:99
+};
+export const selZindx1 ={
+    zIndex:'90'
 };

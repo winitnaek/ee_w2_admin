@@ -5,3 +5,6 @@ export const GET_COMP_AUDIT_URL = '/getAuditFiles';
 export const GET_MESSAGES_URL = '/getMessages';
 export const POST_PUBUNPUB_RECORDS='/publishUnpublishEEW2Records/';
 export const POST_ISOUTPUT_GEN_INPROGRESS='/isOutputGenerationInprogress';
+export const GET_TRANSMITTER='/getTransmitters';
+export const GET_COMPANY_BY_TRANSMITTER='/getCompaniesByTransmitter';
+export const POST_EMPLOYEES='/getEmployees/';
