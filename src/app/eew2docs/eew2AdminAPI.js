@@ -26,8 +26,8 @@ class eew2AdminAPI {  static geteew2records(eew2recordInput) {
         return error;
       });
   }
-  static getEEW2Pdf(dataset, reqNo, fein, empId) {
-    let paramurl = `${'?dataset='}${dataset}${'&empId='}${empId}${'&compId='}${fein}${'&requestno='}${reqNo}`;
+  static getEEW2Pdf(dataset, reqNo, fein, empkey) {
+    let paramurl = `${'?dataset='}${dataset}${'&empkey='}${empkey}${'&compId='}${fein}${'&requestno='}${reqNo}`;
     var svcs_url = `${svcs.GET_EE_W2_PDF_URL}${paramurl}`;
     return fetch(URLUtils.buildURL(svcs_url),{
         credentials: 'same-origin'

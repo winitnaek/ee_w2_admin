@@ -22,6 +22,19 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         eew2pdf: {}, 
       });
     }
+    case types.GET_EEW2RECORDS_ERROR:{
+      return Object.assign({}, ...state, {
+        filtertype:action.eew2data.filtertype,
+        filterby:action.eew2data.filterby,
+        startdt:action.eew2data.startdt,
+        enddate:action.eew2data.enddate,
+        viewtype:action.eew2data.viewtype,
+        filterlabel:action.eew2data.filterlabel,
+        transmitters:action.eew2data.transmitters,
+        eew2ecords: Object.assign([], ...state.eew2ecords, action.eew2data.eew2ecords),
+        eew2pdf: {}, 
+      });
+    }
     case types.GET_EEW2PDF_SUCCESS: {
       return Object.assign({}, ...state, {
         filtertype:state.filtertype,
