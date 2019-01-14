@@ -24,11 +24,15 @@ import ViewCompanyAuditFiles from '../comp_outputs/ViewCompanyAuditFiles';
 
 const viewer_path ='/pdfjs/web/viewer.html?file=';
 const viewer_url  = window.location.protocol+'//'+window.location.host+viewer_path;
-const dataset = 'test';
+
+let usrobj = JSON.parse(sessionStorage.getItem('up'));
+console.log('usrobj ==============================>>> : '+usrobj);
+const dataset = '00_EE_W2_DATA';//usrobj.dataset;
+//console.log('dataset ==============================>>> : '+dataset);
 class EEW2Records extends React.Component {
     constructor(props) {
         super(props);
-        let data = this.props.eew2data
+        let data = this.props.eew2data.eew2ecords
         let source =
             {
                 datatype: "json",
@@ -44,7 +48,9 @@ class EEW2Records extends React.Component {
                     { name: 'isPublished', type: 'boolean' },
                     { name: 'isPrinted', type: 'boolean' },
                     { name: 'requestno', type: 'int' },
-                    { name: 'generatedDateTime', type: 'date' }
+                    { name: 'generatedDateTime', type: 'date' },
+                    { name: 'empkey', type: 'string' },
+                    { name: 'last4digits', type: 'string' }
                 ],
                 localdata: data
 
@@ -104,7 +110,6 @@ class EEW2Records extends React.Component {
         this.interval = setInterval(this.handleInProgress.bind(this), 60000);
     }
     handleInProgress(){
-        let dataset ="00_EE_W2_DATA";
         this.props.actions.isOutputGenerationInprogress(dataset)
     }
     hoverOn(){
@@ -130,7 +135,15 @@ class EEW2Records extends React.Component {
     }
     unpublishW2(){
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
-        if(selIndexes.length >0){
+        let publishCount=0;
+        selIndexes.forEach(index => {
+            let data = this.refs.eew2Grid.getrowdata(index);
+            if(data.isPublished==true){
+                publishCount++;
+            }
+        });
+
+        if(selIndexes.length >0 && publishCount >0){
             var eew2recordInput ={
                 "dataset": "00_EE_W2_DATA",
                 "toUnpublish": true,
@@ -144,31 +157,69 @@ class EEW2Records extends React.Component {
                   }
                 ]
               }
-            selIndexes.forEach(index => {
-                let data = this.refs.eew2Grid.getrowdata(index);
+              var eew2recordInpu1 ={  
+                "dataset":"CF_EEW2_1",
+                "toUnpublish":true,
+                "year":2018,
+                "w2RequestInputs":[  
+                   {  
+                      "transmitterid":"123456789",
+                      "companyId":"525012345",
+                      "empkey":"152C69D42036D1C33475D55F707FDEDE  ",
+                      "allRecs":false
+                   },
+                   {  
+                      "transmitterid":"581234567",
+                      "companyId":"225012345",
+                      "empkey":"152C69D42036D1C33475D55F707FDEDE  ",
+                      "allRecs":false,
+                      "requestno":0
+                   }
+                ]
+             }  
+              
+            //selIndexes.forEach(index => {
+            //    let data = this.refs.eew2Grid.getrowdata(index);
                 //alert('Selected for Post : '+ Object.values(data));
-            });
-            this.props.actions.publishUnpublishEEW2Records(eew2recordInput).then(response => {
+            //});
+            this.props.actions.publishUnpublishEEW2Records(eew2recordInpu1).then(response => {
+                selIndexes.forEach(index => {
+                    let data = this.refs.eew2Grid.getrowdata(index);
+                    this.props.eew2data.eew2ecords.forEach(function (emp) {
+                        if(data.compFein==emp.compFein && data.isPublished ==true && data.empkey == emp.empkey){
+                            emp.isPublished=false;
+                        }
+                    });
+                });
                 this.state.source.localdata=this.props.eew2data.eew2ecords;
                 this.refs.eew2Grid.clearselection();
                 this.refs.eew2Grid.updatebounddata('data');
-                this.refs.eew2Grid.sortby('requestno', 'desc');
+                //this.refs.eew2Grid.sortby('requestno', 'desc');
                 this.toggleSuccess('Employee W2 Output Un-Published Successfully!');
                 this.interval = setInterval(this.tick.bind(this), 3000);
                 return response
             }).catch(error => {
                 throw new SubmissionError(error)
             })
-        }else{
+        }else if(publishCount >0){
             this.showAlert(true,'Publish W2','Please select at least one employee record to Un-Publish W2 output.');
         }
      }
     publishW2(){
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
-        if(selIndexes.length >0){
-            var eew2recordInput ={
+        let unpublishCount=0;
+        selIndexes.forEach(index => {
+            let data = this.refs.eew2Grid.getrowdata(index);
+            if(data.isPublished ==false){
+                unpublishCount++;
+            }
+        });
+
+        if(selIndexes.length >0 && unpublishCount >0){
+            var eew2recordInput ={ // getting 0 for this input.
                 "dataset": "00_EE_W2_DATA",
                 "toUnpublish": false,
+                "year":2018,
                 "w2RequestInputs": [
                   {
                     "transmitterid": "123456789",
@@ -179,22 +230,47 @@ class EEW2Records extends React.Component {
                   }
                 ]
               }
-            selIndexes.forEach(index => {
-                let data = this.refs.eew2Grid.getrowdata(index);
-                //alert('Selected for Post : '+ Object.values(data));
-            });
-            this.props.actions.publishUnpublishEEW2Records(eew2recordInput).then(response => {
+
+              var eew2recordInpu1 ={  
+                "dataset":"CF_EEW2_1",
+                "toUnpublish":false,
+                "year":2018,
+                "w2RequestInputs":[  
+                   {  
+                      "transmitterid":"123456789",
+                      "companyId":"525012345",
+                      "empkey":"152C69D42036D1C33475D55F707FDEDE  ",
+                      "allRecs":false
+                   },
+                   {  
+                      "transmitterid":"581234567",
+                      "companyId":"225012345",
+                      "empkey":"152C69D42036D1C33475D55F707FDEDE  ",
+                      "allRecs":false,
+                      "requestno":0
+                   }
+                ]
+             }  
+            this.props.actions.publishUnpublishEEW2Records(eew2recordInpu1).then(response => {
+                selIndexes.forEach(index => {
+                    let data = this.refs.eew2Grid.getrowdata(index);
+                    this.props.eew2data.eew2ecords.forEach(function (emp) {
+                        if(data.compFein==emp.compFein && data.isPublished ==false && data.empkey == emp.empkey){
+                            emp.isPublished=true;
+                        }
+                    });
+                });
                 this.state.source.localdata=this.props.eew2data.eew2ecords;
                 this.refs.eew2Grid.clearselection();
                 this.refs.eew2Grid.updatebounddata('data');
-                this.refs.eew2Grid.sortby('requestno', 'desc');
+                //this.refs.eew2Grid.sortby('requestno', 'desc');
                 this.toggleSuccess('Employee W2 Output Published Successfully!');
                 this.interval = setInterval(this.tick.bind(this), 3000);
                 return response
             }).catch(error => {
                 throw new SubmissionError(error)
             })
-        }else{
+        }else if(unpublishCount > 0){
             this.showAlert(true,'Publish W2','Please select at least one employee record to Publish W2 output.');
         }
     }
@@ -290,6 +366,10 @@ class EEW2Records extends React.Component {
                 //alert('Selected for Post : '+ Object.values(data));
             });
             this.props.actions.generateOutputs(eew2recordInput).then(response => {
+
+                this.props.eew2data.eew2ecords.forEach(function (data) {
+                    alert(data);
+                });
                 this.state.source.localdata=this.props.eew2data.eew2ecords;
                 this.refs.eew2Grid.clearselection();
                 this.refs.eew2Grid.updatebounddata('data');
@@ -424,18 +504,22 @@ class EEW2Records extends React.Component {
             title: rowdata.empFname+' '+rowdata.empLname+ ' W2 PDF'
         })
         //this.renderPDFData(eew2pdf);
+        console.log('rowdata');
+        console.log(rowdata);
         
-        //let reqNo=rowdata.requestno;
-        //let fein =rowdata.compFein;
-        //let empId=rowdata.empId;
-        let reqNo=123;
-        let fein =123456789;
-        let empId=222333444;
+        let reqNo=rowdata.requestno;//226; //
+        let fein =rowdata.compFein;
+        let empId=rowdata.empkey;//'001907'; 
 
-        this.props.actions.getEEW2Pdf(dataset, reqNo, fein, empId).then((eew2pdf) => {
+        console.log('dataset : '+dataset+', reqNo : '+reqNo+', fein : '+fein+', empId : '+empId);
+        //let reqNo=123;
+        //let fein =123456789;
+        //let empId=222333444;
+
+        this.props.actions.getEEW2Pdf(dataset, reqNo, fein, empId).then(() => {
             if(this.props.eew2data.eew2pdf.docData){
                 this.renderPDFData(this.props.eew2data.eew2pdf);
-            }else if(this.props.yetaxDoc.type =='AppError'){
+            }else if(this.props.eew2data.eew2pdf.type =='AppError'){
                 this.renderErrorPDF(this.props.eew2data.eew2pdf);
             }
         });
@@ -490,7 +574,7 @@ class EEW2Records extends React.Component {
     }
     renderErrorPDF(yrEndTaxDoc) {
         var printFrame = document.getElementById('pdfi-frame');
-        let errorContent = `<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"></head><body><div class="alert alert-danger" style="margin:3px;" role="alert"><strong>Error: </strong>Unable to Get Year End Tax Document. Please contact your system administrator.</div></body></html>`;
+        let errorContent = `<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"></head><body><div class="alert alert-danger" style="margin:3px;" role="alert"><strong>Error: </strong>Unable to Load Employee W2 Document. Please contact your system administrator.</div></body></html>`;
         if (printFrame) {
             printFrame.height='100'
             printFrame.src = "data:text/html;charset=utf-8,"+errorContent
@@ -536,7 +620,7 @@ class EEW2Records extends React.Component {
                 { text: 'Employee Name', cellsalign: 'center', align: 'center',width: 'auto',cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
                     return `<a href="#" data-toggle="tooltip" class="tooltipempw2" title="View W2 PDF"><div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadPdfData('${ndex}')}>${rowdata.empFname+' '+rowdata.empLname}</button></div></a>`;
                    },filtertype: 'input'},
-                { text: '  SSN  ', datafield: 'empId', cellsalign: 'center', align: 'center', width: 'auto', filtertype: 'input',cellsrenderer:formatssn},
+                { text: '  SSN  ', datafield: 'last4digits', cellsalign: 'center', align: 'center', width: 'auto', filtertype: 'input'},
                 { text: 'Published', datafield: 'isPublished',cellsalign: 'center', align: 'center', cellsrenderer: pubrenderer,  width: 'auto',filtertype: 'bool', },
                 { text: 'Printed', datafield: 'isPrinted', cellsalign: 'center', align: 'center', cellsrenderer: printrenderer, width: 'auto', filtertype: 'bool',},
             ];
