@@ -6,6 +6,10 @@ export const OUTPUT_CLIENT_SUM = 'CLIENT_KIT_SUM';
 export const OUTPUT_CLIENT_DTL = 'CLIENT_KIT_DTL';
 export const OUTPUT_AUDIT = 'AUDIT';
 export const OUTPUT_MESSAGES = 'MESSAGES';
+export const OUTPUT_PRINT = 'PRINT';
+
+export const PDF_ANCHOR_ID = "pdfi-frame";
+export const NON_PDF_ANCHOR_ID = "nonpdf-anchor";
 
 export const divStyleFirst = {
     display: 'block',

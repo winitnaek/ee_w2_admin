@@ -85,11 +85,9 @@ class FilterPayrollData extends Component {
             "year": 2017,
             "w2RequestInputs": [
                 {
-                    "transmitterid": "123456789",
-                    "companyId": "123456789",
-                    "empid": "12345",
-                    "allRecs": true,
-                    "requestno": 0
+                    "transmitterid": "952023160",
+                    "companyId": "952023160",
+                    "allRecs": true
                 }
             ]
         };
