@@ -1,22 +1,8 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { Alert,Tooltip} from 'reactstrap';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
-import JqxButton from '../../deps/jqwidgets-react/react_jqxbuttons.js';
-import JqxButtonGroup from '../../deps/jqwidgets-react/react_jqxbuttongroup.js';
+import { Alert, Tooltip } from 'reactstrap';
+import { divStyle, divStyleBot, divStyleFirst, divStyleFirstBot, divStyleR, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, PDF_ANCHOR_ID } from '../../base/constants/AppConstants';
 import { RN_FILTER_PAYROLL_DATA } from '../../base/constants/RenderNames';
-import {
-    divStyle,
-    divStyleFirst,
-    divStyleBot,
-    divStyleFirstBot,
-    divStyleR,
-    OUTPUT_CLIENT_SUM,
-    OUTPUT_CLIENT_DTL
-} from '../../base/constants/AppConstants';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
 import UIAlert from '../common/UIAlert';
 import UIConfirm from '../common/UIConfirm';
 import ViewPDF from '../common/ViewPDF';
@@ -29,6 +15,7 @@ let usrobj = JSON.parse(sessionStorage.getItem('up'));
 console.log('usrobj ==============================>>> : '+usrobj);
 const dataset = '00_EE_W2_DATA';//usrobj.dataset;
 //console.log('dataset ==============================>>> : '+dataset);
+//const dataset = '00_EE_W2_DATA';
 class EEW2Records extends React.Component {
     constructor(props) {
         super(props);
@@ -75,8 +62,8 @@ class EEW2Records extends React.Component {
             this.handleShowPDF = this.handleShowPDF.bind(this);
             this.handleHideAuditPDF = this.handleHideAuditPDF.bind(this);
             this.handleShowAuditPDF = this.handleShowAuditPDF.bind(this);
+            this.handleShowMessages = this.handleShowMessages.bind(this);
             this.handleInProgress = this.handleInProgress.bind(this);
-            this.getCompInfo = this.getCompInfo.bind(this);
         this.state = {
             source: source,
             exptoExlTip:false,
@@ -341,7 +328,7 @@ class EEW2Records extends React.Component {
               }
             this.props.actions.loadCompData(compdata);
             let data = this.refs.eew2Grid.getrowdata(nextProps.compdata.compid);
-            this.getCompInfo(data);
+            this.handleShowMessages(data, null);
         }
     }
     generateOutputCorrection(){
@@ -524,6 +511,16 @@ class EEW2Records extends React.Component {
             }
         });
     }
+    handleShowMessages(rowdata, title) {
+        this.setState({
+            title: (!title ? `Showing Viewable/Downloadable Artifacts for ${rowdata.compName}` : title),
+            audits: {
+                showMessages: true,
+                inputParams: rowdata
+            },
+            showAudits: true
+        });
+    }
     handleShowAuditPDF(rowdata, title, pdfType) {
         let isSumPdf = (OUTPUT_CLIENT_SUM === pdfType);
         let isDetPdf = (OUTPUT_CLIENT_DTL === pdfType);
@@ -545,18 +542,13 @@ class EEW2Records extends React.Component {
             showAudits: false
         });
     }
-    getOutputFilters() {
-        let reqNo = 123;
-        let compId = '123456789';
+    getOutputFilters(inputParams) {
         let outputFilters = {
             "dataset": dataset,
-            "compId": compId,
-            "reqNo": reqNo
+            "compId": inputParams.compFein,
+            "reqNo": inputParams.requestno
         };
         return outputFilters;
-    }
-    getCompInfo(data) {
-        this.handleShowAuditPDF(data, null, OUTPUT_CLIENT_SUM);
     }
     renderPDFData(eew2pdf){
         var raw = window.atob(eew2pdf.docData);
@@ -570,11 +562,11 @@ class EEW2Records extends React.Component {
         var binaryData = [];
         binaryData.push(pdfAsArray);
         var dataPdf = window.URL.createObjectURL(new Blob(binaryData, {type: "application/pdf"}))
-        document.getElementById('pdfi-frame').setAttribute('src',viewer_url + encodeURIComponent(dataPdf));
+        document.getElementById(PDF_ANCHOR_ID).setAttribute('src',viewer_url + encodeURIComponent(dataPdf));
     }
     renderErrorPDF(yrEndTaxDoc) {
-        var printFrame = document.getElementById('pdfi-frame');
-        let errorContent = `<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"></head><body><div class="alert alert-danger" style="margin:3px;" role="alert"><strong>Error: </strong>Unable to Load Employee W2 Document. Please contact your system administrator.</div></body></html>`;
+        var printFrame = document.getElementById(PDF_ANCHOR_ID);
+        let errorContent = `<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"></head><body><div class="alert alert-danger" style="margin:3px;" role="alert"><strong>Error: </strong>Unable to Get Year End Tax Document. Please contact your system administrator.</div></body></html>`;
         if (printFrame) {
             printFrame.height='100'
             printFrame.src = "data:text/html;charset=utf-8,"+errorContent

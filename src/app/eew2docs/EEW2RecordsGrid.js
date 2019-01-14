@@ -6,15 +6,24 @@ import {bindActionCreators} from 'redux';
 import EEW2Records from './EEW2Records'
 import {getEEW2Pdf,generateOutputs,publishUnpublishEEW2Records,isOutputGenerationInprogress,loadPdfData,loadCompData}  from './eew2AdminAction';
 import {getAuditOutput}  from '../comp_outputs/compViewAction';
-
+import {
+    divStylePA
+} from '../../base/constants/AppConstants';
 class EEW2RecordsGrid extends React.Component {
     renderGrid(eew2data){
         if(eew2data && eew2data.eew2ecords && eew2data.eew2ecords.length >0){
             return(<EEW2Records eew2data={this.props.eew2data} w2data={this.props.w2data} viewcompdata={this.props.viewcompdata} compdata={this.props.compdata} isoutinprogress={this.props.isoutinprogress} actions={this.props.actions}/>);
+        }else if(eew2data && eew2data.eew2ecords && eew2data.eew2ecords.type=='AppError'){
+            return(<div>
+                <Alert color="danger">
+                    Error...
+                </Alert>
+                </div>
+            );
         }else {
             return(<div>
                 <Alert color="primary">
-                    Loading...
+                    <span href="#"  style={divStylePA} id="inProgressAction"> <i class="fas fa-spinner fa-spin"></i> Loading...</span>
                 </Alert>
                 </div>
             );

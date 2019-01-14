@@ -1,9 +1,7 @@
 import * as types from '../../base/constants/ActionTypes';
 import { OUTPUT_MESSAGES } from '../../base/constants/AppConstants';
+import { generateAppErrorEvent } from '../../base/utils/AppErrorEvent';
 import compdataApi from './compdataAPI';
-import {
-    generateAppErrorEvent
-} from '../../base/utils/AppErrorEvent';
 
 export function getAuditOutputSuccess(outputDoc) {
     return {

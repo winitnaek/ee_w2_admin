@@ -1,4 +1,5 @@
 import React from 'react';
+import { PDF_ANCHOR_ID } from '../../../src/base/constants/AppConstants';
 
 class PDFViewer extends React.Component {
     render() {
@@ -6,7 +7,7 @@ class PDFViewer extends React.Component {
             <div>
                 <canvas id="the-canvas"></canvas>
                 <div id="pageContainer"></div>
-                <iframe id="pdfi-frame" width="100%" height="100%" allowfullscreen webkitallowfullscreen></iframe>
+                <iframe id={PDF_ANCHOR_ID} width="100%" height="100%" allowfullscreen webkitallowfullscreen></iframe>
             </div>
         );
     }
@@ -52,7 +53,7 @@ class PDFViewer extends React.Component {
     }
     renderPDFFile(){
         let file2 = 'http://cdn.mozilla.net/pdfjs/tracemonkey.pdf';
-        var printFrame = document.getElementById('pdfi-frame')
+        var printFrame = document.getElementById(PDF_ANCHOR_ID)
         //if (printFrame) {
            printFrame.src = './res/js/pdfjs-1.9.426-dist/web/viewer.html?file='+file2; 
        // }
@@ -100,7 +101,7 @@ class PDFViewer extends React.Component {
                 var binaryData = [];
                 binaryData.push(pdfAsArray);
                 var dataPdf = window.URL.createObjectURL(new Blob(binaryData, {type: "application/pdf"}))
-                document.getElementById('pdfi-frame').setAttribute('src',url + encodeURIComponent(dataPdf));
+                document.getElementById(PDF_ANCHOR_ID).setAttribute('src',url + encodeURIComponent(dataPdf));
                 //Worked 1===============Start==>
                 //let file2 = 'http://localhost:8080/response.pdf';
                 //var printFrame = document.getElementById('pdfi-frame');
