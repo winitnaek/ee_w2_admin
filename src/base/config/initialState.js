@@ -17,7 +17,9 @@ export default {
     filterlabel: '',
     eew2pdf: {},
     transmitters:[],
-    eew2ecords: []
+    eew2ecords: [],
+    pubunpubcnt:0
+
   },
   viewcompdata: {
     messages: [],

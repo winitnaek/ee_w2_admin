@@ -95,27 +95,25 @@ export function generateOutputsFailed(eew2ecords) {
 export function publishUnpublishEEW2Records(eew2recordInput) {
     return function (dispatch, getState) {
         const state = getState();
-        return eew2AdminAPI.publishUnpublishEEW2Records(eew2recordInput).then(eew2ecords => {
-            if(eew2ecords.status && eew2ecords.message){
-                let arr = [];
-                arr.push([]);
-                dispatch(publishUnpublishEEW2Failed(arr));
-                throw eew2ecords;
+        return eew2AdminAPI.publishUnpublishEEW2Records(eew2recordInput).then(pubunpubcnt => {
+            if(pubunpubcnt.status && pubunpubcnt.message){
+                dispatch(publishUnpublishEEW2Failed(0));
+                throw pubunpubcnt;
             }else{
-                if(eew2ecords){
-                   dispatch(publishUnpublishEEW2Success(eew2ecords));
-                }
+                //if(pubunpubcnt){
+                   dispatch(publishUnpublishEEW2Success(pubunpubcnt));
+                //}
             }
         }).catch(error => {
             generateAppErrorEvent(error.type,error.status,error.message,error);
         });
     };
 }
-export function publishUnpublishEEW2Success(eew2ecords) {
-    return { type: types.POST_PUBUNPUB_OUTPUTS_SUCCESS, eew2ecords };
+export function publishUnpublishEEW2Success(pubunpubcnt) {
+    return { type: types.POST_PUBUNPUB_OUTPUTS_SUCCESS, pubunpubcnt };
 }
-export function publishUnpublishEEW2Failed(eew2ecords) {
-    return { type: types.POST_PUBUNPUB_OUTPUTS_ERROR, eew2ecords };
+export function publishUnpublishEEW2Failed(pubunpubcnt) {
+    return { type: types.POST_PUBUNPUB_OUTPUTS_ERROR, pubunpubcnt };
 }
 export function isOutputGenerationInprogress(dataset) {
     return function (dispatch, getState) {

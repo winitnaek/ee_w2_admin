@@ -83,3 +83,10 @@ export const selZindx ={
 export const selZindx1 ={
     zIndex:'90'
 };
+export const divStylePA={
+    display: 'block',
+    transition: 'all 0.3s ease',
+    textAling: 'center',
+    fontSize: '24px',
+    marginLeft: '20px'
+}

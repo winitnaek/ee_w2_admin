@@ -96,7 +96,8 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         viewtype:state.viewtype,
         filterlabel:state.filterlabel,
         transmitters:state.transmitters,
-        eew2ecords: Object.assign([], ...state.eew2ecords, action.eew2ecords),
+        eew2ecords: Object.assign([], ...state.eew2ecords, state.eew2ecords),
+        pubunpubcnt:action.pubunpubcnt,
         eew2pdf: {} 
       });
     }
@@ -110,6 +111,7 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         filterlabel:state.filterlabel,
         transmitters:state.transmitters,
         eew2ecords: Object.assign([], ...state.eew2ecords, state.eew2ecords),
+        pubunpubcnt:action.pubunpubcnt,
         eew2pdf: {} 
       });
     }
