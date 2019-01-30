@@ -21,12 +21,27 @@ class EEW2RecordsGrid extends React.Component {
                 </div>
             );
         }else {
-            return(<div>
-                <Alert color="primary">
-                    <span href="#"  style={divStylePA} id="inProgressAction"> <i class="fas fa-spinner fa-spin"></i> Loading...</span>
-                </Alert>
-                </div>
-            );
+            if(eew2data && eew2data.eew2ecords && eew2data.eew2ecords.length ==0){
+                /*return(<div>
+                    <Alert color="warning">
+                        <span>No records found. Please try another filter criteria.</span>
+                    </Alert>
+                    </div>
+                );*/
+                return(<div>
+                    <Alert color="primary">
+                        <span href="#"  style={divStylePA} id="inProgressAction"> <i class="fas fa-spinner fa-spin"></i> Loading...</span>
+                    </Alert>
+                    </div>
+                );
+            }else{
+                return(<div>
+                    <Alert color="primary">
+                        <span href="#"  style={divStylePA} id="inProgressAction"> <i class="fas fa-spinner fa-spin"></i> Loading...</span>
+                    </Alert>
+                    </div>
+                );
+            }
         };
     }
     render() {

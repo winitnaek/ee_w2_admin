@@ -14,8 +14,8 @@ export default {
     eew2pdf: {},
     transmitters:[],
     eew2ecords: [],
-    pubunpubcnt:0
-
+    pubunpubcnt:0,
+    genstatus:0
   },
   viewcompdata: {
     messages: [],
