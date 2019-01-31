@@ -13,7 +13,7 @@ const viewer_url  = window.location.protocol+'//'+window.location.host+viewer_pa
 
 let usrobj = JSON.parse(sessionStorage.getItem('up'));
 console.log('usrobj ==============================>>> : '+usrobj);
-const dataset = '00_EE_W2_DATA';//usrobj.dataset;
+const dataset = '00_CFWD_002';//usrobj.dataset;
 //console.log('dataset ==============================>>> : '+dataset);
 //const dataset = '00_EE_W2_DATA';
 class EEW2Records extends React.Component {
@@ -40,7 +40,8 @@ class EEW2Records extends React.Component {
                     { name: 'requestno', type: 'int' },
                     { name: 'generatedDateTime', type: 'date' },
                     { name: 'empkey', type: 'string' },
-                    { name: 'last4digits', type: 'string' }
+                    { name: 'last4digits', type: 'string' },
+                    { name: 'year', type: 'int' }
                 ],
                 cache: false,
                 url: getRecsUrl,
@@ -119,7 +120,7 @@ class EEW2Records extends React.Component {
                 showClientKitDetPdf: false
             }
         };
-        this.interval = setInterval(this.handleInProgress.bind(this), 60000);
+        //this.interval = setInterval(this.handleInProgress.bind(this), 60000);
     }
     handleInProgress(){
         this.props.actions.isOutputGenerationInprogress(dataset)
@@ -228,23 +229,8 @@ class EEW2Records extends React.Component {
         });
 
         if(selIndexes.length >0 && unpublishCount >0){
-            var eew2recordInput ={ // getting 0 for this input.
-                "dataset": "00_EE_W2_DATA",
-                "toUnpublish": false,
-                "year":2017,
-                "w2RequestInputs": [
-                  {
-                    "transmitterId": "123456789",
-                    "companyId": "123456789",
-                    "empid": "123456789",
-                    "allRecs": true,
-                    "requestno": 0
-                  }
-                ]
-              }
-
-              var eew2recordInpu1 ={  
-                "dataset":"00_EE_W2_DATA",
+            var eew2recordInpu1 ={  
+                "dataset":"CF_EEW2_1",
                 "toUnpublish":false,
                 "year":2017,
                 "w2RequestInputs":[  
@@ -299,23 +285,49 @@ class EEW2Records extends React.Component {
     generateOutput(){
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
         if(selIndexes.length >0){
-            var eew2recordInput ={  
-                "dataset":"00_EE_W2_DATA",
-                "isCorrection":false,
-                "w2RequestInputs":[  
-                   {  
-                      "transmitterId":"123456789",
-                      "companyId":"123456789",
-                      "empid":"123456789",
-                      "allRecs":true,
-                      "requestno":0
-                   }
-                ]
-             }
+
+            let usrobj = JSON.parse(sessionStorage.getItem('up'));
+            console.log('generateOutput usrobj =====>>> : '+usrobj);
+            const dataset = '0000EEW2_RG';//usrobj.dataset;
+            let taxYear = "";
             selIndexes.forEach(index => {
                 let data = this.refs.eew2Grid.getrowdata(index);
-                //alert('Selected for Post : '+ Object.values(data));
+                taxYear = data.year
+                return;
+                alert('Selected for Post : '+ Object.values(data) +" Year : "+taxYear);
             });
+
+            var w2RequestInputs=[];
+            selIndexes.forEach(index => {
+                let data = this.refs.eew2Grid.getrowdata(index);
+                w2RequestInputs.push({"transmitterid":data.transmitterid,"companyId":data.companyId,"empkey":data.empkey});
+            });
+            console.log('w2RequestInputs generateOutput===>');
+            console.log(w2RequestInputs);
+            var eew2recordInput = {
+                "dataset": dataset,
+                "year": taxYear,
+                "w2RequestInputs": w2RequestInputs
+            };
+            console.log('eew2recordInput');
+            console.log(eew2recordInput);
+
+            var eew2recordInput ={
+                "dataset": dataset,
+                "year": 2017,
+                "w2RequestInputs": [
+                    {
+                        "transmitterId": "225012345",
+                        "companyId": "225012345",
+                        "empkey": "152C69D42036D1C33475D55F707FDEDE"
+                    },
+                    {
+                        "transmitterId": "225012346",
+                        "companyId": "225012346",
+                        "allRecs": true
+                    }
+                ]
+            }
             this.props.actions.generateOutputs(eew2recordInput).then(response => {
                 this.state.source.localdata=this.props.eew2data.eew2ecords;
                 this.refs.eew2Grid.clearselection();
@@ -354,47 +366,6 @@ class EEW2Records extends React.Component {
             this.props.actions.loadCompData(compdata);
             let data = this.refs.eew2Grid.getrowdata(nextProps.compdata.compid);
             this.handleShowMessages(data, null);
-        }
-    }
-    generateOutputCorrection(){
-        let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
-        if(selIndexes.length >0){
-            //this.showConfirm(true,'Confirm?', 'Are you sure you want to W2 correction(s)?');
-            var eew2recordInput ={  
-                "dataset":"00_EE_W2_DATA",
-                "isCorrection":true,
-                "w2RequestInputs":[  
-                   {  
-                      "transmitterId":"123456789",
-                      "companyId":"123456789",
-                      "empid":"123456789",
-                      "allRecs":true,
-                      "requestno":0
-                   }
-                ]
-             }
-            selIndexes.forEach(index => {
-                let data = this.refs.eew2Grid.getrowdata(index);
-                //alert('Selected for Post : '+ Object.values(data));
-            });
-            this.props.actions.generateOutputs(eew2recordInput).then(response => {
-
-                this.props.eew2data.eew2ecords.forEach(function (data) {
-                    alert(data);
-                });
-                this.state.source.localdata=this.props.eew2data.eew2ecords;
-                this.refs.eew2Grid.clearselection();
-                this.refs.eew2Grid.updatebounddata('data');
-                this.refs.eew2Grid.sortby('requestno', 'desc');
-                this.toggleSuccess('Employee W2 Correction Generated Successfully!');
-                this.interval = setInterval(this.tick.bind(this), 3000);
-                return response
-            }).catch(error => {
-                throw new SubmissionError(error)
-            })
-            
-        }else{
-            this.showAlert(true,'Generate W2 Correction','Please select at least one employee record for W2 correction.');
         }
     }
     showConfirm(cshow, cheader, cbody){
@@ -691,19 +662,15 @@ class EEW2Records extends React.Component {
                    Print W2s
                 </Tooltip>
                 <a href="#" style={divStyleR} onClick={() => this.unpublishW2()} id="unpublishW2"><i class='fas fa-calendar-minus fa-lg'></i></a>
-                <Tooltip placement="right" isOpen={this.state.unpublishW2} target="unpublishW2" toggle={this.toggleUnPubW2Sel}>
+                <Tooltip placement="bottom" isOpen={this.state.unpublishW2} target="unpublishW2" toggle={this.toggleUnPubW2Sel}>
                    Un-Publish W2
                 </Tooltip>
                 <a href="#" style={divStyleR} onClick={() => this.publishW2()} id="publishW2"><i class='fas fa-calendar-plus fa-lg'></i></a>
-                <Tooltip placement="right" isOpen={this.state.publishW2} target="publishW2" toggle={this.togglePubW2Sel}>
+                <Tooltip placement="top" isOpen={this.state.publishW2} target="publishW2" toggle={this.togglePubW2Sel}>
                    Publish W2
                 </Tooltip>
-                <a href="#" style={divStyleR} onClick={() => this.generateOutputCorrection()} id="generateOutputCorrection"><i class='fas fa-calendar-check fa-lg'></i></a>
-                <Tooltip placement="top" isOpen={this.state.deleSelected} target="generateOutputCorrection" toggle={this.toggleDelSel}>
-                    Generate W2 Correction
-                </Tooltip> 
                 <a href="#" style={divStyleR} onClick={() => this.generateOutput()} id="generateOutput"><i class='fas fa-calculator fa-lg'></i></a>
-                <Tooltip placement="right" isOpen={this.state.generateOutput} target="generateOutput" toggle={this.togglePstSel}>
+                <Tooltip placement="left" isOpen={this.state.generateOutput} target="generateOutput" toggle={this.togglePstSel}>
                     Generate W2
                 </Tooltip>
                 <JqxGrid ref='eew2Grid'

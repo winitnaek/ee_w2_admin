@@ -140,7 +140,7 @@ class eew2AdminAPI {  static geteew2records(eew2recordInput) {
       });
   }
   static getCompaniesByTransmitter(dataset,tfein) {
-    let paramurl = `${'?dataset='}${dataset}${'&tfein='}${tfein}`;
+    let paramurl = `${'?dataset='}${dataset}${'&transmitterId='}${tfein}`;
     var svcs_url = `${svcs.GET_COMPANY_BY_TRANSMITTER}${paramurl}`;
     
     return fetch(URLUtils.buildURL(svcs_url), {
