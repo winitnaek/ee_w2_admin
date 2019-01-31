@@ -281,9 +281,9 @@ class FilterPayrollData extends Component {
         var w2RequestInputs=[];
         this.state.w2dgridata.forEach(function (data) {
             if(data.companyId=='All' && data.empid=='All'){
-                w2RequestInputs.push({"transmitterid":data.transmitterid,"companyId":"","empid":"","allRecs":data.allRecs,"requestno":data.requestno});
+                w2RequestInputs.push({"transmitterId":data.transmitterid,"companyId":"","empid":"","allRecs":data.allRecs,"requestno":data.requestno});
             }else{
-                w2RequestInputs.push({"transmitterid":data.transmitterid,"companyId":data.companyId,"empid":data.empid,"allRecs":data.allRecs,"requestno":data.requestno});
+                w2RequestInputs.push({"transmitterId":data.transmitterid,"companyId":data.companyId,"empid":data.empid,"allRecs":data.allRecs,"requestno":data.requestno});
             }
         });
        console.log('w2RequestInputs');
@@ -303,7 +303,7 @@ class FilterPayrollData extends Component {
             "year":"2017",
             "w2RequestInputs":[
                {
-                  "transmitterid":"952023160",
+                  "transmitterId":"952023160",
                   "companyId":"",
                   "empid":"",
                   "allRecs":false,
@@ -318,7 +318,7 @@ class FilterPayrollData extends Component {
             "year":2017,
             "w2RequestInputs":[  
                {  
-                  "transmitterid":"952023160",
+                  "transmitterId":"952023160",
                   "companyId":"952023160",
                   "empid":"001907",
                   "allRecs":false,
@@ -328,12 +328,12 @@ class FilterPayrollData extends Component {
          }
 
          var eew2recordInput4 =   {  
-            "dataset":"CF_EEW2_1",
+            "dataset":"00_EE_W2_DATA",
             "latestonly":true,
-            "year":2018,
+            "year":2017,
             "w2RequestInputs":[  
                {  
-                  "transmitterid":"123456789",
+                  "transmitterId":"123456789",
                   "companyId":"525012345",
                   "empid":"179",
                   "allRecs":false,
@@ -342,19 +342,19 @@ class FilterPayrollData extends Component {
             ]
          }
          var eew2recordInput5 =   {  
-            "dataset":"CF_EEW2_1",
+            "dataset":"00_EE_W2_DATA",
             "latestonly":true,
-            "year":2018,
+            "year":2017,
             "w2RequestInputs":[  
                {  
-                  "transmitterid":"123456789",
+                  "transmitterId":"123456789",
                   "companyId":"525012345",
                   "empid":"179",
                   "allRecs":false,
                   "requestno":0
                },
                {  
-                  "transmitterid":"581234567",
+                  "transmitterId":"581234567",
                   "companyId":"225012345",
                   "empid":"179",
                   "allRecs":false,
@@ -363,43 +363,39 @@ class FilterPayrollData extends Component {
             ]
          }
 
-         var eew2recordInput6 = {  
-            "dataset":"CF_EEW2_1",
-            "latestonly":true,
-            "year":2018,
-            "w2RequestInputs":[  
-               {  
-                  "transmitterid":"123456789",
-                  "companyId":"525012345",
-                  "empid":"179",
-                  "allRecs":false,
-                  "requestno":0
-               },
-               {  
-                  "transmitterid":"581234567",
-                  "companyId":"225012345",
-                  "empid":"179",
-                  "allRecs":false,
-                  "requestno":0
-               }
-            ]
-         }
+         var eew2recordInput6 = {
+             "dataset": "00_EE_W2_DATA",
+             "latestonly": true,
+             "year": 2017,
+             "w2RequestInputs": [{
+                     "transmitterId": "952023160",
+                     "companyId": "952023160"
+                 },
+                 {
+                     "transmitterId": "581234567",
+                     "companyId": "225012345",
+                     "empid": "179",
+                     "allRecs": false,
+                     "requestno": 0
+                 }
+             ]
+         };
 
          var eew2recordInput7= {  
-            "dataset":"CF_EEW2_1",
+            "dataset":"00_EE_W2_DATA",
             "latestonly":true,
-            "year":2018,
+            "year":2017,
             "w2RequestInputs":[  
-              {"transmitterid":"123456789","companyId":"525012345","empid":"179","allRecs":false,"requestno":0}
+              {"transmitterId":"123456789","companyId":"525012345","empid":"179","allRecs":false,"requestno":0}
             ]
          }
 
          var eew2recordInput8= {  
-            "dataset":"CF_EEW2_1",
+            "dataset":"00_EE_W2_DATA",
             "latestonly":true,
-            "year":2018,
+            "year":2017,
             "w2RequestInputs":[
-            {"transmitterid":123456789,"allRecs":true,"requestno":0}
+            {"transmitterId":123456789,"allRecs":true,"requestno":0}
             ]
          }
          
@@ -664,6 +660,6 @@ function mapStateToProps(state) {
     }
 }
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({ loadEEW2Records ,loadPeriodicData,getTransmitters,getCompaniesByTransmitter}, dispatch)
+    return bindActionCreators({loadEEW2Records,loadPeriodicData,getTransmitters,getCompaniesByTransmitter}, dispatch)
 }
 export default connect(mapStateToProps,mapDispatchToProps)(FilterPayrollData);

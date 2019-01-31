@@ -17,24 +17,14 @@ export function loadCompData(compdata) {
 export function loadPdfData(w2data){
     return {type:types.LOAD_PDF_DATA,w2data};
 }
+/**
+ * Merely dispatches "SUCCESS" to proceed and delegate actual data fetching to the jqxGrid component!
+ * 
+ * @param {*} eew2data 
+ */
 export function loadEEW2Records(eew2data) {
     return function (dispatch, getState) {
-        const state = getState();
-        return eew2AdminAPI.geteew2records(eew2data.eew2recordInput).then(eew2ecords => {
-            if(eew2ecords.status && eew2ecords.message){
-                let arr = [];
-                arr.push([]);
-                dispatch(loadEEW2RecordsFailed(arr));
-                throw eew2ecords;
-            }else{
-                if(eew2ecords){
-                    eew2data.eew2ecords = eew2ecords;
-                   dispatch(loadEEW2RecordsSuccess(eew2data));
-                }
-            }
-        }).catch(error => {
-            generateAppErrorEvent(error.type,error.status,error.message,error);
-        });
+        dispatch(loadEEW2RecordsSuccess(eew2data));
     };
 }
 export function loadEEW2RecordsSuccess(eew2data) {

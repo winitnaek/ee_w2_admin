@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Tooltip } from 'reactstrap';
-import { divStyle, divStyleBot, divStyleFirst, divStyleFirstBot, divStyleR, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, PDF_ANCHOR_ID } from '../../base/constants/AppConstants';
+import { divStyle, divStyleBot, divStyleFirst, divStyleFirstBot, divStyleR, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, PDF_ANCHOR_ID, DFLT_PAGE_SIZE } from '../../base/constants/AppConstants';
 import { RN_FILTER_PAYROLL_DATA } from '../../base/constants/RenderNames';
 import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
 import UIAlert from '../common/UIAlert';
@@ -19,7 +19,10 @@ const dataset = '00_EE_W2_DATA';//usrobj.dataset;
 class EEW2Records extends React.Component {
     constructor(props) {
         super(props);
-        let data = this.props.eew2data.eew2ecords
+        let eeW2GetRecInput = this.props.eew2data.eew2recordInput;
+        console.debug("EE W2 Get Records input data --> ", eeW2GetRecInput);
+        let getRecsUrl = this.props.eew2data.getRecsUrl;
+        console.debug("EE W2 Get Records URL --> ", getRecsUrl);
         let source =
             {
                 datatype: "json",
@@ -39,8 +42,30 @@ class EEW2Records extends React.Component {
                     { name: 'empkey', type: 'string' },
                     { name: 'last4digits', type: 'string' }
                 ],
-                localdata: data
-
+                cache: false,
+                url: getRecsUrl,
+                pagenum: 1,
+                pagesize: DFLT_PAGE_SIZE,
+                pager: (pagenum, pagesize, oldpagenum) => {
+                    // callback called when a page or page size is changed.
+                },
+                type: "POST",
+                data: eeW2GetRecInput,
+                filter: function() {
+                    // update the grid and send a request to the server.
+                    let _id = document.querySelector("div[role='grid']").id;
+                    $('#' + _id).jqxGrid('updatebounddata', 'filter');
+                },
+                sort: function() {
+                    // update the grid and send a request to the server.
+                    let _id = document.querySelector("div[role='grid']").id;
+                    $('#' + _id).jqxGrid('updatebounddata', 'sort');
+                },
+                beforeprocessing: function(data) {
+                    if (data != null && data.length > 0) {
+                        source.totalrecords = data[0].totalRecords;
+                    }
+                }
             };
             this.toggleSuccess = this.toggleSuccess.bind(this);
             this.toggleExpExl=this.toggleExpExl.bind(this);
@@ -136,7 +161,7 @@ class EEW2Records extends React.Component {
                 "toUnpublish": true,
                 "w2RequestInputs": [
                   {
-                    "transmitterid": "123456789",
+                    "transmitterId": "123456789",
                     "companyId": "123456789",
                     "empid": "123456789",
                     "allRecs": true,
@@ -145,18 +170,18 @@ class EEW2Records extends React.Component {
                 ]
               }
               var eew2recordInpu1 ={  
-                "dataset":"CF_EEW2_1",
+                "dataset":"00_EE_W2_DATA",
                 "toUnpublish":true,
-                "year":2018,
+                "year":2017,
                 "w2RequestInputs":[  
                    {  
-                      "transmitterid":"123456789",
+                      "transmitterId":"123456789",
                       "companyId":"525012345",
                       "empkey":"152C69D42036D1C33475D55F707FDEDE  ",
                       "allRecs":false
                    },
                    {  
-                      "transmitterid":"581234567",
+                      "transmitterId":"581234567",
                       "companyId":"225012345",
                       "empkey":"152C69D42036D1C33475D55F707FDEDE  ",
                       "allRecs":false,
@@ -206,10 +231,10 @@ class EEW2Records extends React.Component {
             var eew2recordInput ={ // getting 0 for this input.
                 "dataset": "00_EE_W2_DATA",
                 "toUnpublish": false,
-                "year":2018,
+                "year":2017,
                 "w2RequestInputs": [
                   {
-                    "transmitterid": "123456789",
+                    "transmitterId": "123456789",
                     "companyId": "123456789",
                     "empid": "123456789",
                     "allRecs": true,
@@ -219,18 +244,18 @@ class EEW2Records extends React.Component {
               }
 
               var eew2recordInpu1 ={  
-                "dataset":"CF_EEW2_1",
+                "dataset":"00_EE_W2_DATA",
                 "toUnpublish":false,
-                "year":2018,
+                "year":2017,
                 "w2RequestInputs":[  
                    {  
-                      "transmitterid":"123456789",
+                      "transmitterId":"123456789",
                       "companyId":"525012345",
                       "empkey":"152C69D42036D1C33475D55F707FDEDE  ",
                       "allRecs":false
                    },
                    {  
-                      "transmitterid":"581234567",
+                      "transmitterId":"581234567",
                       "companyId":"225012345",
                       "empkey":"152C69D42036D1C33475D55F707FDEDE  ",
                       "allRecs":false,
@@ -279,7 +304,7 @@ class EEW2Records extends React.Component {
                 "isCorrection":false,
                 "w2RequestInputs":[  
                    {  
-                      "transmitterid":"123456789",
+                      "transmitterId":"123456789",
                       "companyId":"123456789",
                       "empid":"123456789",
                       "allRecs":true,
@@ -340,7 +365,7 @@ class EEW2Records extends React.Component {
                 "isCorrection":true,
                 "w2RequestInputs":[  
                    {  
-                      "transmitterid":"123456789",
+                      "transmitterId":"123456789",
                       "companyId":"123456789",
                       "empid":"123456789",
                       "allRecs":true,
@@ -573,7 +598,30 @@ class EEW2Records extends React.Component {
         }
     }
     render() {
-        let dataAdapter = new $.jqx.dataAdapter(this.state.source);
+        var source = this.state.source;
+        let dataAdapter = new $.jqx.dataAdapter(source, {
+            // remove the comment to debug
+            formatData: function(data) {
+                let noOfFilters = 6;
+                // alert(JSON.stringify(data));
+                for (let i = 0; i < noOfFilters; i++) {
+                    if ("generatedDateTime" === data["filterdatafield" + i]) {
+                        data["filtervalue" + i] = $.jqx.formatDate(new Date(data["filtervalue" + i]), 'yyyyMMdd');
+                        // alert(data["filtervalue" + i]);
+                    }
+                }
+                return data;
+            },
+            downloadComplete: function(data, status, xhr) {
+                if (!source.totalrecords) {
+                    source.totalrecords = data.length;
+                }
+            },
+            loadError: function(xhr, status, error) {
+                throw new Error(error);
+            }
+        });
+
         let uiAlert    =   <UIAlert handleClick={this.hideUIAlert}  showAlert={this.state.showAlert} aheader={this.state.aheader} abody={this.state.abody} abtnlbl={'Ok'}/>;
         let uiDelConfirm = <UIConfirm handleOk={this.handleConfirmOk} handleCancel={this.handleConfirmCancel}  showConfirm={this.state.showConfirm} cheader={this.state.cheader} cbody={this.state.cbody} okbtnlbl={'Ok'} cancelbtnlbl={'Cancel'}/>;
         let data = this.props.eew2data;
@@ -609,10 +657,10 @@ class EEW2Records extends React.Component {
                     return `<a href="#" data-toggle="tooltip" class="tooltipcomp2" title="View Company Artifacts"><div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadCompData('${ndex}')}>${rowdata.compName}</button></div></a>`;
                    },filtertype: 'input'},
                 { text: 'Run Date/Time', datafield: 'generatedDateTime', width: 'auto', cellsformat: 'MM-dd-yyyy hh:mm:00 tt', filtertype: 'range' },
-                { text: 'Employee Name', cellsalign: 'center', align: 'center',width: 'auto',cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
+                { text: 'Employee Name', datafield: 'lastName', cellsalign: 'center', align: 'center',width: 'auto',cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
                     return `<a href="#" data-toggle="tooltip" class="tooltipempw2" title="View W2 PDF"><div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadPdfData('${ndex}')}>${rowdata.empFname+' '+rowdata.empLname}</button></div></a>`;
                    },filtertype: 'input'},
-                { text: '  SSN  ', datafield: 'last4digits', cellsalign: 'center', align: 'center', width: 'auto', filtertype: 'input'},
+                { text: '  SSN  ', datafield: 'last4digits', cellsalign: 'center', align: 'center', width: 'auto', filterable: false, sortable: false },
                 { text: 'Published', datafield: 'isPublished',cellsalign: 'center', align: 'center', cellsrenderer: pubrenderer,  width: 'auto',filtertype: 'bool', },
                 { text: 'Printed', datafield: 'isPrinted', cellsalign: 'center', align: 'center', cellsrenderer: printrenderer, width: 'auto', filtertype: 'bool',},
             ];
@@ -659,10 +707,11 @@ class EEW2Records extends React.Component {
                     Generate W2
                 </Tooltip>
                 <JqxGrid ref='eew2Grid'
-                    width={'100%'} source={dataAdapter} pageable={true} pagermode ={'simple'}
-                    sortable={false} altrows={false} enabletooltips={false}
+                    width={'100%'} source={dataAdapter} pageable={true}
+                    sortable={true} altrows={false} enabletooltips={false}
                     autoheight={true} editable={false} columns={columns}
-                    filterable={true} showfilterrow={true}
+                    filterable={true} showfilterrow={true} virtualmode={true}
+                    rendergridrows={function(obj){return obj.data;}}
                     selectionmode={'multiplerowsextended'}/>
                 <a href="#"  style={divStyleFirstBot} onClick={() => this.exportToExcel()} id="exportToExcel"><i class='fas fa-table fa-lg'></i></a>
                 <Tooltip placement="bottom" isOpen={this.state.exptoExlTip} target="exportToExcel" toggle={this.toggleExpExl}>

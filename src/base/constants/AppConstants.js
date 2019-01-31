@@ -11,6 +11,8 @@ export const OUTPUT_PRINT = 'PRINT';
 export const PDF_ANCHOR_ID = "pdfi-frame";
 export const NON_PDF_ANCHOR_ID = "nonpdf-anchor";
 
+export const DFLT_PAGE_SIZE = 20;
+
 export const divStyleFirst = {
     display: 'block',
     paddingBottom: '8px',
