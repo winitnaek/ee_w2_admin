@@ -11,10 +11,18 @@ import ViewCompanyAuditFiles from '../comp_outputs/ViewCompanyAuditFiles';
 const viewer_path ='/pdfjs/web/viewer.html?file=';
 const viewer_url  = window.location.protocol+'//'+window.location.host+viewer_path;
 
+//Temporary set user in session:======Comment this when deployed with MAC======
+var userProfile ="{\r\n            \"userId\": \"001907\",\r\n            \"firstName\": \"Isreal\",\r\n            \"lastName\": \"Fullerton\",\r\n            \"dataset\": \"00_CFWD_002\",\r\n            \"securitytokn\": \"fhfh484jer843je848rj393jf\",\r\n            \"branding\": \"base64ImageData\",\r\n            \"userTheme\": \"Default\",\r\n            \"roles\": [\r\n                \"EE\"\r\n            ],\r\n            \"applications\": [\r\n                {\r\n                    \"id\": \"610bbc96-10dc-4874-a9fc-ecf0edf4260b\",\r\n                    \"name\": \"YearEndFactory\",\r\n                    \"accessIds\": [\r\n                        {\r\n                            \"id\": \"b9f6848d-30a7-451d-d2fa-86f3afa4df67\",\r\n                            \"visible\": true\r\n                        }\r\n                    ],\r\n                    \"permissions\": {\r\n                        \"viewDocument\": [\r\n                            1,\r\n                            0,\r\n                            0,\r\n                            0,\r\n                            0\r\n                        ]\r\n                    }\r\n                },\r\n                {   \r\n                \"id\": \"dd4282b1-0544-4ad1-8e0b-6a8d278ffd5c\",\r\n                \"name\": \"eeAdminFactory\",\r\n                \"accessIds\": [\r\n                    {\r\n                        \"id\": \"b55f51a1-0273-4457-8226-013a35d32080\",\r\n                        \"visible\": true\r\n                    }\r\n                ],\r\n                \"permissions\": {\r\n                    \"viewDocument\": [\r\n                        1,\r\n                        0,\r\n                        0,\r\n                        0,\r\n                        0\r\n                    ]\r\n                }\r\n            }\r\n            ],\r\n            \"themeList\": [\r\n                {\r\n                    \"id\": \"Default\",\r\n                    \"name\": \"Default\"\r\n                },\r\n                {\r\n                    \"id\": \"HighContrast\",\r\n                    \"name\": \"High Contrast\"\r\n                },\r\n                {\r\n                    \"id\": \"WhiteOnBlack\",\r\n                    \"name\": \"White On Black\"\r\n                },\r\n                {\r\n                    \"id\": \"BlackOnWhite\",\r\n                    \"name\": \"Black On White\"\r\n                }\r\n            ]\r\n        }"
+var userdata = JSON.parse(userProfile);
+console.log('setUserProfile userdata');
+console.log(userdata);
+sessionStorage.setItem("up", userProfile);
+//==============================================================================
+
 let usrobj = JSON.parse(sessionStorage.getItem('up'));
-console.log('usrobj ==============================>>> : '+usrobj);
-const dataset = '00_CFWD_002';//usrobj.dataset;
-//console.log('dataset ==============================>>> : '+dataset);
+console.log('usrobj EEW2Records==============================>>> : '+usrobj);
+const dataset = usrobj.dataset;
+console.log('dataset EEW2Records==============================>>> : '+dataset);
 //const dataset = '00_EE_W2_DATA';
 class EEW2Records extends React.Component {
     constructor(props) {
@@ -146,55 +154,39 @@ class EEW2Records extends React.Component {
         this.refs.eew2Grid.clearselection();
     }
     unpublishW2(){
+        this.setState({outputSuccess: false});
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
         let publishCount=0;
         selIndexes.forEach(index => {
-            let data = this.refs.eew2Grid.getrowdata(index);
+            let data = this.refs.eew2Grid.getrowdatabyid(index);
             if(data.isPublished==true){
-                publishCount++;
+                    publishCount++;
             }
         });
 
         if(selIndexes.length >0 && publishCount >0){
-            var eew2recordInput ={
-                "dataset": "00_EE_W2_DATA",
-                "toUnpublish": true,
-                "w2RequestInputs": [
-                  {
-                    "transmitterId": "123456789",
-                    "companyId": "123456789",
-                    "empid": "123456789",
-                    "allRecs": true,
-                    "requestno": 0
-                  }
-                ]
-              }
-              var eew2recordInpu1 ={  
-                "dataset":"00_EE_W2_DATA",
+            let taxYear = "";
+            selIndexes.forEach(index => {
+                let data = this.refs.eew2Grid.getrowdata(index);
+                taxYear = data.year
+                return;
+            });
+            var w2RequestInputs=[];
+            selIndexes.forEach(index => {
+                let data = this.refs.eew2Grid.getrowdata(index);
+                w2RequestInputs.push({"transmitterId":data.tranFein,"companyId":data.compFein,"empkey":data.empkey});
+            });
+            console.log('w2RequestInputs generateOutput===>');
+            console.log(w2RequestInputs);
+            var eew2recordInput = {
+                "dataset": dataset, //Dataset need to come from top
+                "year": taxYear,
                 "toUnpublish":true,
-                "year":2017,
-                "w2RequestInputs":[  
-                   {  
-                      "transmitterId":"123456789",
-                      "companyId":"525012345",
-                      "empkey":"152C69D42036D1C33475D55F707FDEDE  ",
-                      "allRecs":false
-                   },
-                   {  
-                      "transmitterId":"581234567",
-                      "companyId":"225012345",
-                      "empkey":"152C69D42036D1C33475D55F707FDEDE  ",
-                      "allRecs":false,
-                      "requestno":0
-                   }
-                ]
-             }  
-              
-            //selIndexes.forEach(index => {
-            //    let data = this.refs.eew2Grid.getrowdata(index);
-                //alert('Selected for Post : '+ Object.values(data));
-            //});
-            this.props.actions.publishUnpublishEEW2Records(eew2recordInpu1).then(response => {
+                "w2RequestInputs": w2RequestInputs
+            };
+            console.log('unpublishW2 eew2recordInput ==>');
+            console.log(eew2recordInput);
+            this.props.actions.publishUnpublishEEW2Records(eew2recordInput).then(response => {
                 selIndexes.forEach(index => {
                     let data = this.refs.eew2Grid.getrowdata(index);
                     this.props.eew2data.eew2ecords.forEach(function (emp) {
@@ -203,52 +195,55 @@ class EEW2Records extends React.Component {
                         }
                     });
                 });
-                this.state.source.localdata=this.props.eew2data.eew2ecords;
                 this.refs.eew2Grid.clearselection();
                 this.refs.eew2Grid.updatebounddata('data');
-                //this.refs.eew2Grid.sortby('requestno', 'desc');
                 this.toggleSuccess('Employee W2 Output Un-Published Successfully!');
-                this.interval = setInterval(this.tick.bind(this), 3000);
+                this.interval = setInterval(this.tick.bind(this), 300000);
                 return response
             }).catch(error => {
                 throw new SubmissionError(error)
             })
-        }else if(publishCount >0){
+        }else if(selIndexes.length <=0){
             this.showAlert(true,'Publish W2','Please select at least one employee record to Un-Publish W2 output.');
         }
      }
     publishW2(){
+        this.setState({outputSuccess: false});
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
         let unpublishCount=0;
-        selIndexes.forEach(index => {
-            let data = this.refs.eew2Grid.getrowdata(index);
+
+       selIndexes.forEach(index => {
+            console.log('Data ingrid index '+index);
+            let data = this.refs.eew2Grid.getrowdatabyid(index);
+            console.log('data');
+            console.log(data);
             if(data.isPublished ==false){
-                unpublishCount++;
+                    unpublishCount++;
             }
         });
-
         if(selIndexes.length >0 && unpublishCount >0){
-            var eew2recordInpu1 ={  
-                "dataset":"CF_EEW2_1",
+            let taxYear = "";
+            selIndexes.forEach(index => {
+                let data = this.refs.eew2Grid.getrowdata(index);
+                taxYear = data.year
+                return;
+            });
+            var w2RequestInputs=[];
+            selIndexes.forEach(index => {
+                let data = this.refs.eew2Grid.getrowdata(index);
+                w2RequestInputs.push({"transmitterId":data.tranFein,"companyId":data.compFein,"empkey":data.empkey});
+            });
+            console.log('w2RequestInputs generateOutput===>');
+            console.log(w2RequestInputs);
+            var eew2recordInput = {
+                "dataset": dataset, //Dataset need to come from top
+                "year": taxYear,
                 "toUnpublish":false,
-                "year":2017,
-                "w2RequestInputs":[  
-                   {  
-                      "transmitterId":"123456789",
-                      "companyId":"525012345",
-                      "empkey":"152C69D42036D1C33475D55F707FDEDE  ",
-                      "allRecs":false
-                   },
-                   {  
-                      "transmitterId":"581234567",
-                      "companyId":"225012345",
-                      "empkey":"152C69D42036D1C33475D55F707FDEDE  ",
-                      "allRecs":false,
-                      "requestno":0
-                   }
-                ]
-             }  
-            this.props.actions.publishUnpublishEEW2Records(eew2recordInpu1).then(response => {
+                "w2RequestInputs": w2RequestInputs
+            };
+            console.log('publishW2 eew2recordInput ==>');
+            console.log(eew2recordInput);
+            this.props.actions.publishUnpublishEEW2Records(eew2recordInput).then(response => {
                 selIndexes.forEach(index => {
                     let data = this.refs.eew2Grid.getrowdata(index);
                     this.props.eew2data.eew2ecords.forEach(function (emp) {
@@ -257,17 +252,15 @@ class EEW2Records extends React.Component {
                         }
                     });
                 });
-                this.state.source.localdata=this.props.eew2data.eew2ecords;
                 this.refs.eew2Grid.clearselection();
                 this.refs.eew2Grid.updatebounddata('data');
-                //this.refs.eew2Grid.sortby('requestno', 'desc');
                 this.toggleSuccess('Employee W2 Output Published Successfully!');
-                this.interval = setInterval(this.tick.bind(this), 3000);
+                this.interval = setInterval(this.tick.bind(this), 300000);
                 return response
             }).catch(error => {
                 throw new SubmissionError(error)
             })
-        }else if(unpublishCount > 0){
+        }else if(selIndexes.length <= 0){
             this.showAlert(true,'Publish W2','Please select at least one employee record to Publish W2 output.');
         }
     }
@@ -282,58 +275,36 @@ class EEW2Records extends React.Component {
         });
     }
     generateOutput(){
+        this.setState({outputSuccess: false});
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
         if(selIndexes.length >0){
-
-            let usrobj = JSON.parse(sessionStorage.getItem('up'));
-            console.log('generateOutput usrobj =====>>> : '+usrobj);
-            const dataset = '0000EEW2_RG';//usrobj.dataset;
             let taxYear = "";
             selIndexes.forEach(index => {
                 let data = this.refs.eew2Grid.getrowdata(index);
                 taxYear = data.year
                 return;
-                alert('Selected for Post : '+ Object.values(data) +" Year : "+taxYear);
             });
-
             var w2RequestInputs=[];
             selIndexes.forEach(index => {
                 let data = this.refs.eew2Grid.getrowdata(index);
-                w2RequestInputs.push({"transmitterid":data.transmitterid,"companyId":data.companyId,"empkey":data.empkey});
+                w2RequestInputs.push({"transmitterId":data.tranFein,"companyId":data.compFein,"empkey":data.empkey});
             });
             console.log('w2RequestInputs generateOutput===>');
             console.log(w2RequestInputs);
             var eew2recordInput = {
-                "dataset": dataset,
+                "dataset": dataset, //Dataset need to come from top
                 "year": taxYear,
                 "w2RequestInputs": w2RequestInputs
             };
-            console.log('eew2recordInput');
+            console.log('generateOutput eew2recordInput ==>');
             console.log(eew2recordInput);
-
-            var eew2recordInput ={
-                "dataset": dataset,
-                "year": 2017,
-                "w2RequestInputs": [
-                    {
-                        "transmitterId": "225012345",
-                        "companyId": "225012345",
-                        "empkey": "152C69D42036D1C33475D55F707FDEDE"
-                    },
-                    {
-                        "transmitterId": "225012346",
-                        "companyId": "225012346",
-                        "allRecs": true
-                    }
-                ]
-            }
             this.props.actions.generateOutputs(eew2recordInput).then(response => {
                 this.state.source.localdata=this.props.eew2data.eew2ecords;
                 this.refs.eew2Grid.clearselection();
-                this.refs.eew2Grid.updatebounddata('data');
-                this.refs.eew2Grid.sortby('requestno', 'desc');
+                //this.refs.eew2Grid.updatebounddata('data');
+                //this.refs.eew2Grid.sortby('requestno', 'desc');
                 this.toggleSuccess('Employee W2 Output Generated Successfully!');
-                this.interval = setInterval(this.tick.bind(this), 3000);
+                this.interval = setInterval(this.tick.bind(this), 300000);
                 return response
             }).catch(error => {
                 throw new SubmissionError(error)
@@ -682,7 +653,7 @@ class EEW2Records extends React.Component {
                     autoheight={true} editable={false} columns={columns}
                     filterable={true} showfilterrow={true} virtualmode={true}
                     rendergridrows={function(obj){return obj.data;}}
-                    selectionmode={'multiplerowsextended'}/>
+                    selectionmode={'checkbox'}/>
                 <a href="#"  style={divStyleFirstBot} onClick={() => this.exportToExcel()} id="exportToExcel"><i class='fas fa-table fa-lg'></i></a>
                 <Tooltip placement="bottom" isOpen={this.state.exptoExlTip} target="exportToExcel" toggle={this.toggleExpExl}>
                     Export To Excel
