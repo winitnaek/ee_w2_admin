@@ -43,7 +43,6 @@ class EEW2Records extends React.Component {
                     { name: 'last4digits', type: 'string' },
                     { name: 'year', type: 'int' }
                 ],
-                cache: false,
                 url: getRecsUrl,
                 pagenum: 1,
                 pagesize: DFLT_PAGE_SIZE,
@@ -573,9 +572,10 @@ class EEW2Records extends React.Component {
         let dataAdapter = new $.jqx.dataAdapter(source, {
             // remove the comment to debug
             formatData: function(data) {
-                let noOfFilters = 6;
                 // alert(JSON.stringify(data));
-                for (let i = 0; i < noOfFilters; i++) {
+                var noOfFilters = data.filterscount;
+                var i;
+                for (i = 0; i < noOfFilters; i++) {
                     if ("generatedDateTime" === data["filterdatafield" + i]) {
                         data["filtervalue" + i] = $.jqx.formatDate(new Date(data["filtervalue" + i]), 'yyyyMMdd');
                         // alert(data["filtervalue" + i]);
@@ -628,8 +628,11 @@ class EEW2Records extends React.Component {
                     return `<a href="#" data-toggle="tooltip" class="tooltipcomp2" title="View Company Artifacts"><div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadCompData('${ndex}')}>${rowdata.compName}</button></div></a>`;
                    },filtertype: 'input'},
                 { text: 'Run Date/Time', datafield: 'generatedDateTime', width: 'auto', cellsformat: 'MM-dd-yyyy hh:mm:00 tt', filtertype: 'range' },
-                { text: 'Employee Name', datafield: 'lastName', cellsalign: 'center', align: 'center',width: 'auto',cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
-                    return `<a href="#" data-toggle="tooltip" class="tooltipempw2" title="View W2 PDF"><div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadPdfData('${ndex}')}>${rowdata.empFname+' '+rowdata.empLname}</button></div></a>`;
+                { text: 'First Name', datafield: 'firstName', cellsalign: 'center', align: 'center',width: 'auto',cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
+                    return `<a href="#" data-toggle="tooltip" class="tooltipempw2" title="View W2 PDF"><div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadPdfData('${ndex}')}>${rowdata.empFname}</button></div></a>`;
+                   },filtertype: 'input'},
+                   { text: 'Last Name', datafield: 'lastName', cellsalign: 'center', align: 'center',width: 'auto',cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
+                    return `<a href="#" data-toggle="tooltip" class="tooltipempw2" title="View W2 PDF"><div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadPdfData('${ndex}')}>${rowdata.empLname}</button></div></a>`;
                    },filtertype: 'input'},
                 { text: '  SSN  ', datafield: 'last4digits', cellsalign: 'center', align: 'center', width: 'auto', filterable: false, sortable: false },
                 { text: 'Published', datafield: 'isPublished',cellsalign: 'center', align: 'center', cellsrenderer: pubrenderer,  width: 'auto',filtertype: 'bool', },
