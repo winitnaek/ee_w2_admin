@@ -75,6 +75,7 @@ class FilterPayrollData extends Component {
             value:'',
             isEmpSelDisabled:true,
             empInfo:false,
+            selAllInfo:false,
             showActionAlert:false,
             actionAlertMessage:''
         };
@@ -91,6 +92,7 @@ class FilterPayrollData extends Component {
         this.onYearChange = this.onYearChange.bind(this);
         this.getEmployees = this.getEmployees.bind(this);
         this.toggleempInfo = this.toggleempInfo.bind(this);
+        this.toggleselAllInfo = this.toggleselAllInfo.bind(this);
         this.toggleActAlert = this.toggleActAlert.bind(this);
         this.tick2 = this.tick2.bind(this);
         this.onDismiss = this.onDismiss.bind(this);
@@ -494,6 +496,11 @@ class FilterPayrollData extends Component {
             empInfo: !this.state.empInfo
         }); 
     }
+    toggleselAllInfo(){
+        this.setState({
+            selAllInfo: !this.state.selAllInfo
+        }); 
+    }
     render() {
         var eew2data={};
         eew2data.eew2ecords=[];
@@ -620,6 +627,11 @@ class FilterPayrollData extends Component {
             <FormGroup row style={{ paddingLeft: 20 }}>
                     <Label for="periodBy1" sm={3}></Label>
                     <CustomInput type="checkbox" innerRef={(input) => this.latestOnly = input} id="exampleCustomSwitch" defaultChecked={true} name="customSwitch" label="Select Latest Records" />
+                    &nbsp;
+                    <a href="#" id="selAllInfoId"><i class="fas fa-info-circle fa-sm"></i></a>
+                    <Tooltip placement="right" isOpen={this.state.selAllInfo} target="selAllInfoId" toggle={this.toggleselAllInfo}>
+                       Select latest records from all the previous runs.
+                    </Tooltip>
             </FormGroup>
             <FormGroup row>
                 <Label for="periodBy1" sm={1}></Label>
