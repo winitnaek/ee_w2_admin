@@ -1,21 +1,22 @@
 export default {
-  outputgeninprogress:false,
-  w2data:{
-    loadeew2:false,
-    eew2id:''
+  outputgeninprogress: false,
+  w2data: {
+    loadeew2: false,
+    eew2id: ''
   },
-  compdata:{
-    loadcomp:false,
-    compid:''
+  compdata: {
+    loadcomp: false,
+    compid: ''
   },
   eew2data: {
     filtertype: '',
     filterlabel: '',
     eew2pdf: {},
-    transmitters:[],
+    transmitters: [],
     eew2ecords: [],
-    pubunpubcnt:0,
-    genstatus:0
+    eew2recordInput: {},
+    pubunpubcnt: 0,
+    genstatus: 0
   },
   viewcompdata: {
     messages: [],

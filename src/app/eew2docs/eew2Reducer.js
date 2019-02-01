@@ -15,6 +15,7 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         filtertype:action.eew2data.filtertype,
         transmitters:action.eew2data.transmitters,
         eew2ecords: Object.assign([], ...state.eew2ecords, action.eew2data.eew2ecords),
+        eew2recordInput: action.eew2data.eew2recordInput,
         eew2pdf: {}, 
       });
     }

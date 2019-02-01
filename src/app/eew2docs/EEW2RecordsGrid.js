@@ -9,10 +9,16 @@ import {getAuditOutput}  from '../comp_outputs/compViewAction';
 import {
     divStylePA
 } from '../../base/constants/AppConstants';
+import * as svcs from '../../base/constants/ServiceUrls';
+import URLUtils from '../../base/utils/urlUtils';
 class EEW2RecordsGrid extends React.Component {
     renderGrid(eew2data){
-        if(eew2data && eew2data.eew2ecords && eew2data.eew2ecords.length >0){
-            return(<EEW2Records eew2data={this.props.eew2data} w2data={this.props.w2data} viewcompdata={this.props.viewcompdata} compdata={this.props.compdata} isoutinprogress={this.props.isoutinprogress} actions={this.props.actions}/>);
+        eew2data.getRecsUrl = buildGetRecsUrl();
+
+        if(eew2data && eew2data.eew2ecords){
+            return(<EEW2Records eew2data={this.props.eew2data} w2data={this.props.w2data} viewcompdata={this.props.viewcompdata} 
+                compdata={this.props.compdata} isoutinprogress={this.props.isoutinprogress} 
+                actions={this.props.actions}/>);
         }else if(eew2data && eew2data.eew2ecords && eew2data.eew2ecords.type=='AppError'){
             return(<div>
                 <Alert color="danger">
@@ -47,6 +53,10 @@ class EEW2RecordsGrid extends React.Component {
     render() {
         return (<div>{this.renderGrid(this.props.eew2data)}</div>);
     }
+};
+function buildGetRecsUrl() {
+    let url = URLUtils.buildURL(svcs.GET_EEW2RECORDS);
+    return url;
 };
 function mapStateToProps(state) {
     return {
