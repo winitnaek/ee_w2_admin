@@ -3,22 +3,20 @@ import ReactDOM from 'react-dom';
 import {Alert, Button, ButtonGroup, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Label, Col, Form,Input,Tooltip,FormFeedback,CustomInput} from 'reactstrap';
 import JqxDateTimeInput from '../../deps/jqwidgets-react/react_jqxdatetimeinput.js';
 import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
-import {RN_PERIODIC_COMPNAY_TOTAL,RN_AUTH_TAXTYPE_TOTAL,RN_EEW2_RECORDS} from '../../base/constants/RenderNames';
+import {RN_EEW2_RECORDS} from '../../base/constants/RenderNames';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {loadPeriodicData,loadEEW2Records,getTransmitters,getCompaniesByTransmitter,publishUnpublishEEW2Records,generateOutputs}  from './eew2AdminAction';
 import eew2Api from './eew2AdminAPI';
 import Select from 'react-select';
 import AsyncSelect from 'react-select/lib/Async';
-import {divStyleep,selZindx,selZindx1} from '../../base/constants/AppConstants';
+import {divStyleep,selZindx} from '../../base/constants/AppConstants';
 import styles from '../../css/cfapp.css';
 const yearSpan = 7;
-const usrobj = JSON.parse(sessionStorage.getItem('up'));
-console.log(usrobj);
-//const dataset = 'CF_EEW2_1';
-const dataset = '00_CFWD_002';
-//const dataset = usrobj.dataset;
-
+let usrobj = JSON.parse(sessionStorage.getItem('up'));
+console.log('usrobj Inside FilterPayrollData ===============>>> : '+usrobj);
+const dataset = usrobj.dataset;
+console.log('dataset Inside FilterPayrollData ==============>>> : '+dataset);
 const VIEW_PDF = 1;
 const GENERATE_W2S = 2;
 const PUBLISH_W2S = 3;
@@ -419,8 +417,6 @@ class FilterPayrollData extends Component {
             cfein.push(comp);
             let tfein = this.state.selectedTransmitter.value;
             var eew2empInput= {"dataset":dataset,"transmitterId":tfein,"companyId":cfein,"allComps":false,"empFilter":input}
-
-            //var eew2empInput={"dataset":"CF_EEW2_1","transmitterId":"581234567","companyId":["225012345"],"allComps":false,"empFilter":input}
             console.log('this.state.selectedEmployees during employee search');  
             console.log(this.state.selectedEmployees);   
             var selectedEmp = this.state.selectedEmployees;
