@@ -3,27 +3,26 @@ import ReactDOM from 'react-dom';
 import {Alert, Button, ButtonGroup, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Label, Col, Form,Input,Tooltip,FormFeedback,CustomInput} from 'reactstrap';
 import JqxDateTimeInput from '../../deps/jqwidgets-react/react_jqxdatetimeinput.js';
 import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
-import {RN_PERIODIC_COMPNAY_TOTAL,RN_AUTH_TAXTYPE_TOTAL,RN_EEW2_RECORDS} from '../../base/constants/RenderNames';
+import {RN_EEW2_RECORDS} from '../../base/constants/RenderNames';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {loadPeriodicData,loadEEW2Records,getTransmitters,getCompaniesByTransmitter,publishUnpublishEEW2Records}  from './eew2AdminAction';
+import {loadPeriodicData,loadEEW2Records,getTransmitters,getCompaniesByTransmitter,publishUnpublishEEW2Records,generateOutputs}  from './eew2AdminAction';
 import eew2Api from './eew2AdminAPI';
 import Select from 'react-select';
 import AsyncSelect from 'react-select/lib/Async';
-import {divStyleep,selZindx,selZindx1} from '../../base/constants/AppConstants';
+import {divStyleep,selZindx} from '../../base/constants/AppConstants';
 import styles from '../../css/cfapp.css';
 const yearSpan = 7;
-const usrobj = JSON.parse(sessionStorage.getItem('up'));
-console.log(usrobj);
-//const dataset = 'CF_EEW2_1';
-const dataset = '00_CFWD_002';
-//const dataset = usrobj.dataset;
-
+let usrobj = JSON.parse(sessionStorage.getItem('up'));
+console.log('usrobj Inside FilterPayrollData ===============>>> : '+usrobj);
+const dataset = usrobj.dataset;
+console.log('dataset Inside FilterPayrollData ==============>>> : '+dataset);
 const VIEW_PDF = 1;
 const GENERATE_W2S = 2;
 const PUBLISH_W2S = 3;
 const UNPUBLISH_W2S = 4;
-
+const ALERTINTERVAL = 300000;
+const CURRENT_YR = new Date().getFullYear();
 /**
  * 
  * 
@@ -48,7 +47,6 @@ class FilterPayrollData extends Component {
             pagesize: 5,
             localdata: data
         };
-       
         this.state = {
             source: source,
             modal: true,
@@ -66,12 +64,18 @@ class FilterPayrollData extends Component {
             isCompLoading:false,
             isEmpsLoading:false,
             disableviewpdf:true,
+            disablegenpdf:true,
+            disablepubpdf:true,
+            disableunpubpdf:true,
             gridHasData:false,
             ops:ops,
             inputValue: '',
             value:'',
             isEmpSelDisabled:true,
-            empInfo:false
+            empInfo:false,
+            selAllInfo:false,
+            showActionAlert:false,
+            actionAlertMessage:''
         };
         this.toggle = this.toggle.bind(this);
         this.toggleaddEmpsSel = this.toggleaddEmpsSel.bind(this);
@@ -86,16 +90,24 @@ class FilterPayrollData extends Component {
         this.onYearChange = this.onYearChange.bind(this);
         this.getEmployees = this.getEmployees.bind(this);
         this.toggleempInfo = this.toggleempInfo.bind(this);
+        this.toggleselAllInfo = this.toggleselAllInfo.bind(this);
+        this.toggleActAlert = this.toggleActAlert.bind(this);
+        this.tick2 = this.tick2.bind(this);
+        this.onDismiss = this.onDismiss.bind(this);
+        this.onActionDone = this.onActionDone.bind(this);
     }
+    onDismiss() {
+        this.setState({ visible: false });
+      }
     onYearChange(e){
         //console.log('Year val');
         //console.log(e.target.value);
         if(this.state.gridHasData && e.target.value > 0){
-            this.setState({ disableviewpdf:false });
+            this.setState({ disableviewpdf:false,disablegenpdf:false,disablepubpdf:false,disableunpubpdf:false});
         }else if(!this.state.gridHasData && !e.target.value){
-            this.setState({ disableviewpdf:true });
+            this.setState({ disableviewpdf:true,disablegenpdf:true,disablepubpdf:true,disableunpubpdf:true});
         }else if(!e.target.value){
-            this.setState({ disableviewpdf:false });
+            this.setState({ disableviewpdf:false,disablegenpdf:false,disablepubpdf:false,disableunpubpdf:false});
         }
     }
     handleTransmitterChange(selectedTransmitter){
@@ -134,7 +146,7 @@ class FilterPayrollData extends Component {
         var cfein =[];
         let comp = `${selectedCompany.value}`;
         cfein.push(comp);
-        this.setState({ isEmpSelDisabled:false});
+        this.setState({ isEmpSelDisabled:false,selectedEmployees: null});
     }
     handleEmployeeChange(selectedEmployees){
         console.log('selectedEmployees');
@@ -161,11 +173,28 @@ class FilterPayrollData extends Component {
         var fein  = this.state.selectedCompany.value;
         var allRecs = false;
         var w2dgridata=[];
+        var compsloaded = this.state.companies;
+        var comps =[];
+        var hasAllEmpSelected = false;
         this.state.selectedEmployees.forEach(function (emp) {
+            if(emp.value=='All'){
+                console.log('All employee selected for the company : '+company);
+                compsloaded.forEach(function (comp) {
+                    if(comp.value ==fein){
+                        comps.push({'value':comp.value,'label':comp.label, disabled:'yes'});
+                        hasAllEmpSelected=true;
+                    }else{
+                        comps.push({'value':comp.value,'label':comp.label, disabled:comp.disabled});
+                    }
+                });
+            }
             w2dgridata.push({'name':emp.label, 'transmitterid':transmitter,'company':company,'companyId':fein, 'type': 'Employee', 'empid':emp.value,'empkey':emp.empkey,'allRecs':allRecs,'requestno':0});
         });
-       
-        this.setState({ selectedTransmitter: null , selectedCompany: null, selectedEmployees: null , companies:[], disableaddemp:true,addEmps:false,gridHasData:true,isEmpSelDisabled:true});
+        if(hasAllEmpSelected){
+            this.setState({ companies:comps,selectedCompany: null});
+        }   
+        //this.setState({ selectedTransmitter: null , selectedCompany: null, selectedEmployees: null , companies:[], disableaddemp:true,addEmps:false,gridHasData:true,isEmpSelDisabled:true});
+        this.setState({ selectedEmployees: null , disableaddemp:true,addEmps:false,gridHasData:true,isEmpSelDisabled:false});
         
         this.state.w2dgridata.push(...w2dgridata);
        
@@ -173,7 +202,7 @@ class FilterPayrollData extends Component {
         this.refs.eew2ActionGrid.clearselection();
         this.refs.eew2ActionGrid.updatebounddata('data');
         if(this.yearSelected.value > 0){
-            this.setState({disableviewpdf:false});
+            this.setState({ disableviewpdf:false,disablegenpdf:false,disablepubpdf:false,disableunpubpdf:false});
             //this.yearSelected.value=null;
             this.yearSelected.disabled=true;
         }
@@ -210,6 +239,16 @@ class FilterPayrollData extends Component {
      */
     onSetQuarter(qSelected){
         this.setState({ qSelected });
+    }
+    toggleActAlert(message){
+        this.setState({
+            showActionAlert: !this.state.showActionAlert,
+            actionAlertMessage:message
+        });
+    }
+    tick2(){
+        clearInterval(this.interval);
+        this.toggleActAlert('');
     }
     /**
      * getRequestData
@@ -257,7 +296,7 @@ class FilterPayrollData extends Component {
         }else if(actionClicked==PUBLISH_W2S){
             eew2recordInput = {
                 "dataset": dataset,
-                "toUnpublish":true,
+                "toUnpublish":false,
                 "latestonly": (this.latestOnly.checked==true) ? true:false,
                 "year": this.yearSelected.value,
                 "w2RequestInputs": w2RequestInputs
@@ -269,7 +308,7 @@ class FilterPayrollData extends Component {
         }else if(actionClicked==UNPUBLISH_W2S){
             eew2recordInput = {
                 "dataset": dataset,
-                "toUnpublish":false,
+                "toUnpublish":true,
                 "latestonly": (this.latestOnly.checked==true) ? true:false,
                 "year": this.yearSelected.value,
                 "w2RequestInputs": w2RequestInputs
@@ -294,18 +333,56 @@ class FilterPayrollData extends Component {
             this.props.loadEEW2Records(eew2data);
             renderW2AdmApplication(appAnchor(),RN_EEW2_RECORDS);
         }else if(actionClicked==GENERATE_W2S){
+            this.setState({showActionAlert: false});
             var eew2data = this.getRequestData(actionClicked);
             eew2data.eew2ecords=[];
-
+            this.props.generateOutputs(eew2data.eew2recordInput).then(response => {
+                this.toggleActAlert('W2 Generation Initiated for the selected companies and employees.');
+                this.interval = setInterval(this.tick2.bind(this), ALERTINTERVAL);
+                this.onActionDone(GENERATE_W2S);
+                return response
+            }).catch(error => {
+                throw new SubmissionError(error)
+            })
         }else if(actionClicked==PUBLISH_W2S){
+            this.setState({showActionAlert: false});
             var eew2data = this.getRequestData(actionClicked);
             eew2data.eew2ecords=[];
-            this.props.publishUnpublishEEW2Records(eew2data.eew2recordInput);
-            this.onResetSelection(PUBLISH_W2S)
+            this.props.publishUnpublishEEW2Records(eew2data.eew2recordInput).then(response => {
+                this.toggleActAlert('Publish W2 Initiated for the selected companies and employees.');
+                this.interval = setInterval(this.tick2.bind(this), ALERTINTERVAL);
+                this.onActionDone(PUBLISH_W2S);
+                return response
+            }).catch(error => {
+                throw new SubmissionError(error)
+            });
         }else if(actionClicked==UNPUBLISH_W2S){
+            this.setState({showActionAlert: false});
             var eew2data = this.getRequestData(actionClicked);
             eew2data.eew2ecords=[];
-
+            this.props.publishUnpublishEEW2Records(eew2data.eew2recordInput).then(response => {
+                this.toggleActAlert('Un-Publish Initiated W2 for the selected companies and employees.');
+                this.interval = setInterval(this.tick2.bind(this), ALERTINTERVAL);
+                this.onActionDone(UNPUBLISH_W2S);
+                return response
+            }).catch(error => {
+                throw new SubmissionError(error)
+            });
+        }
+    }
+    /**
+     * onActionDone
+     * @param {*} actionClicked 
+     */
+    onActionDone(actionClicked){
+        this.setState({pSelected:actionClicked});
+        if(actionClicked==VIEW_PDF){
+        }else if(actionClicked==GENERATE_W2S){
+            this.setState({disablegenpdf:true});
+        }else if(actionClicked==PUBLISH_W2S){
+            this.setState({disablepubpdf:true});
+        }else if(actionClicked==UNPUBLISH_W2S){
+            this.setState({disableunpubpdf:true});
         }
     }
     /**
@@ -313,10 +390,10 @@ class FilterPayrollData extends Component {
      * @param {*} actionClicked 
      */
     onResetSelection(actionClicked){
-        this.setState({w2dgridata:[], selectedTransmitter: null , selectedCompany: null, selectedEmployees: null,disableaddemp:true,addEmps:false,gridHasData:false,disableviewpdf:true,isEmpSelDisabled:true});
+        this.setState({w2dgridata:[], selectedTransmitter: null , selectedCompany: null, selectedEmployees: null,disableaddemp:true,addEmps:false,gridHasData:false,disableviewpdf:true,disablegenpdf:true,disablepubpdf:true,disableunpubpdf:true,isEmpSelDisabled:true});
         this.yearSelected.disabled=false;
-        this.yearSelected.value=null;
-        this.latestOnly.checked=false;
+        this.yearSelected.value=(CURRENT_YR-1);
+        this.latestOnly.checked=true;
         this.state.source.localdata=[];
         this.refs.eew2ActionGrid.clearselection();
         this.refs.eew2ActionGrid.updatebounddata('data');
@@ -340,32 +417,45 @@ class FilterPayrollData extends Component {
             cfein.push(comp);
             let tfein = this.state.selectedTransmitter.value;
             var eew2empInput= {"dataset":dataset,"transmitterId":tfein,"companyId":cfein,"allComps":false,"empFilter":input}
-
-            //var eew2empInput={"dataset":"CF_EEW2_1","transmitterId":"581234567","companyId":["225012345"],"allComps":false,"empFilter":input}
             console.log('this.state.selectedEmployees during employee search');  
             console.log(this.state.selectedEmployees);   
             var selectedEmp = this.state.selectedEmployees;
             console.log(this.state.w2dgridata);
             var dataSelected = this.state.w2dgridata;
+            var employees = [];
+            if(selectedEmp && selectedEmp.length > 0 && selectedEmp[0].label=='All'){
+                var isDisabled='no';
+                if(dataSelected && dataSelected.length >0){
+                    for(i=0;i <dataSelected.length;i++){
+                        if(dataSelected[i].companyId == comp && dataSelected[i].empid=="All" && dataSelected[i].name=="All"){
+                            isDisabled ='yes';
+                            break;
+                        }
+                    };
+                }
+                employees.push({'value':'All','label':'All',disabled: isDisabled});
+            }else if(selectedEmp && selectedEmp.length > 0 && selectedEmp[0].label !='All'){
+                employees.push({'value':'All','label':'All',disabled: 'yes'});
+            }else{
+                var isDisabled='no';
+                if(dataSelected && dataSelected.length >0){
+                    for(i=0;i <dataSelected.length;i++){
+                        if(dataSelected[i].companyId == comp && dataSelected[i].empid !="All" && dataSelected[i].name !="All"){
+                            isDisabled ='yes';
+                            break;
+                        }
+                    };
+                }
+                employees.push({'value':'All','label':'All',disabled: isDisabled});
+            }
             return eew2Api.getEmployees(eew2empInput).then(function (temps) {
-                var employees = [];
+              
                 if(temps && temps.length >0){
                     if(selectedEmp && selectedEmp.length > 0 && selectedEmp[0].label=='All'){
-                        var isDisabled='no';
-                        if(dataSelected && dataSelected.length >0){
-                            for(i=0;i <dataSelected.length;i++){
-                                if(dataSelected[i].companyId == comp && dataSelected[i].empid=="All" && dataSelected[i].name=="All"){
-                                    isDisabled ='yes';
-                                    break;
-                                }
-                            };
-                        }
-                        employees.push({'value':'All','label':'All',disabled: isDisabled});
                         temps.forEach(function (emp) {
                             employees.push({'value':emp.empid,'label':emp.fname+' '+emp.lname,disabled: 'yes','fein':comp,"empkey":emp.empkey});
                         });
                     }else if(selectedEmp && selectedEmp.length > 0 && selectedEmp[0].label !='All'){
-                        employees.push({'value':'All','label':'All',disabled: 'yes'});
                         temps.forEach(function (emp) {
                             var isDisabled='no';
                             if(dataSelected && dataSelected.length >0){
@@ -379,16 +469,6 @@ class FilterPayrollData extends Component {
                             employees.push({'value':emp.empid,'label':emp.fname+' '+emp.lname,disabled: isDisabled,'fein':comp,"empkey":emp.empkey});
                         });
                     }else{
-                        var isDisabled='no';
-                        if(dataSelected && dataSelected.length >0){
-                            for(i=0;i <dataSelected.length;i++){
-                                if(dataSelected[i].companyId == comp && dataSelected[i].empid !="All" && dataSelected[i].name !="All"){
-                                    isDisabled ='yes';
-                                    break;
-                                }
-                            };
-                        }
-                        employees.push({'value':'All','label':'All',disabled: isDisabled});
                         temps.forEach(function (emp) {
                             var isDisabled='no';
                             if(dataSelected && dataSelected.length >0){
@@ -410,6 +490,11 @@ class FilterPayrollData extends Component {
     toggleempInfo(){
         this.setState({
             empInfo: !this.state.empInfo
+        }); 
+    }
+    toggleselAllInfo(){
+        this.setState({
+            selAllInfo: !this.state.selAllInfo
         }); 
     }
     render() {
@@ -442,9 +527,9 @@ class FilterPayrollData extends Component {
         
         let dataAdapter = new $.jqx.dataAdapter(this.state.source);
 
-        let currentYr = new Date().getFullYear();
-        let minYr = currentYr-yearSpan;;
-        let maxYr = currentYr+yearSpan;
+       
+        let minYr = CURRENT_YR-yearSpan;;
+        let maxYr = CURRENT_YR+yearSpan;
 
         let columns =
         [
@@ -473,7 +558,7 @@ class FilterPayrollData extends Component {
             <Label for="filterYear" sm={1}></Label>
             <Label for="chooseYear" sm={2}>Year</Label>
             <Col sm={3}>
-                    <Input type="number" onChange={this.onYearChange} innerRef={(input) => this.yearSelected = input} name="selYear" min={minYr} max={maxYr} id="selYear" placeholder="Select Year" />
+                    <Input type="number" onChange={this.onYearChange} innerRef={(input) => this.yearSelected = input} name="selYear" min={minYr} max={maxYr} defaultValue={CURRENT_YR-1}  id="selYear" placeholder="Select Year" />
            </Col>
            <Label for="filtertrans" sm={2}>Transmitter</Label>
             <Col sm={3} style={{ zIndex: 101 }}>
@@ -510,7 +595,7 @@ class FilterPayrollData extends Component {
                 <Label sm={1}></Label>
                 <Label sm={2}>Employee  <a href="#" id="empInfoId"><i class="fas fa-info-circle fa-sm"></i></a></Label>
                 <Tooltip placement="bottom" isOpen={this.state.empInfo} target="empInfoId" toggle={this.toggleempInfo}>
-                    Select All or Individual Employees from the selected Company.
+                    Type All or first few characters of Employee Name/Employee Id.
                 </Tooltip>
                 <Col sm={7}  style={{ zIndex: 99 }}>
                         <AsyncSelect
@@ -519,7 +604,7 @@ class FilterPayrollData extends Component {
                             closeMenuOnSelect={false}
                             value={this.state.selectedEmployees}
                             isDisabled={this.state.isEmpSelDisabled}
-                            isMulti
+                            isMulti={true}
                             cacheOptions ={false}
                             defaultOptions
                             isLoading={true}
@@ -537,7 +622,12 @@ class FilterPayrollData extends Component {
             </FormGroup>
             <FormGroup row style={{ paddingLeft: 20 }}>
                     <Label for="periodBy1" sm={3}></Label>
-                    <CustomInput type="checkbox" innerRef={(input) => this.latestOnly = input} id="exampleCustomSwitch" name="customSwitch" label="Select Latest Records Only" />
+                    <CustomInput type="checkbox" innerRef={(input) => this.latestOnly = input} id="exampleCustomSwitch" defaultChecked={true} name="customSwitch" label="Select Latest Records" />
+                    &nbsp;
+                    <a href="#" id="selAllInfoId"><i class="fas fa-info-circle fa-sm"></i></a>
+                    <Tooltip placement="right" isOpen={this.state.selAllInfo} target="selAllInfoId" toggle={this.toggleselAllInfo}>
+                       Select latest records from all the previous runs.
+                    </Tooltip>
             </FormGroup>
             <FormGroup row>
                 <Label for="periodBy1" sm={1}></Label>
@@ -566,7 +656,7 @@ class FilterPayrollData extends Component {
             <ModalFooter>
                 <Button color="secondary" className="btn btn-primary" onClick={this.toggle}>Cancel</Button>
                 <Button color="secondary" className="btn btn-primary mr-auto" onClick={() => this.onResetSelection(2)}>Reset</Button>
-                <Button disabled={this.state.disableviewpdf} onClick={() => this.onPerformAction(2)}  color="success">Generate W2s</Button>{' '}
+                <Button disabled={this.state.disablegenpdf} onClick={() => this.onPerformAction(2)}  color="success">Generate W2s</Button>{' '}
             </ModalFooter>
         }else if(this.state.pSelected === 3){
             eew2ActionView=eew2ActionViewFrm;
@@ -574,7 +664,7 @@ class FilterPayrollData extends Component {
             <ModalFooter>
                 <Button color="secondary" className="btn btn-primary" onClick={this.toggle}>Cancel</Button>
                 <Button color="secondary" className="btn btn-primary mr-auto" onClick={() => this.onResetSelection(3)}>Reset</Button>
-                <Button disabled={this.state.disableviewpdf} onClick={() => this.onPerformAction(3)}  color="success">Publish W2s</Button>{' '}
+                <Button disabled={this.state.disablepubpdf} onClick={() => this.onPerformAction(3)}  color="success">Publish W2s</Button>{' '}
             </ModalFooter>
         }else if(this.state.pSelected === 4){
             eew2ActionView=eew2ActionViewFrm;
@@ -582,19 +672,20 @@ class FilterPayrollData extends Component {
              <ModalFooter>
                 <Button color="secondary" className="btn btn-primary" onClick={this.toggle}>Cancel</Button>
                 <Button color="secondary" className="btn btn-primary mr-auto" onClick={() => this.onResetSelection(4)}>Reset</Button>
-                <Button disabled={this.state.disableviewpdf} onClick={() => this.onPerformAction(4)}  color="success">Un-Publish W2s</Button>{' '}
+                <Button disabled={this.state.disableunpubpdf} onClick={() => this.onPerformAction(4)}  color="success">Un-Publish W2s</Button>{' '}
              </ModalFooter>
         }
         return (
             <div>
                 <Modal size="lg" isOpen={this.state.modal} toggle={this.toggle} className={this.props.className} backdrop={this.state.backdrop}>
-                    <ModalHeader toggle={this.toggle}>Manage EE W2 Records</ModalHeader>
+                    <ModalHeader toggle={this.toggle}>Manage W2 Records</ModalHeader>
                     <ModalBody>
-                     {this.props.eew2data.pubunpubcnt > 0 ?( <Form>
-                            <FormGroup row><Label for="periodBy1" sm={1}></Label><Col sm={10}><Alert color="success">
-                        <span>Publish W2 Initiated for the selected companies and employees</span>
-                    </Alert></Col></FormGroup></Form>) : null}
-                        <Form>
+                     {this.state.showActionAlert ==true ?(<Form>
+                            <FormGroup row><Label for="periodBy1" sm={1}></Label><Col sm={10}>
+                                    <Alert color="success" isOpen={this.state.showActionAlert} toggle={this.onDismiss}>
+                                    {this.state.actionAlertMessage}
+                                    </Alert></Col></FormGroup></Form>) : null}
+                            <Form>
                             <FormGroup row>
                                 <Label for="filterType" sm={1}></Label>
                                 <Label for="filterType" sm={2}>Action</Label>
@@ -602,8 +693,8 @@ class FilterPayrollData extends Component {
                                     <ButtonGroup>
                                         <Button outline color="info" onClick={() => this.onActionBtnSelected(1)} active={this.state.pSelected === 1}>View W2</Button>
                                         <Button outline color="info" onClick={() => this.onActionBtnSelected(2)} active={this.state.pSelected === 2}>Generate W2</Button>
-                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(3)} active={this.state.pSelected === 3}>Publish</Button>
-                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(4)} active={this.state.pSelected === 4}>Un-Publish</Button>
+                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(3)} active={this.state.pSelected === 3}>Publish W2</Button>
+                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(4)} active={this.state.pSelected === 4}>Un-Publish W2</Button>
                                     </ButtonGroup>
                                 </Col>
                             </FormGroup>
@@ -622,6 +713,6 @@ function mapStateToProps(state) {
     }
 }
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({ loadEEW2Records ,loadPeriodicData,getTransmitters,getCompaniesByTransmitter,publishUnpublishEEW2Records}, dispatch)
+    return bindActionCreators({ loadEEW2Records ,loadPeriodicData,getTransmitters,getCompaniesByTransmitter,publishUnpublishEEW2Records,generateOutputs}, dispatch)
 }
 export default connect(mapStateToProps,mapDispatchToProps)(FilterPayrollData);
