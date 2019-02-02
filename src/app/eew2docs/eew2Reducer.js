@@ -35,6 +35,7 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         transmitters:state.transmitters,
         eew2ecords: Object.assign([], ...state.eew2ecords, state.eew2ecords),
         eew2pdf: action.eew2pdf, 
+        eew2recordInput: state.eew2recordInput
       });
     }
     case types.GET_EEW2PDF_ERROR: {
@@ -44,6 +45,7 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         transmitters:state.transmitters,
         eew2ecords: Object.assign([], ...state.eew2ecords, state.eew2ecords),
         eew2pdf: action.eew2pdf,
+        eew2recordInput: state.eew2recordInput
       });
     }
     case types.POST_GENERATE_OUTPUTS_SUCCESS:{
@@ -52,7 +54,8 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         filtertype:state.filtertype,
         transmitters:state.transmitters,
         eew2ecords: Object.assign([], ...state.eew2ecords, action.eew2ecords),
-        eew2pdf: {} 
+        eew2pdf: {},
+        eew2recordInput: state.eew2recordInput 
       });
     }
     case types.POST_GENERATE_OUTPUTS_ERROR:{
@@ -61,7 +64,8 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         filterlabel:state.filterlabel,
         transmitters:state.transmitters,
         eew2ecords: [],
-        eew2pdf: {} 
+        eew2pdf: {},
+        eew2recordInput: state.eew2recordInput 
       });
     }
     case types.POST_PUBUNPUB_OUTPUTS_SUCCESS:{
@@ -71,7 +75,8 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         transmitters:state.transmitters,
         eew2ecords: Object.assign([], ...state.eew2ecords, state.eew2ecords),
         pubunpubcnt:action.pubunpubcnt,
-        eew2pdf: {} 
+        eew2pdf: {},
+        eew2recordInput: state.eew2recordInput 
       });
     }
     case types.POST_PUBUNPUB_OUTPUTS_ERROR:{
@@ -81,7 +86,8 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         transmitters:state.transmitters,
         eew2ecords: Object.assign([], ...state.eew2ecords, state.eew2ecords),
         pubunpubcnt:action.pubunpubcnt,
-        eew2pdf: {} 
+        eew2pdf: {},
+        eew2recordInput: state.eew2recordInput 
       });
     }
     case types.GET_TRANSMITTER_SUCCESS:{
