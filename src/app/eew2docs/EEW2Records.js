@@ -742,7 +742,7 @@ class EEW2Records extends React.Component {
                     autoheight={true} editable={false} columns={columns}
                     filterable={true} showfilterrow={true} virtualmode={true}
                     rendergridrows={function(obj){return obj.data;}}
-                    selectionmode={'multiplerowsextended'}/>
+                    selectionmode={'multiplerows'}/>
                 <a href="#"  style={divStyleFirstBot} onClick={() => this.exportToExcel()} id="exportToExcel"><i class='fas fa-table fa-lg'></i></a>
                 <Tooltip placement="bottom" isOpen={this.state.exptoExlTip} target="exportToExcel" toggle={this.toggleExpExl}>
                     Export To Excel
