@@ -269,7 +269,7 @@ class EEW2Records extends React.Component {
             
             if(totalRecordsInGrid == totalRecordsSelected){
 
-                console.log('w2RequestInputs generateOutput===>');
+                console.log('w2RequestInputs publishW2===>');
                 console.log(w2RequestInputs);
                 var eew2recordInput = {
                     "dataset": grindRecInputData.dataset,
@@ -364,40 +364,72 @@ class EEW2Records extends React.Component {
         });
     }
     generateOutput(){
-        this.setState({outputSuccess: false});
-        let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
+       let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
         if(selIndexes.length >0){
-            let taxYear = "";
+            this.setState({outputSuccess: false});
+            console.log('this.props.eew2data.eew2recordInput');
+            console.log(this.props.eew2data.eew2recordInput);
+            let grindRecInputData  = this.props.eew2data.eew2recordInput;
+            let totalRecordsInGrid = this.state.source.totalrecords
+            let totalRecordsSelected = 0;
             selIndexes.forEach(index => {
-                let data = this.refs.eew2Grid.getrowdata(index);
-                taxYear = data.year
-                return;
+                totalRecordsSelected++;
             });
-            var w2RequestInputs=[];
-            selIndexes.forEach(index => {
-                let data = this.refs.eew2Grid.getrowdata(index);
-                w2RequestInputs.push({"transmitterId":data.tranFein,"companyId":data.compFein,"empkey":data.empkey});
-            });
-            console.log('w2RequestInputs generateOutput===>');
-            console.log(w2RequestInputs);
-            var eew2recordInput = {
-                "dataset": dataset, //Dataset need to come from top
-                "year": taxYear,
-                "w2RequestInputs": w2RequestInputs
-            };
-            console.log('generateOutput eew2recordInput ==>');
-            console.log(eew2recordInput);
-            this.props.actions.generateOutputs(eew2recordInput).then(response => {
-                //this.state.source.localdata=this.props.eew2data.eew2ecords;
-                this.refs.eew2Grid.clearselection();
-                //this.refs.eew2Grid.updatebounddata('data');
-                //this.refs.eew2Grid.sortby('requestno', 'desc');
-                this.toggleSuccess('Employee W2 Output Generated Successfully!');
-                this.interval = setInterval(this.tick.bind(this), 300000);
-                return response
-            }).catch(error => {
-                throw new SubmissionError(error)
-            })
+    
+            console.log('totalRecordsInGrid');
+            console.log(totalRecordsInGrid);
+            console.log('totalRecordsSelected');
+            console.log(totalRecordsSelected);
+            
+            if(totalRecordsInGrid == totalRecordsSelected){
+                var eew2recordInput = {
+                    "dataset": grindRecInputData.dataset,
+                    "year": grindRecInputData.year,
+                    "w2RequestInputs": grindRecInputData.w2RequestInputs
+                };
+                console.log('generateOutput eew2recordInput ==>');
+                console.log(eew2recordInput);
+                this.props.actions.generateOutputs(eew2recordInput).then(response => {
+                    this.refs.eew2Grid.clearselection();
+                    this.toggleSuccess('Employee W2 Output Generated Successfully!');
+                    this.interval = setInterval(this.tick.bind(this), 300000);
+                    return response
+                }).catch(error => {
+                    throw new SubmissionError(error)
+                })
+            }else{
+                let taxYear = "";
+                selIndexes.forEach(index => {
+                    let data = this.refs.eew2Grid.getrowdata(index);
+                    taxYear = data.year
+                    return;
+                });
+                var w2RequestInputs=[];
+                selIndexes.forEach(index => {
+                    let data = this.refs.eew2Grid.getrowdata(index);
+                    w2RequestInputs.push({"transmitterId":data.tranFein,"companyId":data.compFein,"empkey":data.empkey});
+                });
+                console.log('w2RequestInputs generateOutput===>');
+                console.log(w2RequestInputs);
+                var eew2recordInput = {
+                    "dataset": dataset, //Dataset need to come from top
+                    "year": taxYear,
+                    "w2RequestInputs": w2RequestInputs
+                };
+                console.log('generateOutput eew2recordInput ==>');
+                console.log(eew2recordInput);
+                this.props.actions.generateOutputs(eew2recordInput).then(response => {
+                    //this.state.source.localdata=this.props.eew2data.eew2ecords;
+                    this.refs.eew2Grid.clearselection();
+                    //this.refs.eew2Grid.updatebounddata('data');
+                    //this.refs.eew2Grid.sortby('requestno', 'desc');
+                    this.toggleSuccess('Employee W2 Output Generated Successfully!');
+                    this.interval = setInterval(this.tick.bind(this), 300000);
+                    return response
+                }).catch(error => {
+                    throw new SubmissionError(error)
+                })
+            }
         }else{
             this.showAlert(true,'Generate W2','Please select at least one employee record to generate output.');
         }
