@@ -52,11 +52,6 @@ class EEW2Records extends React.Component {
                     { name: 'year', type: 'int' }
                 ],
                 url: getRecsUrl,
-                pagenum: 1,
-                pagesize: DFLT_PAGE_SIZE,
-                pager: (pagenum, pagesize, oldpagenum) => {
-                    // callback called when a page or page size is changed.
-                },
                 type: "POST",
                 data: eeW2GetRecInput,
                 filter: function() {
@@ -774,7 +769,7 @@ class EEW2Records extends React.Component {
                     autoheight={true} editable={false} columns={columns}
                     filterable={true} showfilterrow={true} virtualmode={true}
                     rendergridrows={function(obj){return obj.data;}}
-                    selectionmode={'multiplerows'}/>
+                    selectionmode={'multiplerows'} cache={false}/>
                 <a href="#"  style={divStyleFirstBot} onClick={() => this.exportToExcel()} id="exportToExcel"><i class='fas fa-table fa-lg'></i></a>
                 <Tooltip placement="bottom" isOpen={this.state.exptoExlTip} target="exportToExcel" toggle={this.toggleExpExl}>
                     Export To Excel
