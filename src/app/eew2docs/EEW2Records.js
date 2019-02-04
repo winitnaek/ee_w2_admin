@@ -92,6 +92,7 @@ class EEW2Records extends React.Component {
             this.handleShowAuditPDF = this.handleShowAuditPDF.bind(this);
             this.handleShowMessages = this.handleShowMessages.bind(this);
             this.handleInProgress = this.handleInProgress.bind(this);
+            this.refreshDataSel = this.refreshDataSel.bind(this);
         this.state = {
             source: source,
             exptoExlTip:false,
@@ -156,10 +157,14 @@ class EEW2Records extends React.Component {
         this.setState({
             allSelected: false
         });
-        let grindRecInputData  = this.props.eew2data.eew2recordInput;
+       
         this.setState({
             allSelected: false
         });
+        this.refreshDataSel();
+    }
+    refreshDataSel(){
+        let grindRecInputData  = this.props.eew2data.eew2recordInput;
         this.state.source.data=grindRecInputData;
         this.state.source.url=this.props.eew2data.getRecsUrl;
         this.refs.eew2Grid.clearfilters();
@@ -516,6 +521,7 @@ class EEW2Records extends React.Component {
         this.setState({
             allSelected: true
         });
+        this.refreshDataSel();
     }
     handleConfirmCancel(){
         console.log('hideUIConfirmCancel');
