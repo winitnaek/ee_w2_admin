@@ -144,6 +144,7 @@ class EEW2Records extends React.Component {
         this.refs.eew2Grid.exportdata('csv', 'EEW2Records');
     }
     selectAllClk(){
+        this.refs.eew2Grid.clearselection();
         this.showConfirm(true,'Select All', this.getSelAllMessage());
     }
     getSelAllMessage(){
@@ -155,6 +156,14 @@ class EEW2Records extends React.Component {
         this.setState({
             allSelected: false
         });
+        let grindRecInputData  = this.props.eew2data.eew2recordInput;
+        this.setState({
+            allSelected: false
+        });
+        this.state.source.data=grindRecInputData;
+        this.state.source.url=this.props.eew2data.getRecsUrl;
+        this.refs.eew2Grid.clearfilters();
+        this.refs.eew2Grid.updatebounddata('data');
         this.refs.eew2Grid.clearselection();
     }
     unpublishW2(){
@@ -486,6 +495,11 @@ class EEW2Records extends React.Component {
     componentDidMount() {
         //$('.tooltipempw2').tooltip({trigger : 'hover'});
         //$('.tooltipcomp2').tooltip({trigger : 'hover'});
+        this.refs.eew2Grid.on('rowclick', (event) => {
+            this.setState({
+                allSelected: false
+            });
+        });
     }
     componentDidUpdate(){
         //$('.tooltipempw2').tooltip({trigger : 'hover'});
