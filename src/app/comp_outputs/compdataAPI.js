@@ -19,12 +19,14 @@ class compdataAPI {
             } else {
                 var errorCode = response.status;
                 var errorMsg = 'Failed to get Company Audit Document. ' + ADMIN_ERROR_MSG;
-                return new AppError(errorMsg, errorCode);
+                throw new AppError(errorMsg, errorCode);
             }
         })
-        .then(response => OUTPUT_MESSAGES === fileType ? response : response.blob())
+        .then(response => { 
+            return OUTPUT_MESSAGES === fileType ? response : response.blob(); 
+        })
         .catch(error => {
-            return error;
+            throw error;
         });
     }
 }

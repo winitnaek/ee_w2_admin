@@ -69,7 +69,12 @@ class ViewCompanyAuditFiles extends Component {
         let fileType = this.getAuditFileType();
         //
         this.props.actions.getAuditOutput(dataset, compId, reqNo, fileType).then(() => {
-            console.log('Get Company Output Done.');
+            console.debug('Get Company Output Done.');
+
+            if ($('#errAlrtCont')) {
+                $('#errAlrtCont').addClass('d-none');
+            }
+
             if (OUTPUT_MESSAGES === fileType && this.props.viewcompdata.messages) {
                 // Get Messages Action
                 this.state.messages = this.props.viewcompdata.messages;
@@ -78,14 +83,12 @@ class ViewCompanyAuditFiles extends Component {
                 });
             } else if ((OUTPUT_CLIENT_SUM === fileType || OUTPUT_CLIENT_DTL === fileType) && this.props.viewcompdata.outputDoc) {
                 this.renderPDFData(this.props.viewcompdata.outputDoc);
-            }
-            else if (OUTPUT_AUDIT === fileType && this.props.viewcompdata.outputDoc) {
+            } else if (OUTPUT_AUDIT === fileType && this.props.viewcompdata.outputDoc) {
                 this.downloadAuditZip(this.props.viewcompdata.outputDoc);
-            } 
-            else {
-                this.flipPdfAnchor(true);
-                this.renderErrorPDF();
             }
+        }).catch(error => {
+            $('#errAlrt').html(error);
+            $('#errAlrtCont').removeClass('d-none');
         });
     }
     flipPdfAnchor(isPdf) {
@@ -273,6 +276,12 @@ class ViewCompanyAuditFiles extends Component {
                     </div>
                 </ModalHeader>
                 <ModalBody>
+                    <div class="d-none alert alert-danger" id="errAlrtCont" role="alert">
+                        <span id="errAlrt"></span>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
                     { (this.state.renderMsg && this.state.msgSel) ? (<div id={NON_PDF_ANCHOR_ID}>
                         <Messages 
                             title={this.state.title} 

@@ -35,7 +35,8 @@ export function getAuditOutput(dataset, compId, reqNo, fileType) {
                 throw output;
             }
         }).catch(error => {
-            generateAppErrorEvent(error.type, error.status, error.message, error);
+            // generateAppErrorEvent(error.type, error.status, error.message, error);
+            throw error;
         });
     };
 }
