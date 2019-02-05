@@ -12,19 +12,6 @@ import PrintW2s from './PrintW2s';
 const viewer_path ='/pdfjs/web/viewer.html?file=';
 const viewer_url  = window.location.protocol+'//'+window.location.host+viewer_path;
 
-//Temporary set user in session:======Comment this when deployed with MAC======
-var userProfile ="{\r\n            \"userId\": \"001907\",\r\n            \"firstName\": \"Isreal\",\r\n            \"lastName\": \"Fullerton\",\r\n            \"dataset\": \"00_CFWD_002\",\r\n            \"securitytokn\": \"fhfh484jer843je848rj393jf\",\r\n            \"branding\": \"base64ImageData\",\r\n            \"userTheme\": \"Default\",\r\n            \"roles\": [\r\n                \"EE\"\r\n            ],\r\n            \"applications\": [\r\n                {\r\n                    \"id\": \"610bbc96-10dc-4874-a9fc-ecf0edf4260b\",\r\n                    \"name\": \"YearEndFactory\",\r\n                    \"accessIds\": [\r\n                        {\r\n                            \"id\": \"b9f6848d-30a7-451d-d2fa-86f3afa4df67\",\r\n                            \"visible\": true\r\n                        }\r\n                    ],\r\n                    \"permissions\": {\r\n                        \"viewDocument\": [\r\n                            1,\r\n                            0,\r\n                            0,\r\n                            0,\r\n                            0\r\n                        ]\r\n                    }\r\n                },\r\n                {   \r\n                \"id\": \"dd4282b1-0544-4ad1-8e0b-6a8d278ffd5c\",\r\n                \"name\": \"eeAdminFactory\",\r\n                \"accessIds\": [\r\n                    {\r\n                        \"id\": \"b55f51a1-0273-4457-8226-013a35d32080\",\r\n                        \"visible\": true\r\n                    }\r\n                ],\r\n                \"permissions\": {\r\n                    \"viewDocument\": [\r\n                        1,\r\n                        0,\r\n                        0,\r\n                        0,\r\n                        0\r\n                    ]\r\n                }\r\n            }\r\n            ],\r\n            \"themeList\": [\r\n                {\r\n                    \"id\": \"Default\",\r\n                    \"name\": \"Default\"\r\n                },\r\n                {\r\n                    \"id\": \"HighContrast\",\r\n                    \"name\": \"High Contrast\"\r\n                },\r\n                {\r\n                    \"id\": \"WhiteOnBlack\",\r\n                    \"name\": \"White On Black\"\r\n                },\r\n                {\r\n                    \"id\": \"BlackOnWhite\",\r\n                    \"name\": \"Black On White\"\r\n                }\r\n            ]\r\n        }"
-var userdata = JSON.parse(userProfile);
-console.log('setUserProfile userdata');
-console.log(userdata);
-sessionStorage.setItem("up", userProfile);
-//==============================================================================
-
-let usrobj = JSON.parse(sessionStorage.getItem('up'));
-console.log('usrobj EEW2Records==============================>>> : '+usrobj);
-const dataset = usrobj.dataset;
-console.log('dataset EEW2Records==============================>>> : '+dataset);
-//const dataset = '00_EE_W2_DATA';
 class EEW2Records extends React.Component {
     constructor(props) {
         super(props);
@@ -132,6 +119,7 @@ class EEW2Records extends React.Component {
         //this.interval = setInterval(this.handleInProgress.bind(this), 60000);
     }
     handleInProgress(){
+        const dataset = appDataset();
         this.props.actions.isOutputGenerationInprogress(dataset)
     }
     hoverOn(){
@@ -179,6 +167,7 @@ class EEW2Records extends React.Component {
     unpublishW2(){
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
         if(selIndexes.length >0 || this.state.allSelected){
+            const dataset = appDataset();
             this.setState({outputSuccess: false});
             if(selIndexes.length >0){
                 let publishCount=0;
@@ -268,6 +257,7 @@ class EEW2Records extends React.Component {
         if(selIndexes.length >0 || this.state.allSelected){
             this.setState({outputSuccess: false});
             if(selIndexes.length >0){
+                const dataset = appDataset();
                 let unpublishCount=0;
                 selIndexes.forEach(index => {
                     let data = this.refs.eew2Grid.getrowdata(index);
@@ -365,6 +355,7 @@ class EEW2Records extends React.Component {
        if(selIndexes.length >0 || this.state.allSelected){
             this.setState({outputSuccess: false});
             if(selIndexes.length >0){
+                const dataset = appDataset();
                 let taxYear = "";
                 selIndexes.forEach(index => {
                     let data = this.refs.eew2Grid.getrowdata(index);
@@ -577,7 +568,7 @@ class EEW2Records extends React.Component {
         let reqNo=rowdata.requestno;//226; //
         let fein =rowdata.compFein;
         let empId=rowdata.empkey;//'001907'; 
-
+        const dataset = appDataset();
         console.log('dataset : '+dataset+', reqNo : '+reqNo+', fein : '+fein+', empId : '+empId);
         //let reqNo=123;
         //let fein =123456789;
@@ -623,6 +614,7 @@ class EEW2Records extends React.Component {
         });
     }
     getOutputFilters(inputParams) {
+        const dataset = appDataset();
         let outputFilters = {
             "dataset": dataset,
             "compId": inputParams.compFein,
