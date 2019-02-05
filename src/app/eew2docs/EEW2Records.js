@@ -7,6 +7,7 @@ import UIAlert from '../common/UIAlert';
 import UIConfirm from '../common/UIConfirm';
 import ViewPDF from '../common/ViewPDF';
 import ViewCompanyAuditFiles from '../comp_outputs/ViewCompanyAuditFiles';
+import PrintW2s from './PrintW2s';
 
 const viewer_path ='/pdfjs/web/viewer.html?file=';
 const viewer_url  = window.location.protocol+'//'+window.location.host+viewer_path;
@@ -93,6 +94,9 @@ class EEW2Records extends React.Component {
             this.handleShowMessages = this.handleShowMessages.bind(this);
             this.handleInProgress = this.handleInProgress.bind(this);
             this.refreshDataSel = this.refreshDataSel.bind(this);
+            this.handlePrintOk = this.handlePrintOk.bind(this);
+            this.handlePrintCancel = this.handlePrintCancel.bind(this);
+            
         this.state = {
             source: source,
             exptoExlTip:false,
@@ -122,7 +126,8 @@ class EEW2Records extends React.Component {
             audits: {
                 showClientKitSumPdf: false,
                 showClientKitDetPdf: false
-            }
+            },
+            showPrint:false
         };
         //this.interval = setInterval(this.handleInProgress.bind(this), 60000);
     }
@@ -345,7 +350,9 @@ class EEW2Records extends React.Component {
     }
     
     printW2s(){
-        alert('printW2s');
+        this.setState({
+            showPrint: true
+        });
     }
     toggleSuccess(message){
         this.setState({
@@ -529,6 +536,16 @@ class EEW2Records extends React.Component {
             showConfirm: !this.state.showConfirm,allSelected: false
         });
     }
+    handlePrintOk(){
+        console.log('handlePrintOk');
+        this.handlePrintCancel();
+    }
+    handlePrintCancel(){
+        console.log('handlePrintCancel');
+        this.setState({
+            showPrint: !this.state.showPrint
+        });
+    }
     componentWillMount(){
         
     }
@@ -663,6 +680,9 @@ class EEW2Records extends React.Component {
 
         let uiAlert    =   <UIAlert handleClick={this.hideUIAlert}  showAlert={this.state.showAlert} aheader={this.state.aheader} abody={this.state.abody} abtnlbl={'Ok'}/>;
         let uiDelConfirm = <UIConfirm handleOk={this.handleConfirmOk} handleCancel={this.handleConfirmCancel}  showConfirm={this.state.showConfirm} cheader={this.state.cheader} cbody={this.state.cbody} okbtnlbl={'Ok'} cancelbtnlbl={'Cancel'}/>;
+
+        let printW2s = <PrintW2s handleOk={this.handlePrintOk} handleCancel={this.handlePrintCancel} showPrint={this.state.showPrint} />
+
         let data = this.props.eew2data;
         let cbody  = 'Select All'; //this.getSelAllMessage();
         let selectall = <div><a href="#" style={divStyleFirst} onClick={() => this.selectAllClk()} id="selectAllid"><i class="fas fa-check-square fa-lg"></i></a>
@@ -771,6 +791,7 @@ class EEW2Records extends React.Component {
                 {this.state.showAudits ? (<ViewCompanyAuditFiles isOpen="true" title={this.state.title} view="true" actions={this.props.actions}
                                                 audits={this.state.audits} viewcompdata={this.props.viewcompdata} getOutputFilters={this.getOutputFilters} 
                                                 handleShowAuditPDF={this.handleShowAuditPDF} handleHideAuditPDF={this.handleHideAuditPDF} />) : null}
+                {this.state.showPrint ? (printW2s):null}                                                
             </div>
         );
     }

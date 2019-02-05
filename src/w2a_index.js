@@ -17,23 +17,15 @@ import {loadPdfData,loadCompData,getTransmitters} from './app/eew2docs/eew2Admin
 let store = configureStore();
 
 //Temporary set user in session:======Comment this when deployed with MAC======
-var userProfile ="{\r\n            \"userId\": \"001907\",\r\n            \"firstName\": \"Isreal\",\r\n            \"lastName\": \"Fullerton\",\r\n            \"dataset\": \"00_CFWD_002\",\r\n            \"securitytokn\": \"fhfh484jer843je848rj393jf\",\r\n            \"branding\": \"base64ImageData\",\r\n            \"userTheme\": \"Default\",\r\n            \"roles\": [\r\n                \"EE\"\r\n            ],\r\n            \"applications\": [\r\n                {\r\n                    \"id\": \"610bbc96-10dc-4874-a9fc-ecf0edf4260b\",\r\n                    \"name\": \"YearEndFactory\",\r\n                    \"accessIds\": [\r\n                        {\r\n                            \"id\": \"b9f6848d-30a7-451d-d2fa-86f3afa4df67\",\r\n                            \"visible\": true\r\n                        }\r\n                    ],\r\n                    \"permissions\": {\r\n                        \"viewDocument\": [\r\n                            1,\r\n                            0,\r\n                            0,\r\n                            0,\r\n                            0\r\n                        ]\r\n                    }\r\n                },\r\n                {   \r\n                \"id\": \"dd4282b1-0544-4ad1-8e0b-6a8d278ffd5c\",\r\n                \"name\": \"eeAdminFactory\",\r\n                \"accessIds\": [\r\n                    {\r\n                        \"id\": \"b55f51a1-0273-4457-8226-013a35d32080\",\r\n                        \"visible\": true\r\n                    }\r\n                ],\r\n                \"permissions\": {\r\n                    \"viewDocument\": [\r\n                        1,\r\n                        0,\r\n                        0,\r\n                        0,\r\n                        0\r\n                    ]\r\n                }\r\n            }\r\n            ],\r\n            \"themeList\": [\r\n                {\r\n                    \"id\": \"Default\",\r\n                    \"name\": \"Default\"\r\n                },\r\n                {\r\n                    \"id\": \"HighContrast\",\r\n                    \"name\": \"High Contrast\"\r\n                },\r\n                {\r\n                    \"id\": \"WhiteOnBlack\",\r\n                    \"name\": \"White On Black\"\r\n                },\r\n                {\r\n                    \"id\": \"BlackOnWhite\",\r\n                    \"name\": \"Black On White\"\r\n                }\r\n            ]\r\n        }"
-var userdata = JSON.parse(userProfile);
-console.log('setUserProfile userdata');
-console.log(userdata);
-sessionStorage.setItem("up", userProfile);
+//var userProfile ="{\r\n            \"userId\": \"001907\",\r\n            \"firstName\": \"Isreal\",\r\n            \"lastName\": \"Fullerton\",\r\n            \"dataset\": \"00_CFWD_002\",\r\n            \"securitytokn\": \"fhfh484jer843je848rj393jf\",\r\n            \"branding\": \"base64ImageData\",\r\n            \"userTheme\": \"Default\",\r\n            \"roles\": [\r\n                \"EE\"\r\n            ],\r\n            \"applications\": [\r\n                {\r\n                    \"id\": \"610bbc96-10dc-4874-a9fc-ecf0edf4260b\",\r\n                    \"name\": \"YearEndFactory\",\r\n                    \"accessIds\": [\r\n                        {\r\n                            \"id\": \"b9f6848d-30a7-451d-d2fa-86f3afa4df67\",\r\n                            \"visible\": true\r\n                        }\r\n                    ],\r\n                    \"permissions\": {\r\n                        \"viewDocument\": [\r\n                            1,\r\n                            0,\r\n                            0,\r\n                            0,\r\n                            0\r\n                        ]\r\n                    }\r\n                },\r\n                {   \r\n                \"id\": \"dd4282b1-0544-4ad1-8e0b-6a8d278ffd5c\",\r\n                \"name\": \"eeAdminFactory\",\r\n                \"accessIds\": [\r\n                    {\r\n                        \"id\": \"b55f51a1-0273-4457-8226-013a35d32080\",\r\n                        \"visible\": true\r\n                    }\r\n                ],\r\n                \"permissions\": {\r\n                    \"viewDocument\": [\r\n                        1,\r\n                        0,\r\n                        0,\r\n                        0,\r\n                        0\r\n                    ]\r\n                }\r\n            }\r\n            ],\r\n            \"themeList\": [\r\n                {\r\n                    \"id\": \"Default\",\r\n                    \"name\": \"Default\"\r\n                },\r\n                {\r\n                    \"id\": \"HighContrast\",\r\n                    \"name\": \"High Contrast\"\r\n                },\r\n                {\r\n                    \"id\": \"WhiteOnBlack\",\r\n                    \"name\": \"White On Black\"\r\n                },\r\n                {\r\n                    \"id\": \"BlackOnWhite\",\r\n                    \"name\": \"Black On White\"\r\n                }\r\n            ]\r\n        }"
+//var userdata = JSON.parse(userProfile);
+//console.log('setUserProfile userdata');
+//console.log(userdata);
+//sessionStorage.setItem("up", userProfile);
 //==============================================================================
 let usrobj = JSON.parse(sessionStorage.getItem('up'));
-
 var dataset = usrobj.dataset;
 var empId = usrobj.userId;
-//const dataset = '00_EE_W2_DATA';
-//const dataset = 'CF_EEW2_1';
-
-//const empId = '001488';
-
-//store.dispatch(getTransmitters(dataset));
-
 /**
  * renderW2AdmApplication TEST
  * master branch
@@ -42,6 +34,7 @@ var empId = usrobj.userId;
  */
 function renderW2AdmApplication(elem, renderName) {
     setAppAnchor(elem);
+    setAppDataset(dataset);
     if(renderName===rname.RN_FILTER_PAYROLL_DATA){
         store.dispatch(getTransmitters(dataset)).then((result) => {
                 renderFilterPayrollData(elem);
@@ -82,6 +75,13 @@ function setAppAnchor(elem){
 }
 function appAnchor(){
    return APP_ANCHOR;
+}
+var APP_DATASET;
+function setAppDataset(dataset){
+    APP_DATASET = dataset;
+}
+function appDataset(){
+   return APP_DATASET;
 }
 function onloadPdfData(id) {
     var w2data = {
@@ -189,6 +189,9 @@ const unMountNMountContainerNode = () => {
 
 module.exports = renderW2AdmApplication;
 window.renderW2AdmApplication = renderW2AdmApplication;
+
+module.exports = appDataset;
+window.appDataset = appDataset;
 
 module.exports = appAnchor;
 window.appAnchor = appAnchor;
