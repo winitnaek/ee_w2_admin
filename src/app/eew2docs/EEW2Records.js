@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Tooltip } from 'reactstrap';
+import { Alert, Tooltip, Button} from 'reactstrap';
 import { divStyle, divStyleBot, divStyleFirst, divStyleFirstBot, divStyleR, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, PDF_ANCHOR_ID, DFLT_PAGE_SIZE } from '../../base/constants/AppConstants';
 import { RN_FILTER_PAYROLL_DATA } from '../../base/constants/RenderNames';
 import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
@@ -52,11 +52,6 @@ class EEW2Records extends React.Component {
                     { name: 'year', type: 'int' }
                 ],
                 url: getRecsUrl,
-                pagenum: 1,
-                pagesize: DFLT_PAGE_SIZE,
-                pager: (pagenum, pagesize, oldpagenum) => {
-                    // callback called when a page or page size is changed.
-                },
                 type: "POST",
                 data: eeW2GetRecInput,
                 filter: function() {
@@ -97,6 +92,7 @@ class EEW2Records extends React.Component {
             this.handleShowAuditPDF = this.handleShowAuditPDF.bind(this);
             this.handleShowMessages = this.handleShowMessages.bind(this);
             this.handleInProgress = this.handleInProgress.bind(this);
+            this.refreshDataSel = this.refreshDataSel.bind(this);
         this.state = {
             source: source,
             exptoExlTip:false,
@@ -122,6 +118,7 @@ class EEW2Records extends React.Component {
             outputSuccess: false,
             showAudits: false,
             outputMessage: false,
+            allSelected:false,
             audits: {
                 showClientKitSumPdf: false,
                 showClientKitDetPdf: false
@@ -148,30 +145,88 @@ class EEW2Records extends React.Component {
         this.refs.eew2Grid.exportdata('csv', 'EEW2Records');
     }
     selectAllClk(){
-        this.refs.eew2Grid.selectallrows(); 
+        this.refs.eew2Grid.clearselection();
+        this.showConfirm(true,'Select All', this.getSelAllMessage());
+    }
+    getSelAllMessage(){
+        let grindRecInputData  = this.props.eew2data.eew2recordInput;
+        let cbody = 'This selection will operate Generate W2s, Publish/Un-Publish W2s actions on Dataset :'+grindRecInputData.dataset+' for Year :'+ grindRecInputData.year+" and all the Companies and Employees selected on the \"Manage W2 Records\" filter."
+        return cbody;
     }
     resetAll(){
+        this.setState({
+            allSelected: false
+        });
+       
+        this.setState({
+            allSelected: false
+        });
+        this.refreshDataSel();
+    }
+    refreshDataSel(){
+        let grindRecInputData  = this.props.eew2data.eew2recordInput;
+        this.state.source.data=grindRecInputData;
+        this.state.source.url=this.props.eew2data.getRecsUrl;
+        this.refs.eew2Grid.clearfilters();
+        this.refs.eew2Grid.updatebounddata('data');
         this.refs.eew2Grid.clearselection();
     }
     unpublishW2(){
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
-        if(selIndexes.length >0){
+        if(selIndexes.length >0 || this.state.allSelected){
             this.setState({outputSuccess: false});
-            console.log('this.props.eew2data.eew2recordInput');
-            console.log(this.props.eew2data.eew2recordInput);
-            let grindRecInputData  = this.props.eew2data.eew2recordInput;
-            let totalRecordsInGrid = this.state.source.totalrecords
-            let totalRecordsSelected = 0;
-            selIndexes.forEach(index => {
-                totalRecordsSelected++;
-            });
-    
-            console.log('totalRecordsInGrid');
-            console.log(totalRecordsInGrid);
-            console.log('totalRecordsSelected');
-            console.log(totalRecordsSelected);
-            
-            if(totalRecordsInGrid == totalRecordsSelected){
+            if(selIndexes.length >0){
+                let publishCount=0;
+                selIndexes.forEach(index => {
+                    let data = this.refs.eew2Grid.getrowdata(index);
+                    if(data.isPublished==true){
+                            publishCount++;
+                    }
+                });
+                //if(publishCount >0){
+                    let taxYear = "";
+                    selIndexes.forEach(index => {
+                        let data = this.refs.eew2Grid.getrowdata(index);
+                        taxYear = data.year
+                        return;
+                    });
+                    var w2RequestInputs=[];
+                    selIndexes.forEach(index => {
+                        let data = this.refs.eew2Grid.getrowdata(index);
+                        w2RequestInputs.push({"transmitterId":data.tranFein,"companyId":data.compFein,"empkey":data.empkey});
+                    });
+                    console.log('w2RequestInputs generateOutput===>');
+                    console.log(w2RequestInputs);
+                    var eew2recordInput = {
+                        "dataset": dataset,
+                        "year": taxYear,
+                        "toUnpublish":true,
+                        "w2RequestInputs": w2RequestInputs
+                    };
+                    console.log('unpublishW2 eew2recordInput ==>');
+                    console.log(eew2recordInput);
+                    this.props.actions.publishUnpublishEEW2Records(eew2recordInput).then(response => {
+                        selIndexes.forEach(index => {
+                            let data = this.refs.eew2Grid.getrowdata(index);
+                            this.props.eew2data.eew2ecords.forEach(function (emp) {
+                                if(data.compFein==emp.compFein && data.isPublished ==true && data.empkey == emp.empkey){
+                                    emp.isPublished=false;
+                                }
+                            });
+                        });
+                        this.refs.eew2Grid.updatebounddata('data');
+                        this.toggleSuccess('Employee W2 Output Un-Published Successfully!');
+                        this.interval = setInterval(this.tick.bind(this), 300000);
+                        return response
+                    }).catch(error => {
+                        throw new SubmissionError(error)
+                    });
+                //}
+            }else if(this.state.allSelected){
+                console.log('this.props.eew2data.eew2recordInput');
+                let grindRecInputData  = this.props.eew2data.eew2recordInput;
+                console.log('grindRecInputData Inside Select All Un-Publish.');
+                console.log(grindRecInputData);
                 var eew2recordInput = {
                     "dataset": grindRecInputData.dataset,
                     "year": grindRecInputData.year,
@@ -197,113 +252,20 @@ class EEW2Records extends React.Component {
                 }).catch(error => {
                     throw new SubmissionError(error)
                 });
-            }else{
-                let publishCount=0;
-                selIndexes.forEach(index => {
-                    let data = this.refs.eew2Grid.getrowdata(index);
-                    if(data.isPublished==true){
-                            publishCount++;
-                    }
-                });
-                //if(publishCount >0){
-                    let taxYear = "";
-                    selIndexes.forEach(index => {
-                        let data = this.refs.eew2Grid.getrowdata(index);
-                        taxYear = data.year
-                        return;
-                    });
-                    var w2RequestInputs=[];
-                    selIndexes.forEach(index => {
-                        let data = this.refs.eew2Grid.getrowdata(index);
-                        w2RequestInputs.push({"transmitterId":data.tranFein,"companyId":data.compFein,"empkey":data.empkey});
-                    });
-                    console.log('w2RequestInputs generateOutput===>');
-                    console.log(w2RequestInputs);
-                    var eew2recordInput = {
-                        "dataset": dataset, //Dataset need to come from top
-                        "year": taxYear,
-                        "toUnpublish":true,
-                        "w2RequestInputs": w2RequestInputs
-                    };
-                    console.log('unpublishW2 eew2recordInput ==>');
-                    console.log(eew2recordInput);
-                    this.props.actions.publishUnpublishEEW2Records(eew2recordInput).then(response => {
-                        selIndexes.forEach(index => {
-                            let data = this.refs.eew2Grid.getrowdata(index);
-                            this.props.eew2data.eew2ecords.forEach(function (emp) {
-                                if(data.compFein==emp.compFein && data.isPublished ==true && data.empkey == emp.empkey){
-                                    emp.isPublished=false;
-                                }
-                            });
-                        });
-                        //this.refs.eew2Grid.clearselection();
-                        this.refs.eew2Grid.updatebounddata('data');
-                        this.toggleSuccess('Employee W2 Output Un-Published Successfully!');
-                        this.interval = setInterval(this.tick.bind(this), 300000);
-                        return response
-                    }).catch(error => {
-                        throw new SubmissionError(error)
-                    });
-                //}
+
             }
-        }else if(selIndexes.length <=0){
-            this.showAlert(true,'Publish W2','Please select at least one employee record to Un-Publish W2 output.');
+        }else{
+            this.showAlert(true,'Publish W2','Please select at least one employee record from grid or check Select All option to Un-Publish W2 output.');
         }
-     }
+    }
     publishW2(){
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
-        if(selIndexes.length >0){
-            console.log('this.props.eew2data.eew2recordInput');
-            console.log(this.props.eew2data.eew2recordInput);
-            let grindRecInputData  = this.props.eew2data.eew2recordInput;
-            let totalRecordsInGrid = this.state.source.totalrecords
-            let totalRecordsSelected = 0;
-            selIndexes.forEach(index => {
-                totalRecordsSelected++;
-            });
-    
-            console.log('totalRecordsInGrid');
-            console.log(totalRecordsInGrid);
-            console.log('totalRecordsSelected');
-            console.log(totalRecordsSelected);
-            
-            if(totalRecordsInGrid == totalRecordsSelected){
-
-                console.log('w2RequestInputs publishW2===>');
-                console.log(w2RequestInputs);
-                var eew2recordInput = {
-                    "dataset": grindRecInputData.dataset,
-                    "year": grindRecInputData.year,
-                    "toUnpublish":false,
-                    "w2RequestInputs": grindRecInputData.w2RequestInputs
-                };
-                console.log('publishW2 eew2recordInput All ==>');
-                console.log(eew2recordInput);
-                this.props.actions.publishUnpublishEEW2Records(eew2recordInput).then(response => {
-                    selIndexes.forEach(index => {
-                        let data = this.refs.eew2Grid.getrowdata(index);
-                        this.props.eew2data.eew2ecords.forEach(function (emp) {
-                            if(data.compFein==emp.compFein && data.isPublished ==false && data.empkey == emp.empkey){
-                                emp.isPublished=true;
-                            }
-                        });
-                    });
-                    //this.refs.eew2Grid.clearselection();
-                    this.refs.eew2Grid.updatebounddata('data');
-                    this.toggleSuccess('Employee W2 Output Published Successfully!');
-                    this.interval = setInterval(this.tick.bind(this), 300000);
-                    return response
-                }).catch(error => {
-                    throw new SubmissionError(error)
-                })
-            }else{
-                this.setState({outputSuccess: false});
+        if(selIndexes.length >0 || this.state.allSelected){
+            this.setState({outputSuccess: false});
+            if(selIndexes.length >0){
                 let unpublishCount=0;
                 selIndexes.forEach(index => {
-                    console.log('Data ingrid index '+index);
                     let data = this.refs.eew2Grid.getrowdata(index);
-                    console.log('data');
-                    console.log(data);
                     if(data.isPublished ==false){
                             unpublishCount++;
                     }
@@ -323,7 +285,7 @@ class EEW2Records extends React.Component {
                     console.log('w2RequestInputs generateOutput===>');
                     console.log(w2RequestInputs);
                     var eew2recordInput = {
-                        "dataset": dataset, //Dataset need to come from top
+                        "dataset": dataset,
                         "year": taxYear,
                         "toUnpublish":false,
                         "w2RequestInputs": w2RequestInputs
@@ -339,7 +301,6 @@ class EEW2Records extends React.Component {
                                 }
                             });
                         });
-                        //this.refs.eew2Grid.clearselection();
                         this.refs.eew2Grid.updatebounddata('data');
                         this.toggleSuccess('Employee W2 Output Published Successfully!');
                         this.interval = setInterval(this.tick.bind(this), 300000);
@@ -348,9 +309,38 @@ class EEW2Records extends React.Component {
                         throw new SubmissionError(error)
                     })
                 //}
+            }else if(this.state.allSelected){
+                console.log('this.props.eew2data.eew2recordInput');
+                let grindRecInputData  = this.props.eew2data.eew2recordInput;
+                console.log('grindRecInputData Inside Select All Publish.');
+                console.log(grindRecInputData);
+                var eew2recordInput = {
+                    "dataset": grindRecInputData.dataset,
+                    "year": grindRecInputData.year,
+                    "toUnpublish":false,
+                    "w2RequestInputs": grindRecInputData.w2RequestInputs
+                };
+                console.log('publishW2 eew2recordInput All ==>');
+                console.log(eew2recordInput);
+                this.props.actions.publishUnpublishEEW2Records(eew2recordInput).then(response => {
+                    selIndexes.forEach(index => {
+                        let data = this.refs.eew2Grid.getrowdata(index);
+                        this.props.eew2data.eew2ecords.forEach(function (emp) {
+                            if(data.compFein==emp.compFein && data.isPublished ==false && data.empkey == emp.empkey){
+                                emp.isPublished=true;
+                            }
+                        });
+                    });
+                    this.refs.eew2Grid.updatebounddata('data');
+                    this.toggleSuccess('Employee W2 Output Published Successfully!');
+                    this.interval = setInterval(this.tick.bind(this), 300000);
+                    return response
+                }).catch(error => {
+                    throw new SubmissionError(error)
+                })
             }
-        }else if(selIndexes.length <= 0){
-            this.showAlert(true,'Publish W2','Please select at least one employee record to Publish W2 output.');
+        }else{
+            this.showAlert(true,'Publish W2','Please select at least one employee record from grid or check Select All option to Publish W2 output.');
         }
     }
     
@@ -365,23 +355,39 @@ class EEW2Records extends React.Component {
     }
     generateOutput(){
        let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
-        if(selIndexes.length >0){
+       if(selIndexes.length >0 || this.state.allSelected){
             this.setState({outputSuccess: false});
-            console.log('this.props.eew2data.eew2recordInput');
-            console.log(this.props.eew2data.eew2recordInput);
-            let grindRecInputData  = this.props.eew2data.eew2recordInput;
-            let totalRecordsInGrid = this.state.source.totalrecords
-            let totalRecordsSelected = 0;
-            selIndexes.forEach(index => {
-                totalRecordsSelected++;
-            });
-    
-            console.log('totalRecordsInGrid');
-            console.log(totalRecordsInGrid);
-            console.log('totalRecordsSelected');
-            console.log(totalRecordsSelected);
-            
-            if(totalRecordsInGrid == totalRecordsSelected){
+            if(selIndexes.length >0){
+                let taxYear = "";
+                selIndexes.forEach(index => {
+                    let data = this.refs.eew2Grid.getrowdata(index);
+                    taxYear = data.year
+                    return;
+                });
+                var w2RequestInputs=[];
+                selIndexes.forEach(index => {
+                    let data = this.refs.eew2Grid.getrowdata(index);
+                    w2RequestInputs.push({"transmitterId":data.tranFein,"companyId":data.compFein,"empkey":data.empkey});
+                });
+                console.log('w2RequestInputs generateOutput===>');
+                console.log(w2RequestInputs);
+                var eew2recordInput = {
+                    "dataset": dataset,
+                    "year": taxYear,
+                    "w2RequestInputs": w2RequestInputs
+                };
+                console.log('generateOutput eew2recordInput ==>');
+                console.log(eew2recordInput);
+                this.props.actions.generateOutputs(eew2recordInput).then(response => {
+                    this.refs.eew2Grid.clearselection();
+                    this.toggleSuccess('Employee W2 Output Generated Successfully!');
+                    this.interval = setInterval(this.tick.bind(this), 300000);
+                    return response
+                }).catch(error => {
+                    throw new SubmissionError(error)
+                })
+            }else if(this.state.allSelected){
+                let grindRecInputData  = this.props.eew2data.eew2recordInput;
                 var eew2recordInput = {
                     "dataset": grindRecInputData.dataset,
                     "year": grindRecInputData.year,
@@ -397,42 +403,10 @@ class EEW2Records extends React.Component {
                 }).catch(error => {
                     throw new SubmissionError(error)
                 })
-            }else{
-                let taxYear = "";
-                selIndexes.forEach(index => {
-                    let data = this.refs.eew2Grid.getrowdata(index);
-                    taxYear = data.year
-                    return;
-                });
-                var w2RequestInputs=[];
-                selIndexes.forEach(index => {
-                    let data = this.refs.eew2Grid.getrowdata(index);
-                    w2RequestInputs.push({"transmitterId":data.tranFein,"companyId":data.compFein,"empkey":data.empkey});
-                });
-                console.log('w2RequestInputs generateOutput===>');
-                console.log(w2RequestInputs);
-                var eew2recordInput = {
-                    "dataset": dataset, //Dataset need to come from top
-                    "year": taxYear,
-                    "w2RequestInputs": w2RequestInputs
-                };
-                console.log('generateOutput eew2recordInput ==>');
-                console.log(eew2recordInput);
-                this.props.actions.generateOutputs(eew2recordInput).then(response => {
-                    //this.state.source.localdata=this.props.eew2data.eew2ecords;
-                    this.refs.eew2Grid.clearselection();
-                    //this.refs.eew2Grid.updatebounddata('data');
-                    //this.refs.eew2Grid.sortby('requestno', 'desc');
-                    this.toggleSuccess('Employee W2 Output Generated Successfully!');
-                    this.interval = setInterval(this.tick.bind(this), 300000);
-                    return response
-                }).catch(error => {
-                    throw new SubmissionError(error)
-                })
             }
-        }else{
-            this.showAlert(true,'Generate W2','Please select at least one employee record to generate output.');
-        }
+       }else{
+            this.showAlert(true,'Generate W2','Please select at least one employee record from grid or check Select All option to Generate W2s.');
+       }
     }
     tick(){
         clearInterval(this.interval);
@@ -526,6 +500,11 @@ class EEW2Records extends React.Component {
     componentDidMount() {
         //$('.tooltipempw2').tooltip({trigger : 'hover'});
         //$('.tooltipcomp2').tooltip({trigger : 'hover'});
+        this.refs.eew2Grid.on('rowclick', (event) => {
+            this.setState({
+                allSelected: false
+            });
+        });
     }
     componentDidUpdate(){
         //$('.tooltipempw2').tooltip({trigger : 'hover'});
@@ -539,18 +518,15 @@ class EEW2Records extends React.Component {
     handleConfirmOk(){
         console.log('hideUIConfirmOk');
         this.handleConfirmCancel();
-        let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
-        if(selIndexes.length >0){
-            selIndexes.forEach(index => {
-                let data = this.refs.eew2Grid.getrowdata(index);
-                alert('Selected for Delete : '+ Object.values(data));
-            });
-        }
+        this.setState({
+            allSelected: true
+        });
+        this.refreshDataSel();
     }
     handleConfirmCancel(){
         console.log('hideUIConfirmCancel');
         this.setState({
-            showConfirm: !this.state.showConfirm
+            showConfirm: !this.state.showConfirm,allSelected: false
         });
     }
     componentWillMount(){
@@ -688,6 +664,16 @@ class EEW2Records extends React.Component {
         let uiAlert    =   <UIAlert handleClick={this.hideUIAlert}  showAlert={this.state.showAlert} aheader={this.state.aheader} abody={this.state.abody} abtnlbl={'Ok'}/>;
         let uiDelConfirm = <UIConfirm handleOk={this.handleConfirmOk} handleCancel={this.handleConfirmCancel}  showConfirm={this.state.showConfirm} cheader={this.state.cheader} cbody={this.state.cbody} okbtnlbl={'Ok'} cancelbtnlbl={'Cancel'}/>;
         let data = this.props.eew2data;
+        let cbody  = 'Select All'; //this.getSelAllMessage();
+        let selectall = <div><a href="#" style={divStyleFirst} onClick={() => this.selectAllClk()} id="selectAllid"><i class="fas fa-check-square fa-lg"></i></a>
+        <Tooltip placement="top" isOpen={this.state.selectAll} target="selectAllid" toggle={this.toggleSelAll}>
+            {cbody}
+        </Tooltip></div>
+
+        let selectallnone = <div><a href="#" style={divStyleFirst} onClick={() => this.selectAllClk()} id="selectAllid"><i class="far fa-square fa-lg"></i></a>
+        <Tooltip placement="top" isOpen={this.state.selectAll} target="selectAllid" toggle={this.toggleSelAll}>
+            {cbody}
+        </Tooltip></div>
         
         let printrenderer = (row, column, value) => {
             if(value){
@@ -732,7 +718,7 @@ class EEW2Records extends React.Component {
             ];
         return (
             <div>
-                <h3 class="text-bsi">Manage EE W2 Records 
+                <h3 class="text-bsi">Manage W2 Records 
                     <a href="#" onClick={() => this.goToFilterPage()} id="filterDataId"><i class="fas fa-filter fa-xs" title="Filter Payroll Data"></i></a>
                     <Tooltip placement="right" isOpen={this.state.filterData} target="filterDataId" toggle={this.toggleFilDat}>
                     Filter Payroll Data
@@ -744,10 +730,7 @@ class EEW2Records extends React.Component {
                 <Alert color="success" isOpen={this.state.outputSuccess}>
                     {this.state.outputMessage}
                 </Alert>
-                <a href="#"  style={divStyleFirst}  onClick={() => this.selectAllClk()} id="selectAllid"><i class='fas fa-check-square fa-lg'></i></a>
-                <Tooltip placement="top" isOpen={this.state.selectAll} target="selectAllid" toggle={this.toggleSelAll}>
-                    Select All
-                </Tooltip>
+                {this.state.allSelected ? selectall: selectallnone}
                 <a href="#"  style={divStyle} onClick={() => this.resetAll()} id="resetAll"><i class='fas fa-redo-alt fa-lg'></i></a>
                 <Tooltip placement="right" isOpen={this.state.resetAll} target="resetAll" toggle={this.toggleRstAll}>
                     Reset Selection
@@ -765,7 +748,7 @@ class EEW2Records extends React.Component {
                    Publish W2
                 </Tooltip>
                 <a href="#" style={divStyleR} onClick={() => this.generateOutput()} id="generateOutput"><i class='fas fa-calculator fa-lg'></i></a>
-                <Tooltip placement="left" isOpen={this.state.generateOutput} target="generateOutput" toggle={this.togglePstSel}>
+                <Tooltip placement="bottom" isOpen={this.state.generateOutput} target="generateOutput" toggle={this.togglePstSel}>
                     Generate W2
                 </Tooltip>
                 <JqxGrid ref='eew2Grid'
@@ -774,7 +757,7 @@ class EEW2Records extends React.Component {
                     autoheight={true} editable={false} columns={columns}
                     filterable={true} showfilterrow={true} virtualmode={true}
                     rendergridrows={function(obj){return obj.data;}}
-                    selectionmode={'multiplerows'}/>
+                    selectionmode={'multiplerows'} cache={false}/>
                 <a href="#"  style={divStyleFirstBot} onClick={() => this.exportToExcel()} id="exportToExcel"><i class='fas fa-table fa-lg'></i></a>
                 <Tooltip placement="bottom" isOpen={this.state.exptoExlTip} target="exportToExcel" toggle={this.toggleExpExl}>
                     Export To Excel
