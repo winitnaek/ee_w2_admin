@@ -24,16 +24,8 @@ console.log(userdata);
 sessionStorage.setItem("up", userProfile);
 //==============================================================================
 let usrobj = JSON.parse(sessionStorage.getItem('up'));
-
 var dataset = usrobj.dataset;
 var empId = usrobj.userId;
-//const dataset = '00_EE_W2_DATA';
-//const dataset = 'CF_EEW2_1';
-
-//const empId = '001488';
-
-//store.dispatch(getTransmitters(dataset));
-
 /**
  * renderW2AdmApplication TEST
  * master branch
@@ -42,6 +34,7 @@ var empId = usrobj.userId;
  */
 function renderW2AdmApplication(elem, renderName) {
     setAppAnchor(elem);
+    setAppDataset(dataset);
     if(renderName===rname.RN_FILTER_PAYROLL_DATA){
         store.dispatch(getTransmitters(dataset)).then((result) => {
                 renderFilterPayrollData(elem);
@@ -82,6 +75,13 @@ function setAppAnchor(elem){
 }
 function appAnchor(){
    return APP_ANCHOR;
+}
+var APP_DATASET;
+function setAppDataset(dataset){
+    APP_DATASET = dataset;
+}
+function appDataset(){
+   return APP_DATASET;
 }
 function onloadPdfData(id) {
     var w2data = {
@@ -189,6 +189,9 @@ const unMountNMountContainerNode = () => {
 
 module.exports = renderW2AdmApplication;
 window.renderW2AdmApplication = renderW2AdmApplication;
+
+module.exports = appDataset;
+window.appDataset = appDataset;
 
 module.exports = appAnchor;
 window.appAnchor = appAnchor;

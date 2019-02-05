@@ -13,17 +13,6 @@ import AsyncSelect from 'react-select/lib/Async';
 import {divStyleep,selZindx} from '../../base/constants/AppConstants';
 import styles from '../../css/cfapp.css';
 const yearSpan = 7;
-//Temporary set user in session:======Comment this when deployed with MAC======
-var userProfile ="{\r\n            \"userId\": \"001907\",\r\n            \"firstName\": \"Isreal\",\r\n            \"lastName\": \"Fullerton\",\r\n            \"dataset\": \"00_CFWD_002\",\r\n            \"securitytokn\": \"fhfh484jer843je848rj393jf\",\r\n            \"branding\": \"base64ImageData\",\r\n            \"userTheme\": \"Default\",\r\n            \"roles\": [\r\n                \"EE\"\r\n            ],\r\n            \"applications\": [\r\n                {\r\n                    \"id\": \"610bbc96-10dc-4874-a9fc-ecf0edf4260b\",\r\n                    \"name\": \"YearEndFactory\",\r\n                    \"accessIds\": [\r\n                        {\r\n                            \"id\": \"b9f6848d-30a7-451d-d2fa-86f3afa4df67\",\r\n                            \"visible\": true\r\n                        }\r\n                    ],\r\n                    \"permissions\": {\r\n                        \"viewDocument\": [\r\n                            1,\r\n                            0,\r\n                            0,\r\n                            0,\r\n                            0\r\n                        ]\r\n                    }\r\n                },\r\n                {   \r\n                \"id\": \"dd4282b1-0544-4ad1-8e0b-6a8d278ffd5c\",\r\n                \"name\": \"eeAdminFactory\",\r\n                \"accessIds\": [\r\n                    {\r\n                        \"id\": \"b55f51a1-0273-4457-8226-013a35d32080\",\r\n                        \"visible\": true\r\n                    }\r\n                ],\r\n                \"permissions\": {\r\n                    \"viewDocument\": [\r\n                        1,\r\n                        0,\r\n                        0,\r\n                        0,\r\n                        0\r\n                    ]\r\n                }\r\n            }\r\n            ],\r\n            \"themeList\": [\r\n                {\r\n                    \"id\": \"Default\",\r\n                    \"name\": \"Default\"\r\n                },\r\n                {\r\n                    \"id\": \"HighContrast\",\r\n                    \"name\": \"High Contrast\"\r\n                },\r\n                {\r\n                    \"id\": \"WhiteOnBlack\",\r\n                    \"name\": \"White On Black\"\r\n                },\r\n                {\r\n                    \"id\": \"BlackOnWhite\",\r\n                    \"name\": \"Black On White\"\r\n                }\r\n            ]\r\n        }"
-var userdata = JSON.parse(userProfile);
-console.log('setUserProfile userdata');
-console.log(userdata);
-sessionStorage.setItem("up", userProfile);
-//==============================================================================
-let usrobj = JSON.parse(sessionStorage.getItem('up'));
-console.log('usrobj Inside FilterPayrollData ===============>>> : '+usrobj);
-const dataset = usrobj.dataset;
-console.log('dataset Inside FilterPayrollData ==============>>> : '+dataset);
 const VIEW_PDF = 1;
 const GENERATE_W2S = 2;
 const PUBLISH_W2S = 3;
@@ -31,9 +20,8 @@ const UNPUBLISH_W2S = 4;
 const ALERTINTERVAL = 300000;
 const CURRENT_YR = new Date().getFullYear();
 /**
- * 
- * 
- * */
+ * FilterPayrollData
+  * */
 class FilterPayrollData extends Component {
     constructor(props) {
         super(props);
@@ -126,6 +114,7 @@ class FilterPayrollData extends Component {
         var dataSelected = this.state.w2dgridata;
         console.log('companies before ');
         console.log(this.state.companies);
+        const dataset = appDataset();
         eew2Api.getCompaniesByTransmitter(dataset,tfein).then(function (tcomp) {
             var companies = [];
             console.log('dataSelected');
@@ -265,6 +254,7 @@ class FilterPayrollData extends Component {
         var fLabel;
         var eew2data={};
         var eew2recordInput={};
+        const dataset = appDataset();
         console.log('this.refs.yearSelected');
         console.log(this.yearSelected);
         console.log(this.yearSelected.value);
@@ -419,6 +409,7 @@ class FilterPayrollData extends Component {
             });
         }
         if (input && input.length >=2) {
+            const dataset = appDataset();
             var cfein =[];
             let comp = this.state.selectedCompany.value;
             cfein.push(comp);
