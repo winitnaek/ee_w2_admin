@@ -2,9 +2,12 @@ import { Component } from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Tooltip } from 'reactstrap';
 import { divStyleFloatNone, NON_PDF_ANCHOR_ID, OUTPUT_AUDIT, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, OUTPUT_MESSAGES, OUTPUT_PRINT, PDF_ANCHOR_ID } from '../../base/constants/AppConstants';
 import Messages from '../comp_outputs/Messages';
+import compApi from './compdataAPI';
 
 const viewer_path = '/pdfjs/web/viewer.html?file=';
 const viewer_url = window.location.protocol + '//' + window.location.host + viewer_path;
+const printdataset = '00_EE_W2_DATA';
+const printId= '236305';
 
 class ViewCompanyAuditFiles extends Component {
     constructor(props) {
@@ -69,7 +72,12 @@ class ViewCompanyAuditFiles extends Component {
         let fileType = this.getAuditFileType();
         //
         this.props.actions.getAuditOutput(dataset, compId, reqNo, fileType).then(() => {
-            console.log('Get Company Output Done.');
+            console.debug('Get Company Output Done.');
+
+            if ($('#errAlrtCont')) {
+                $('#errAlrtCont').addClass('d-none');
+            }
+
             if (OUTPUT_MESSAGES === fileType && this.props.viewcompdata.messages) {
                 // Get Messages Action
                 this.state.messages = this.props.viewcompdata.messages;
@@ -78,15 +86,17 @@ class ViewCompanyAuditFiles extends Component {
                 });
             } else if ((OUTPUT_CLIENT_SUM === fileType || OUTPUT_CLIENT_DTL === fileType) && this.props.viewcompdata.outputDoc) {
                 this.renderPDFData(this.props.viewcompdata.outputDoc);
-            }
-            else if (OUTPUT_AUDIT === fileType && this.props.viewcompdata.outputDoc) {
+            } else if (OUTPUT_AUDIT === fileType && this.props.viewcompdata.outputDoc) {
                 this.downloadAuditZip(this.props.viewcompdata.outputDoc);
-            } 
-            else {
-                this.flipPdfAnchor(true);
-                this.renderErrorPDF();
             }
+        }).catch(error => {
+            $('#errAlrt').html(error);
+            $('#errAlrtCont').removeClass('d-none');
         });
+    }
+    handlePrint() {
+        var eew2printInput= {"dataset":printdataset,"printIds":printId}
+        compApi.printjnlp(eew2printInput); 
     }
     flipPdfAnchor(isPdf) {
         if (isPdf) {
@@ -189,6 +199,7 @@ class ViewCompanyAuditFiles extends Component {
     }
     onPrintSel() {
         this.onOutputTypeSel(OUTPUT_PRINT);
+        this.handlePrint();
     }
     onOutputTypeSel(outpType) {
         switch (outpType) {
@@ -220,7 +231,7 @@ class ViewCompanyAuditFiles extends Component {
                 this.state.auditSel = true;
                 return;
             default: // "Print" is selected
-                alert("'Print' option is selected!");
+               // alert("'Print' option is selected!");
                 return;
         }
     }
@@ -273,6 +284,12 @@ class ViewCompanyAuditFiles extends Component {
                     </div>
                 </ModalHeader>
                 <ModalBody>
+                    <div class="d-none alert alert-danger" id="errAlrtCont" role="alert">
+                        <span id="errAlrt"></span>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
                     { (this.state.renderMsg && this.state.msgSel) ? (<div id={NON_PDF_ANCHOR_ID}>
                         <Messages 
                             title={this.state.title} 
