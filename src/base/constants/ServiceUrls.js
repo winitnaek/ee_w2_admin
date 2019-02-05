@@ -8,3 +8,4 @@ export const POST_ISOUTPUT_GEN_INPROGRESS='/isOutputGenerationInprogress';
 export const GET_TRANSMITTER='/getTransmitters';
 export const GET_COMPANY_BY_TRANSMITTER='/getCompaniesByTransmitter';
 export const POST_EMPLOYEES='/getEmployees/';
+export const POST_PRINT_JNLP='/getRecsToPrintJnlp/';

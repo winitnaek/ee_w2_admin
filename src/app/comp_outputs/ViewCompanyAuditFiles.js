@@ -2,9 +2,12 @@ import { Component } from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Tooltip } from 'reactstrap';
 import { divStyleFloatNone, NON_PDF_ANCHOR_ID, OUTPUT_AUDIT, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, OUTPUT_MESSAGES, OUTPUT_PRINT, PDF_ANCHOR_ID } from '../../base/constants/AppConstants';
 import Messages from '../comp_outputs/Messages';
+import compApi from './compdataAPI';
 
 const viewer_path = '/pdfjs/web/viewer.html?file=';
 const viewer_url = window.location.protocol + '//' + window.location.host + viewer_path;
+const printdataset = '00_EE_W2_DATA';
+const printId= '236305';
 
 class ViewCompanyAuditFiles extends Component {
     constructor(props) {
@@ -90,6 +93,10 @@ class ViewCompanyAuditFiles extends Component {
             $('#errAlrt').html(error);
             $('#errAlrtCont').removeClass('d-none');
         });
+    }
+    handlePrint() {
+        var eew2printInput= {"dataset":printdataset,"printIds":printId}
+        compApi.printjnlp(eew2printInput); 
     }
     flipPdfAnchor(isPdf) {
         if (isPdf) {
@@ -192,6 +199,7 @@ class ViewCompanyAuditFiles extends Component {
     }
     onPrintSel() {
         this.onOutputTypeSel(OUTPUT_PRINT);
+        this.handlePrint();
     }
     onOutputTypeSel(outpType) {
         switch (outpType) {
@@ -223,7 +231,7 @@ class ViewCompanyAuditFiles extends Component {
                 this.state.auditSel = true;
                 return;
             default: // "Print" is selected
-                alert("'Print' option is selected!");
+               // alert("'Print' option is selected!");
                 return;
         }
     }
