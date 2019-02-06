@@ -36,8 +36,8 @@ class Messages extends Component {
             let dataAdapter = new $.jqx.dataAdapter(source);
             let columns =
             [
-                { text: 'Message', datafield: 'msg',  cellsalign: 'left', filtertype: 'input', width: '80%'},
-                { text: 'Severity', datafield: 'severity',  cellsalign: 'center', filtertype: 'number', width: '20%'}
+                { text: 'Message', datafield: 'msg',  cellsalign: 'left', align: 'center', filtertype: 'input', width: '80%'},
+                { text: 'Severity', datafield: 'severity',  cellsalign: 'center', align: 'center', filtertype: 'number', width: '20%'}
             ];
             return (
                 <div>
