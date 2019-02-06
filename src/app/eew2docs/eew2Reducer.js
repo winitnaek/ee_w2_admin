@@ -13,7 +13,7 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
       return Object.assign({}, ...state, {
         filterlabel:action.eew2data.filterlabel,
         filtertype:action.eew2data.filtertype,
-        transmitters:action.eew2data.transmitters,
+        transmitters:state.transmitters,
         eew2ecords: Object.assign([], ...state.eew2ecords, action.eew2data.eew2ecords),
         eew2recordInput: action.eew2data.eew2recordInput,
         eew2pdf: {}, 
@@ -23,7 +23,7 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
       return Object.assign({}, ...state, {
         filtertype:action.eew2data.filtertype,
         filterlabel:action.eew2data.filterlabel,
-        transmitters:action.eew2data.transmitters,
+        transmitters:state.transmitters,
         eew2ecords: Object.assign([], ...state.eew2ecords, action.eew2data.eew2ecords),
         eew2pdf: {}, 
       });
