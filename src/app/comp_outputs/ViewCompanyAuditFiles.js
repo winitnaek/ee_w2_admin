@@ -100,9 +100,9 @@ class ViewCompanyAuditFiles extends Component {
         var eew2printInput= {"dataset":printdataset,"printIds":printId}
        // compApi.printjnlp(eew2printInput); 
         //compApi.testjnlp(printdataset,printId);
-       this.props.actions.testjnlp(printdataset, printId).then(() => {
+       //this.props.actions.testjnlp(printdataset, printId).then(() => {
             //this.renderJnlp(output);
-       });
+      // });
       this.props.actions.printjnlp(eew2printInput).then(() => {
             //this.renderJnlp(output);
        });
