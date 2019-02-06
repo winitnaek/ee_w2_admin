@@ -1,36 +1,641 @@
-import React from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-
+import React,{Component} from 'react';
+import ReactDOM from 'react-dom';
+import {Alert, Button, ButtonGroup, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Label, Col, Form,Input,Tooltip,FormFeedback,CustomInput} from 'reactstrap';
+import JqxDateTimeInput from '../../deps/jqwidgets-react/react_jqxdatetimeinput.js';
+import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
+import {RN_EEW2_RECORDS} from '../../base/constants/RenderNames';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {loadPeriodicData,loadEEW2Records,getTransmitters,getCompaniesByTransmitter}  from './eew2AdminAction';
+import eew2Api from './eew2AdminAPI';
+import Select from 'react-select';
+import AsyncSelect from 'react-select/lib/Async';
+import {divStyleep,selZindx} from '../../base/constants/AppConstants';
+import styles from '../../css/cfapp.css';
+const yearSpan = 7;
+const PRINT_PDFS = 1;
+const ALERTINTERVAL = 300000;
+const CURRENT_YR = new Date().getFullYear();
+const printOptions = [
+    { value: 'lname', label: 'Last Name'},
+    { value: 'fname', label: 'First Name'}
+  ];
 class PrintW2s extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            showPrint: this.props.showPrint,
-            closeAll: false
-        };
-        this.toggleUIPrintOk = this.toggleUIPrintOk.bind(this);
-        this.toggleUIPrintCancel = this.toggleUIPrintCancel.bind(this);
+        constructor(props) {
+            super(props);
+            var ops =[]; 
+            this.props.eew2data.transmitters.forEach(function (txm) {
+                ops.push({'value':txm.tfein,'label':txm.name});
+            });
+            //ops = _.uniqWith(ops, _.isEqual);
+            let data = [];
+            let source =
+            {
+                datatype: "json",
+                datafields: [
+                    { name: 'name', type: 'string' },
+                    { name: 'company', type: 'string' },
+                    { name: 'type', type: 'string' }
+                ],
+                pagesize: 5,
+                localdata: data
+            };
+            this.state = {
+                source: source,
+                modal: true,
+                backdrop: 'static',
+                pSelected:1,
+                rSelected:1,
+                mSelected:1,
+                selectedTransmitter: '',
+                companies:[],
+                selectedCompany:'',
+                selectedEmployees:[],
+                addEmps:false,
+                w2dgridata:[],
+                disableaddemp:true,
+                isCompLoading:false,
+                isEmpsLoading:false,
+                disableviewpdf:true,
+                gridHasData:false,
+                ops:ops,
+                inputValue: '',
+                value:'',
+                isEmpSelDisabled:true,
+                empInfo:false,
+                selAllInfo:false,
+                showActionAlert:false,
+                actionAlertMessage:'',
+                showPrint: this.props.showPrint,
+                closeAll: false,
+                selectedPrintOption:'',
+                cSelected: []
+            };
+            this.toggleUIPrintOk = this.toggleUIPrintOk.bind(this);
+            this.toggleUIPrintCancel = this.toggleUIPrintCancel.bind(this);
+            this.toggle = this.toggle.bind(this);
+            this.toggleaddEmpsSel = this.toggleaddEmpsSel.bind(this);
+            this.changeBackdrop = this.changeBackdrop.bind(this);
+            this.onActionBtnSelected = this.onActionBtnSelected.bind(this);
+            this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
+            this.onSetQuarter = this.onSetQuarter.bind(this);
+            this.onPerformAction = this.onPerformAction.bind(this);
+            this.handleTransmitterChange = this.handleTransmitterChange.bind(this);
+            this.handleCompanyChange = this.handleCompanyChange.bind(this);
+            this.handleEmployeeChange = this.handleEmployeeChange.bind(this);
+            this.onYearChange = this.onYearChange.bind(this);
+            this.getEmployees = this.getEmployees.bind(this);
+            this.toggleempInfo = this.toggleempInfo.bind(this);
+            this.toggleselAllInfo = this.toggleselAllInfo.bind(this);
+            this.toggleActAlert = this.toggleActAlert.bind(this);
+            this.tick2 = this.tick2.bind(this);
+            this.onDismiss = this.onDismiss.bind(this);
+            this.onActionDone = this.onActionDone.bind(this);
+            this.handleSortByChange = this.handleSortByChange.bind(this);
+            this.onCheckboxPrinClick = this.onCheckboxPrinClick.bind(this);
     }
-
     toggleUIPrintOk() {
         this.props.handleOk();
     }
     toggleUIPrintCancel() {
         this.props.handleCancel();
     }
+    onDismiss() {
+        this.setState({ visible: false });
+      }
+    onYearChange(e){
+        //console.log('Year val');
+        //console.log(e.target.value);
+        if(this.state.gridHasData && e.target.value > 0){
+            this.setState({ disableviewpdf:false,disablegenpdf:false,disablepubpdf:false,disableunpubpdf:false});
+        }else if(!this.state.gridHasData && !e.target.value){
+            this.setState({ disableviewpdf:true,disablegenpdf:true,disablepubpdf:true,disableunpubpdf:true});
+        }else if(!e.target.value){
+            this.setState({ disableviewpdf:false,disablegenpdf:false,disablepubpdf:false,disableunpubpdf:false});
+        }
+    }
+    handleSortByChange(selectedPrintOption){
+        this.setState({ selectedPrintOption });
+    }
+    handleTransmitterChange(selectedTransmitter){
+        this.setState({ selectedTransmitter });
+        let tfein = `${selectedTransmitter.value}`;
+        this.setState({isCompLoading:true, selectedCompany: null, selectedEmployees: null});
+        console.log('this.state.w2dgridata');
+        console.log(this.state.w2dgridata);
+        var dataSelected = this.state.w2dgridata;
+        console.log('companies before ');
+        console.log(this.state.companies);
+        const dataset = appDataset();
+        eew2Api.getCompaniesByTransmitter(dataset,tfein).then(function (tcomp) {
+            var companies = [];
+            console.log('dataSelected');
+            console.log(dataSelected);
+                tcomp.forEach(function (tcm) {
+                var isDisabled='no';
+                if(dataSelected && dataSelected.length >0){
+                    for(i=0;i <dataSelected.length;i++){
+                        if(dataSelected[i].companyId == tcm.fein && dataSelected[i].empid=="All" && dataSelected[i].name=="All"){
+                            isDisabled ='yes';
+                            break;
+                        }
+                    };
+                }
+                    companies.push({'value':tcm.fein,'label':tcm.name, disabled:isDisabled});
+                });
+        return companies;
+        }).then(data => this.setState({ companies: data,isCompLoading:false}));
+    }
+    handleCompanyChange(selectedCompany){
+        this.setState({isEmpsLoading:true})
+        console.log('selectedCompany');
+        console.log(selectedCompany);
+        this.setState({ selectedCompany });
+        var cfein =[];
+        let comp = `${selectedCompany.value}`;
+        cfein.push(comp);
+        this.setState({ isEmpSelDisabled:false,selectedEmployees: null});
+    }
+    handleEmployeeChange(selectedEmployees){
+        console.log('selectedEmployees');
+        console.log(selectedEmployees);
+        if(selectedEmployees.length == 0){
+            this.setState({disableaddemp:true,addEmps:false});
+        }else{
+            this.setState({disableaddemp:false});
+        }
+        this.setState({ selectedEmployees: selectedEmployees });
+    }
+    addEmps(){
+        this.yearSelected.invalid=true;
+        //alert('addEmps');
+        console.log('this.state.selectedTransmitter');
+        console.log(this.state.selectedTransmitter);
+        console.log('this.state.selectedEmployees');
+        console.log(this.state.selectedEmployees);
+        console.log('this.state.selectedCompany');
+        console.log(this.state.selectedCompany);
+        
+        var transmitter = this.state.selectedTransmitter.value;
+        var company = this.state.selectedCompany.label;
+        var fein  = this.state.selectedCompany.value;
+        var allRecs = false;
+        var w2dgridata=[];
+        var compsloaded = this.state.companies;
+        var comps =[];
+        var hasAllEmpSelected = false;
+        this.state.selectedEmployees.forEach(function (emp) {
+            if(emp.value=='All'){
+                console.log('All employee selected for the company : '+company);
+                compsloaded.forEach(function (comp) {
+                    if(comp.value ==fein){
+                        comps.push({'value':comp.value,'label':comp.label, disabled:'yes'});
+                        hasAllEmpSelected=true;
+                    }else{
+                        comps.push({'value':comp.value,'label':comp.label, disabled:comp.disabled});
+                    }
+                });
+            }
+            w2dgridata.push({'name':emp.label, 'transmitterid':transmitter,'company':company,'companyId':fein, 'type': 'Employee', 'empid':emp.value,'empkey':emp.empkey,'allRecs':allRecs,'requestno':0});
+        });
+        if(hasAllEmpSelected){
+            this.setState({ companies:comps,selectedCompany: null});
+        }   
+        //this.setState({ selectedTransmitter: null , selectedCompany: null, selectedEmployees: null , companies:[], disableaddemp:true,addEmps:false,gridHasData:true,isEmpSelDisabled:true});
+        this.setState({ selectedEmployees: null , disableaddemp:true,addEmps:false,gridHasData:true,isEmpSelDisabled:false});
+        
+        this.state.w2dgridata.push(...w2dgridata);
+       
+        this.state.source.localdata=this.state.w2dgridata;
+        this.refs.eew2ActionGrid.clearselection();
+        this.refs.eew2ActionGrid.updatebounddata('data');
+        if(this.yearSelected.value > 0){
+            this.setState({ disableviewpdf:false,disablegenpdf:false,disablepubpdf:false,disableunpubpdf:false});
+            //this.yearSelected.value=null;
+            this.yearSelected.disabled=true;
+        }
+    }
+    toggle() {
+        this.setState({
+            modal: !this.state.modal
+        });
+       if(this.state.modal){
+            renderWelcomePage(appAnchor());
+       }
+    }
+    toggleaddEmpsSel(){
+        this.setState({
+            addEmps: !this.state.addEmps
+        });
+    }
+    changeBackdrop(e) {
+        let value = e.target.value;
+        if (value !== 'static') {
+            value = JSON.parse(value);
+        }
+        this.setState({ backdrop: value });
+    }
+    onActionBtnSelected(pSelected) {
+        this.setState({ pSelected });
+    }
+    onRadioBtnClick(rSelected) {
+        this.setState({ rSelected });
+    }
+    /**
+     * onSetQuarter
+     * @param {*} qSelected 
+     */
+    onSetQuarter(qSelected){
+        this.setState({ qSelected });
+    }
+    toggleActAlert(message){
+        this.setState({
+            showActionAlert: !this.state.showActionAlert,
+            actionAlertMessage:message
+        });
+    }
+    tick2(){
+        clearInterval(this.interval);
+        this.toggleActAlert('');
+    }
+    /**
+     * getRequestData
+     * @param {*} fromBtn 
+     */
+    getRequestData(actionClicked){
+        var fLabel;
+        var eew2data={};
+        var eew2recordInput={};
+        const dataset = appDataset();
+        console.log('this.refs.yearSelected');
+        console.log(this.yearSelected);
+        console.log(this.yearSelected.value);
+        var w2RequestInputs=[];
+        this.state.w2dgridata.forEach(function (data) {
+            console.log('requestno');
+            console.log(data.requestno);
+            if(data.empid=='All'){
+                w2RequestInputs.push({"transmitterId":data.transmitterid,"companyId":data.companyId,"empId":"","allRecs":true,"requestno":data.requestno});
+            }else{
+                w2RequestInputs.push({"transmitterId":data.transmitterid,"companyId":data.companyId,"empId":data.empid,"empkey":data.empkey,"allRecs":data.allRecs,"requestno":data.requestno});
+            }
+        });
+        if(actionClicked==PRINT_PDFS){
+            eew2recordInput = {
+                 "dataset": dataset,
+                 "latestonly": (this.latestOnly.checked==true) ? true:false,
+                 "year": this.yearSelected.value,
+                 "w2RequestInputs": w2RequestInputs
+             };
+             console.log('getViewW2PdfsData ===>');
+             console.log(eew2recordInput);
+             fLabel = 'View W2 for the selected companies and employees';
+             eew2data.filtertype  = this.state.pSelected;
+        }
+        eew2data.filterlabel = fLabel;
+        eew2data.eew2recordInput = eew2recordInput;
+        return eew2data;
+    }
+    /**
+     * onPerformAction
+     * @param {*} actionClicked 
+     */
+    onPerformAction(actionClicked){
+        if(actionClicked==PRINT_PDFS){
+            var eew2data = this.getRequestData(actionClicked);
+            eew2data.eew2ecords=[];
+            this.props.loadEEW2Records(eew2data);
+            renderW2AdmApplication(appAnchor(),RN_EEW2_RECORDS);
+        }
+    }
+    /**
+     * onActionDone
+     * @param {*} actionClicked 
+     */
+    onActionDone(actionClicked){
+        this.setState({pSelected:actionClicked});
+        if(actionClicked==PRINT_PDFS){
+        }
+    }
+    /**
+     * onResetSelection
+     * @param {*} actionClicked 
+     */
+    onResetSelection(actionClicked){
+        this.setState({w2dgridata:[], selectedTransmitter: null , selectedCompany: null, selectedEmployees: null,disableaddemp:true,addEmps:false,gridHasData:false,disableviewpdf:true,disablegenpdf:true,disablepubpdf:true,disableunpubpdf:true,isEmpSelDisabled:true});
+        this.yearSelected.disabled=false;
+        this.yearSelected.value=(CURRENT_YR-1);
+        this.latestOnly.checked=true;
+        this.state.source.localdata=[];
+        this.refs.eew2ActionGrid.clearselection();
+        this.refs.eew2ActionGrid.updatebounddata('data');
+    }
+    /**
+     * getEmployees
+     * @param {*} input 
+     */
+    getEmployees (input) {
+        if (!input) {
+			return  new Promise(resolve => {
+                setTimeout(() => {
+                    var empfiltered =[];
+                    return empfiltered;
+                }, 1000);
+            });
+        }
+        if (input && input.length >=2) {
+            const dataset = appDataset();
+            var cfein =[];
+            let comp = this.state.selectedCompany.value;
+            cfein.push(comp);
+            let tfein = this.state.selectedTransmitter.value;
+            var eew2empInput= {"dataset":dataset,"transmitterId":tfein,"companyId":cfein,"allComps":false,"empFilter":input}
+            console.log('this.state.selectedEmployees during employee search');  
+            console.log(this.state.selectedEmployees);   
+            var selectedEmp = this.state.selectedEmployees;
+            console.log(this.state.w2dgridata);
+            var dataSelected = this.state.w2dgridata;
+            var employees = [];
+            if(selectedEmp && selectedEmp.length > 0 && selectedEmp[0].label=='All'){
+                var isDisabled='no';
+                if(dataSelected && dataSelected.length >0){
+                    for(i=0;i <dataSelected.length;i++){
+                        if(dataSelected[i].companyId == comp && dataSelected[i].empid=="All" && dataSelected[i].name=="All"){
+                            isDisabled ='yes';
+                            break;
+                        }
+                    };
+                }
+                employees.push({'value':'All','label':'All',disabled: isDisabled});
+            }else if(selectedEmp && selectedEmp.length > 0 && selectedEmp[0].label !='All'){
+                employees.push({'value':'All','label':'All',disabled: 'yes'});
+            }else{
+                var isDisabled='no';
+                if(dataSelected && dataSelected.length >0){
+                    for(i=0;i <dataSelected.length;i++){
+                        if(dataSelected[i].companyId == comp && dataSelected[i].empid !="All" && dataSelected[i].name !="All"){
+                            isDisabled ='yes';
+                            break;
+                        }
+                    };
+                }
+                employees.push({'value':'All','label':'All',disabled: isDisabled});
+            }
+            return eew2Api.getEmployees(eew2empInput).then(function (temps) {
+              
+                if(temps && temps.length >0){
+                    if(selectedEmp && selectedEmp.length > 0 && selectedEmp[0].label=='All'){
+                        temps.forEach(function (emp) {
+                            employees.push({'value':emp.empid,'label':emp.fname+' '+emp.lname,disabled: 'yes','fein':comp,"empkey":emp.empkey});
+                        });
+                    }else if(selectedEmp && selectedEmp.length > 0 && selectedEmp[0].label !='All'){
+                        temps.forEach(function (emp) {
+                            var isDisabled='no';
+                            if(dataSelected && dataSelected.length >0){
+                                for(i=0;i <dataSelected.length;i++){
+                                    if(dataSelected[i].companyId == comp && dataSelected[i].empid==emp.empid){
+                                        isDisabled ='yes';
+                                        break;
+                                    }
+                                };
+                            }
+                            employees.push({'value':emp.empid,'label':emp.fname+' '+emp.lname,disabled: isDisabled,'fein':comp,"empkey":emp.empkey});
+                        });
+                    }else{
+                        temps.forEach(function (emp) {
+                            var isDisabled='no';
+                            if(dataSelected && dataSelected.length >0){
+                                for(i=0;i <dataSelected.length;i++){
+                                    if(dataSelected[i].companyId == comp && dataSelected[i].empid==emp.empid){
+                                        isDisabled ='yes';
+                                        break;
+                                    }
+                                };
+                            }
+                            employees.push({'value':emp.empid,'label':emp.fname+' '+emp.lname,disabled: isDisabled,'fein':comp,"empkey":emp.empkey});
+                        });
+                    }
+                }
+                return employees;
+            });
+        }   
+    }
+    toggleempInfo(){
+        this.setState({
+            empInfo: !this.state.empInfo
+        }); 
+    }
+    toggleselAllInfo(){
+        this.setState({
+            selAllInfo: !this.state.selAllInfo
+        }); 
+    }
+    onCheckboxPrinClick(selected) {
+        const index = this.state.cSelected.indexOf(selected);
+        if (index < 0) {
+          this.state.cSelected.push(selected);
+        } else {
+          this.state.cSelected.splice(index, 1);
+        }
+        this.setState({ cSelected: [...this.state.cSelected] });
+    }
     render() {
+        var eew2data={};
+        eew2data.eew2ecords=[];
+        //this.props.loadPeriodicData(eew2data);
+        const removeMe = (id) => {
+            console.log(id);
+            var selectedrowindex = this.refs.eew2ActionGrid.getselectedrowindex();
+            console.log('selectedrowindex '+selectedrowindex);
+            var rowscount = this.refs.eew2ActionGrid.getdatainformation().rowscount;
+            console.log('rowscount '+rowscount);
+            if (selectedrowindex >= 0 && selectedrowindex < rowscount) {
+                var id = this.refs.eew2ActionGrid.getrowid(selectedrowindex);
+                var commit = this.refs.eew2ActionGrid.deleterow(id);
+                this.state.w2dgridata.splice(selectedrowindex,1);
+                this.setState({selectedTransmitter: null , selectedCompany: null, selectedEmployees: null});
+                let com =[];
+                this.state.companies.forEach(function (comp) {
+                    com.push({'value':comp.fein,'label':comp.name, disabled:'no'});
+                });
+                this.setState({companies:com});
+            }
+        }
+        let eew2ActionView = null;
+        let footerButtons = null;
+        let date = new Date(), y = date.getFullYear(), m = date.getMonth();
+        let firstDay = new Date(y, m, 1);
+        let lastDay = new Date(y, m + 1, 0);
+        
+        let dataAdapter = new $.jqx.dataAdapter(this.state.source);
+
+       
+        let minYr = CURRENT_YR-yearSpan;;
+        let maxYr = CURRENT_YR+yearSpan;
+
+        let columns =
+        [
+            { text: 'Name', datafield: 'name',  cellsalign: 'center', width: 'auto', align: 'center'},
+            { text: 'Company', datafield: 'company',  cellsalign: 'center', width: 'auto', align: 'center'},
+            { text: 'Type', datafield: 'type',  cellsalign: 'center', width: 'auto', align: 'center'},
+            { text: '        ', cellsalign: 'center', width: '65', align: 'center', datafield: 'Delete', columntype: 'button', cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
+                return 'Remove';
+               }, buttonclick: function (id) {
+                   removeMe(id);
+               }
+            },
+        ];
         return (
             <div>
                 <Modal size="lg" isOpen={this.props.showPrint} backdrop="static">
                     <ModalHeader>Print W2 Records</ModalHeader>
-                    <ModalBody>TDB</ModalBody>
+                    <ModalBody>
+                    <Form>
+                        <FormGroup row>
+                            <Label for="filterYear" sm={1}></Label>
+                            <Label for="chooseYear" sm={2}>Year</Label>
+                            <Col sm={3}>
+                                    <Input type="number" onChange={this.onYearChange} innerRef={(input) => this.yearSelected = input} name="selYear" min={minYr} max={maxYr} defaultValue={CURRENT_YR-1}  id="selYear" placeholder="Select Year" />
+                            </Col>
+                        <Label for="filtertrans" sm={2}>Transmitter</Label>
+                            <Col sm={3} style={{ zIndex: 101 }}>
+                                <Select
+                                    name="selTransmitter"
+                                    ref='selTransmitter'
+                                    className={selZindx}
+                                    value={this.state.selectedTransmitter}
+                                    onChange={this.handleTransmitterChange}
+                                    searchable ={true}
+                                    options={this.state.ops}
+                                    />
+                            </Col>
+                        </FormGroup>
+                            <FormGroup row>
+                                <Label sm={1}></Label>
+                                <Label sm={2}>Company</Label>
+                                <Col sm={8} style={{ zIndex: 100 }}>
+                                        <Select
+                                        name="selCompany"
+                                        className={selZindx}
+                                        value={this.state.selectedCompany}
+                                        onChange={this.handleCompanyChange}
+                                        searchable ={true}
+                                        isClearable ={false}
+                                        isOptionDisabled={(option) => option.disabled === 'yes'}
+                                        isMulti={false}
+                                        options={this.state.companies}
+                                        isLoading={this.state.isCompLoading}
+                                        />
+                                </Col>
+                            </FormGroup>
+                            <FormGroup row>
+                                <Label sm={1}></Label>
+                                <Label sm={2}>Employee  <a href="#" id="empInfoId"><i class="fas fa-info-circle fa-sm"></i></a></Label>
+                                <Tooltip placement="bottom" isOpen={this.state.empInfo} target="empInfoId" toggle={this.toggleempInfo}>
+                                    Type All or first few characters of Employee Name/Employee Id.
+                                </Tooltip>
+                                <Col sm={7}  style={{ zIndex: 99 }}>
+                                        <AsyncSelect
+                                            name="selEmployee"
+                                            className={selZindx}
+                                            closeMenuOnSelect={false}
+                                            value={this.state.selectedEmployees}
+                                            isDisabled={this.state.isEmpSelDisabled}
+                                            isMulti={true}
+                                            cacheOptions ={false}
+                                            defaultOptions
+                                            isLoading={true}
+                                            isOptionDisabled={(option) => option.disabled === 'yes'}
+                                            onChange={this.handleEmployeeChange}
+                                            loadOptions={this.getEmployees}
+                                        />
+                                </Col>
+                                <Col sm={1}>
+                                    <Button color="link" disabled={this.state.disableaddemp} style={divStyleep} onClick={() => this.addEmps()} id="addEmps"><i class="fas fa-plus-circle fa-lg"></i></Button>
+                                    <Tooltip placement="right" isOpen={this.state.addEmps} target="addEmps" toggle={this.toggleaddEmpsSel}>
+                                    Add Employees
+                                    </Tooltip>
+                                </Col>
+                            </FormGroup>
+                            <FormGroup row style={{ paddingLeft: 20 }}>
+                                    <Label for="periodBy1" sm={3}></Label>
+                                    <CustomInput type="checkbox" innerRef={(input) => this.latestOnly = input} id="exampleCustomSwitch" defaultChecked={true} name="customSwitch" label="Select Latest Records" />
+                                    &nbsp;
+                                    <a href="#" id="selAllInfoId"><i class="fas fa-info-circle fa-sm"></i></a>
+                                    <Tooltip placement="right" isOpen={this.state.selAllInfo} target="selAllInfoId" toggle={this.toggleselAllInfo}>
+                                    Select latest records from all the previous runs.
+                                    </Tooltip>
+                            </FormGroup>
+                            <FormGroup row>
+                                <Label for="periodBy1" sm={1}></Label>
+                                <Col sm={10} style={{ zIndex: 90 }}>
+                                <JqxGrid ref='eew2ActionGrid'
+                                    width={'100%'} source={dataAdapter} pageable={true} pagermode ={'simple'}
+                                    sortable={false} altrows={false} enabletooltips={false}
+                                    autoheight={true} editable={false} columns={columns}
+                                    filterable={false} showfilterrow={false}
+                                    selectionmode={'multiplerowsextended'}/>
+                                </Col> 
+                            </FormGroup>
+                            <FormGroup row>
+                            <Label for="printOpt1" sm={2}></Label>
+                            <Label for="printOpt2" sm={2}>Sort W2s By</Label>
+                                <Col sm={3} style={{ zIndex: 101 }}>
+                                    <Select
+                                        name="selSortBy"
+                                        ref='selSortBy'
+                                        className={selZindx}
+                                        value={this.state.selectedPrintOption}
+                                        onChange={this.handleSortByChange}
+                                        searchable ={false}
+                                        options={printOptions}
+                                        />
+                                </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                            <Label for="printOpt3" sm={2}></Label>
+                            <Label for="printOpt4" sm={2}>Print</Label>
+                            <Col sm={6}>
+                            <ButtonGroup>
+                                <Button size="sm" color="info" onClick={() => this.onCheckboxPrinClick(1)} active={this.state.cSelected.includes(1)}>Not Printed W2s</Button>
+                                <Button size="sm" color="info" onClick={() => this.onCheckboxPrinClick(2)} active={this.state.cSelected.includes(2)}>Printed W2s</Button>
+                                <Button size="sm" color="info" onClick={() => this.onCheckboxPrinClick(3)} active={this.state.cSelected.includes(3)}>Test Print</Button>
+                            </ButtonGroup>
+                            </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                            <Label for="printOpt3" sm={2}></Label>
+                            <Label for="printOpt4" sm={2}>W2 Range</Label>
+                            <Label for="printOpt5" sm={1}>From</Label>
+                            <Col sm={2}>
+                                    <Input type="number" onChange={this.onYearChange} innerRef={(inputPrintFrm) => this.inputPrintFrmSel = inputPrintFrm} name="selPrintFrm" id="selPrintFrm" placeholder="Print Fro.." />
+                            </Col>
+                            <Label for="printOpt6" sm={1}>To</Label>
+                            <Col sm={2}>
+                                    <Input type="number" onChange={this.onYearChange} innerRef={(inputPrintToSel) => this.inputPrintToSel = inputPrintToSel} name="selPrintTo" id="selPrintFrm" placeholder="Print to" />
+                            </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                            <Label for="printOpt7" sm={4}></Label>
+                            <Label for="printOpt8" sm={4}>Number of W2s selected : 1</Label>
+                        </FormGroup>
+                        </Form>
+                    </ModalBody>
                     <ModalFooter>
                         <Button color="secondary" className="btn btn-primary mr-auto" onClick={() => this.toggleUIPrintCancel()}>Cancel</Button>{' '}
-                        <Button onClick={() => this.toggleUIPrintOk()}  color="success">Print W2s</Button>
+                        <Button disabled={this.state.disableviewpdf} onClick={() => this.toggleUIPrintOk()}  color="success">Print W2s</Button>
                     </ModalFooter>
                 </Modal>
             </div>
         );
     }
 }
-export default PrintW2s;
+function mapStateToProps(state) {
+    return {
+        eew2data: state.eew2data
+    }
+}
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators({ loadEEW2Records ,loadPeriodicData,getTransmitters,getCompaniesByTransmitter}, dispatch)
+}
+export default connect(mapStateToProps,mapDispatchToProps)(PrintW2s);
