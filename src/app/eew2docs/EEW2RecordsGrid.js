@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import EEW2Records from './EEW2Records'
 import {getEEW2Pdf,generateOutputs,publishUnpublishEEW2Records,isOutputGenerationInprogress,loadPdfData,loadCompData}  from './eew2AdminAction';
-import {getAuditOutput}  from '../comp_outputs/compViewAction';
+import {getAuditOutput,testjnlp,printjnlp}  from '../comp_outputs/compViewAction';
 import {
     divStylePA
 } from '../../base/constants/AppConstants';
@@ -68,6 +68,6 @@ function mapStateToProps(state) {
     }
 }
 function mapDispatchToProps(dispatch) {
-    return { actions: bindActionCreators({getEEW2Pdf,generateOutputs,getAuditOutput,publishUnpublishEEW2Records,isOutputGenerationInprogress,loadPdfData,loadCompData}, dispatch) }
+    return { actions: bindActionCreators({getEEW2Pdf,generateOutputs,getAuditOutput,testjnlp,printjnlp,publishUnpublishEEW2Records,isOutputGenerationInprogress,loadPdfData,loadCompData}, dispatch) }
  }
 export default connect(mapStateToProps,mapDispatchToProps, null, { withRef: true })(EEW2RecordsGrid);

@@ -4,6 +4,7 @@ import AppError from '../../base/utils/AppError';
 import { ADMIN_ERROR_MSG } from '../../base/utils/AppErrorEvent';
 import { OUTPUT_MESSAGES } from '../../base/constants/AppConstants';
 
+
 class compdataAPI {
     static getCompanyAuditData(dataset, reqNo, compId, fileType) {
         let paramurl = OUTPUT_MESSAGES === fileType 
@@ -38,6 +39,8 @@ class compdataAPI {
           body: tt,
           headers: {
             'Content-Type': 'application/json' ,
+           // 'Accept' : 'application/octet-stream' ,
+            
              
           },
           credentials: 'same-origin'
@@ -58,6 +61,30 @@ class compdataAPI {
           
         
       }
+
+      static testjnlp(dataset, printId) {
+        let paramurl = `${'?dataset='}${dataset}${'&printId='}${printId}`;
+        var svcs_url = `${svcs.POST_PRINT_JNLP}${paramurl}`;
+        return fetch(URLUtils.buildURL(svcs_url), {
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if(response.ok){
+                return new Response(response.body);
+              }else{
+                var errorCode =  response.status;
+                var errorMsg  =  'Unable to open  jnlp. '+ADMIN_ERROR_MSG;
+                return new AppError(errorMsg, errorCode);
+              } 
+        })
+        .then(response => response.blob())
+        
+        .catch(error => {
+            return error;
+        });
+    }
+
+    
 }
 
 export default compdataAPI;
