@@ -286,7 +286,7 @@ class FilterPayrollData extends Component {
              };
              console.log('getViewW2PdfsData ===>');
              console.log(eew2recordInput);
-             fLabel = 'View W2 for the selected companies and employees';
+             fLabel = 'W2s  for the Year '+this.yearSelected.value;
              eew2data.filtertype  = this.state.pSelected;
         }else if(actionClicked==GENERATE_W2S){
             eew2recordInput = {
@@ -343,7 +343,7 @@ class FilterPayrollData extends Component {
             var eew2data = this.getRequestData(actionClicked);
             eew2data.eew2ecords=[];
             this.props.generateOutputs(eew2data.eew2recordInput).then(response => {
-                this.toggleActAlert('W2 Generation Initiated for the selected companies and employees.');
+                this.toggleActAlert('Generation of W2s initiated for the selected Employees.');
                 this.interval = setInterval(this.tick2.bind(this), ALERTINTERVAL);
                 this.onActionDone(GENERATE_W2S);
                 return response
@@ -355,7 +355,7 @@ class FilterPayrollData extends Component {
             var eew2data = this.getRequestData(actionClicked);
             eew2data.eew2ecords=[];
             this.props.publishUnpublishEEW2Records(eew2data.eew2recordInput).then(response => {
-                this.toggleActAlert('Publish W2 Initiated for the selected companies and employees.');
+                this.toggleActAlert('Publishing  of W2s initiated for the selected Employees.');
                 this.interval = setInterval(this.tick2.bind(this), ALERTINTERVAL);
                 this.onActionDone(PUBLISH_W2S);
                 return response
@@ -367,7 +367,7 @@ class FilterPayrollData extends Component {
             var eew2data = this.getRequestData(actionClicked);
             eew2data.eew2ecords=[];
             this.props.publishUnpublishEEW2Records(eew2data.eew2recordInput).then(response => {
-                this.toggleActAlert('Un-Publish Initiated W2 for the selected companies and employees.');
+                this.toggleActAlert('Un-Publishing  of W2s initiated for the selected Employees.');
                 this.interval = setInterval(this.tick2.bind(this), ALERTINTERVAL);
                 this.onActionDone(UNPUBLISH_W2S);
                 return response

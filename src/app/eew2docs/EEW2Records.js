@@ -145,8 +145,15 @@ class EEW2Records extends React.Component {
         this.refs.eew2Grid.exportdata('csv', 'EEW2Records');
     }
     selectAllClk(){
-        this.refs.eew2Grid.clearselection();
-        this.showConfirm(true,'Select All', this.getSelAllMessage());
+        if(this.state.allSelected){
+            this.setState({
+                allSelected: false
+            });
+        }else{
+            this.refs.eew2Grid.clearselection();
+            this.showConfirm(true,'Select All', this.getSelAllMessage());
+        }
+        
     }
     getSelAllMessage(){
         let grindRecInputData  = this.props.eew2data.eew2recordInput;
@@ -738,7 +745,7 @@ class EEW2Records extends React.Component {
                 <h3 class="text-bsi">Manage W2 Records 
                     <a href="#" onClick={() => this.goToFilterPage()} id="filterDataId"><i class="fas fa-filter fa-xs" title="Filter Payroll Data"></i></a>
                     <Tooltip placement="right" isOpen={this.state.filterData} target="filterDataId" toggle={this.toggleFilDat}>
-                    Filter Payroll Data
+                    Filter
                     </Tooltip>
                 </h3>
                 <Alert color="primary">
