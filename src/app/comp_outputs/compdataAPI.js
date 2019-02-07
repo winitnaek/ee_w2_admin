@@ -63,7 +63,7 @@ class compdataAPI {
       }
 
       static testjnlp(dataset, printId) {
-        let paramurl = `${'?dataset='}${dataset}${'&printId='}${printId}`;
+        let paramurl = `${'?dataset='}${dataset}${'&printIds='}${printId}`;
         var svcs_url = `${svcs.POST_PRINT_JNLP}${paramurl}`;
         return fetch(URLUtils.buildURL(svcs_url), {
             credentials: 'same-origin'
