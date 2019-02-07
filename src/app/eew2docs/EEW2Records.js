@@ -8,6 +8,7 @@ import UIConfirm from '../common/UIConfirm';
 import ViewPDF from '../common/ViewPDF';
 import ViewCompanyAuditFiles from '../comp_outputs/ViewCompanyAuditFiles';
 import PrintW2s from './PrintW2s';
+import FilterPayrollData from './FilterPayrollData';
 
 const viewer_path ='/pdfjs/web/viewer.html?file=';
 const viewer_url  = window.location.protocol+'//'+window.location.host+viewer_path;
@@ -83,6 +84,7 @@ class EEW2Records extends React.Component {
             this.refreshDataSel = this.refreshDataSel.bind(this);
             this.handlePrintOk = this.handlePrintOk.bind(this);
             this.handlePrintCancel = this.handlePrintCancel.bind(this);
+            this.toggleFromGrid = this.toggleFromGrid.bind(this);
             
         this.state = {
             source: source,
@@ -114,7 +116,8 @@ class EEW2Records extends React.Component {
                 showClientKitSumPdf: false,
                 showClientKitDetPdf: false
             },
-            showPrint:false
+            showPrint:false,
+            openFromGrid:false
         };
         //this.interval = setInterval(this.handleInProgress.bind(this), 60000);
     }
@@ -129,7 +132,11 @@ class EEW2Records extends React.Component {
         this.setState({ hover: false });    
     }
     goToFilterPage() {
-        renderW2AdmApplication(appAnchor(), RN_FILTER_PAYROLL_DATA);
+        //renderW2AdmApplication(appAnchor(), RN_FILTER_PAYROLL_DATA);
+        this.setState({ openFromGrid: true });   
+    }
+    toggleFromGrid(){
+        this.setState({ openFromGrid: false });   
     }
     exportToExcel(){
         this.refs.eew2Grid.exportdata('xls', 'EEW2Records');
@@ -669,7 +676,7 @@ class EEW2Records extends React.Component {
                 throw new Error(error);
             }
         });
-
+        let filter = <FilterPayrollData openFromGrid={this.state.openFromGrid} toggleFromGrid={this.toggleFromGrid}/>
         let uiAlert    =   <UIAlert handleClick={this.hideUIAlert}  showAlert={this.state.showAlert} aheader={this.state.aheader} abody={this.state.abody} abtnlbl={'Ok'}/>;
         let uiDelConfirm = <UIConfirm handleOk={this.handleConfirmOk} handleCancel={this.handleConfirmCancel}  showConfirm={this.state.showConfirm} cheader={this.state.cheader} cbody={this.state.cbody} okbtnlbl={'Ok'} cancelbtnlbl={'Cancel'}/>;
 
@@ -783,7 +790,8 @@ class EEW2Records extends React.Component {
                 {this.state.showAudits ? (<ViewCompanyAuditFiles isOpen="true" title={this.state.title} view="true" actions={this.props.actions}
                                                 audits={this.state.audits} viewcompdata={this.props.viewcompdata} getOutputFilters={this.getOutputFilters} 
                                                 handleShowAuditPDF={this.handleShowAuditPDF} handleHideAuditPDF={this.handleHideAuditPDF} />) : null}
-                {this.state.showPrint ? (printW2s):null}                                                
+                {this.state.showPrint ? (printW2s):null}
+                {this.state.openFromGrid ? (filter) : null}                                              
             </div>
         );
     }

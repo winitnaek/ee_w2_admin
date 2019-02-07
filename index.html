@@ -89,19 +89,19 @@
   <script type="text/javascript" src="w2AdminBundle.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function (event) {
-      const xhr = yefIndex.resolveTemplates()
+      const xhr = w2aIndex.resolveTemplates()
         .then(function (templData) {
-          yefIndex.init(templData);
+          w2aIndex.init(templData);
         }).catch(error => {
           console.error('Error:', error);
           alert("System Error! Please contact support!");
           window.location = "index.html";
         });
-      $("#" + yefIndex.nameId).on('click touchstart', function () {
-        yefIndex.reloadContent();
-        yefIndex.renderWelcomePage(yefIndex.contentId);
+      $("#" + w2aIndex.nameId).on('click touchstart', function () {
+        w2aIndex.reloadContent();
+        w2aIndex.renderWelcomePage(w2aIndex.contentId);
       });
-      $("#" + yefIndex.nameId).click();
+      $("#" + w2aIndex.nameId).click();
     });
     $(function() {
       $(document).on("AppError", appErrorHandler);

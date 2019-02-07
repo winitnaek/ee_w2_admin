@@ -26,6 +26,7 @@ class FilterPayrollData extends Component {
     constructor(props) {
         super(props);
         var ops =[]; 
+       
         this.props.eew2data.transmitters.forEach(function (txm) {
             ops.push({'value':txm.tfein,'label':txm.name});
         });
@@ -42,6 +43,10 @@ class FilterPayrollData extends Component {
             pagesize: 5,
             localdata: data
         };
+        let isOpenFromGrid=false;
+        if(this.props.openFromGrid){
+            isOpenFromGrid=true;
+        }
         this.state = {
             source: source,
             modal: true,
@@ -70,7 +75,8 @@ class FilterPayrollData extends Component {
             empInfo:false,
             selAllInfo:false,
             showActionAlert:false,
-            actionAlertMessage:''
+            actionAlertMessage:'',
+            openFromGrid:isOpenFromGrid
         };
         this.toggle = this.toggle.bind(this);
         this.toggleaddEmpsSel = this.toggleaddEmpsSel.bind(this);
@@ -90,6 +96,7 @@ class FilterPayrollData extends Component {
         this.tick2 = this.tick2.bind(this);
         this.onDismiss = this.onDismiss.bind(this);
         this.onActionDone = this.onActionDone.bind(this);
+       
     }
     onDismiss() {
         this.setState({ visible: false });
@@ -204,12 +211,14 @@ class FilterPayrollData extends Component {
         }
     }
     toggle() {
-        this.setState({
-            modal: !this.state.modal
-        });
-       if(this.state.modal){
+        if(this.state.openFromGrid){
+            this.props.toggleFromGrid();
+        }else if(this.state.modal){
+            this.setState({
+                modal: !this.state.modal
+            });
             renderWelcomePage(appAnchor());
-       }
+        }
     }
     toggleaddEmpsSel(){
         this.setState({
