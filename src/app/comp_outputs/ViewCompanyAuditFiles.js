@@ -7,8 +7,8 @@ import compApi from './compdataAPI';
 
 const viewer_path = '/pdfjs/web/viewer.html?file=';
 const viewer_url = window.location.protocol + '//' + window.location.host + viewer_path;
-const printdataset = '00_EE_W2_DATA';
-const printId= '236305';
+const printdataset = "00_EE_W2_DATA";
+const printId= "236305,236309";
 
 class ViewCompanyAuditFiles extends Component {
     constructor(props) {
@@ -97,15 +97,15 @@ class ViewCompanyAuditFiles extends Component {
     }
     handlePrint() {
        
-        var eew2printInput= {"dataset":printdataset,"printIds":printId}
+       // var eew2printInput= {"dataset":printdataset,"printIds":printId}
        // compApi.printjnlp(eew2printInput); 
         //compApi.testjnlp(printdataset,printId);
-       //this.props.actions.testjnlp(printdataset, printId).then(() => {
+       this.props.actions.testjnlp(printdataset, printId).then(() => {
             //this.renderJnlp(output);
-      // });
-      this.props.actions.printjnlp(eew2printInput).then(() => {
+      });
+     // this.props.actions.printjnlp(eew2printInput).then(() => {
             //this.renderJnlp(output);
-       });
+       //});
 
 
     }
