@@ -157,7 +157,7 @@ class EEW2Records extends React.Component {
     }
     getSelAllMessage(){
         let grindRecInputData  = this.props.eew2data.eew2recordInput;
-        let cbody = 'This selection will operate Generate W2s, Publish/Un-Publish W2s actions on Dataset :'+grindRecInputData.dataset+' for Year :'+ grindRecInputData.year+" and all the Companies and Employees selected on the \"Manage W2 Records\" filter."
+        let cbody = 'Employees that satisfy the filter condition set in ‘Manage W2 Records’ modal display in this grid. From here, one can view, generate, publish and/or un-publish W2s for these Employees.';
         return cbody;
     }
     resetAll(){
@@ -743,7 +743,7 @@ class EEW2Records extends React.Component {
         return (
             <div>
                 <h3 class="text-bsi">Manage W2 Records 
-                    <a href="#" onClick={() => this.goToFilterPage()} id="filterDataId"><i class="fas fa-filter fa-xs" title="Filter Payroll Data"></i></a>
+                    <a href="#" onClick={() => this.goToFilterPage()} id="filterDataId"><i class="fas fa-filter fa-xs" title="Filter"></i></a>
                     <Tooltip placement="right" isOpen={this.state.filterData} target="filterDataId" toggle={this.toggleFilDat}>
                     Filter
                     </Tooltip>

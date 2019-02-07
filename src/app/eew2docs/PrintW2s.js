@@ -71,7 +71,9 @@ class PrintW2s extends React.Component {
                 closeAll: false,
                 selectedPrintOption:printOptions[0],
                 cSelected: [],
-                rSelected:''
+                rSelected:1,
+                isDisabledOpt:false,
+                disableMe:false
             };
             this.toggleUIPrintOk = this.toggleUIPrintOk.bind(this);
             this.toggleUIPrintCancel = this.toggleUIPrintCancel.bind(this);
@@ -90,6 +92,7 @@ class PrintW2s extends React.Component {
             this.onActionDone = this.onActionDone.bind(this);
             this.handleSortByChange = this.handleSortByChange.bind(this);
             this.onCheckboxPrinClick = this.onCheckboxPrinClick.bind(this);
+            this.onTestPrint = this.onTestPrint.bind(this);
     }
     toggleUIPrintOk() {
         this.props.handleOk();
@@ -209,6 +212,21 @@ class PrintW2s extends React.Component {
     onRadioPrinClick(rSelected) {
         this.setState({ rSelected });
     }
+    onTestPrint(selected){
+       if(this.testPrintOnly.checked){
+            this.setEnableDisableForPrint(true);
+       }else{
+            this.setEnableDisableForPrint(false);
+       }
+    }
+    setEnableDisableForPrint(isEnabled){
+        this.setState({
+            disableMe:isEnabled,isDisabledOpt: isEnabled,disableviewpdf:!isEnabled
+        }); 
+        this.inputPrintFrmSel.disabled=isEnabled;
+        this.inputPrintToSel.disabled=isEnabled;
+        this.latestOnly.disabled=isEnabled;
+    }
     render() {
         var eew2data={};
         eew2data.eew2ecords=[];
@@ -267,9 +285,9 @@ class PrintW2s extends React.Component {
                             <Label for="printOpt4" sm={2}>Print</Label>
                             <Col sm={6}>
                             <ButtonGroup>
-                                <Button color="primary" onClick={() => this.onRadioPrinClick(1)} active={this.state.rSelected===1}>All W-2s</Button>
-                                <Button color="primary" onClick={() => this.onRadioPrinClick(2)} active={this.state.rSelected===2}>Selected W-2s</Button>
-                                <Button color="primary" onClick={() => this.onRadioPrinClick(3)} active={this.state.rSelected===3}>Not Printed W2s</Button>
+                                <Button outline color="primary" onClick={() => this.onRadioPrinClick(1)} active={this.state.rSelected===1} disabled={this.state.disableMe} >All W-2s</Button>
+                                <Button outline color="primary" onClick={() => this.onRadioPrinClick(2)} active={this.state.rSelected===2} disabled={this.state.disableMe} >Selected W-2s</Button>
+                                <Button outline color="primary" onClick={() => this.onRadioPrinClick(3)} active={this.state.rSelected===3} disabled={this.state.disableMe} >Not Printed W2s</Button>
                             </ButtonGroup>
                             </Col>
                         </FormGroup>
@@ -285,7 +303,7 @@ class PrintW2s extends React.Component {
                         <FormGroup row>
                             <Label for="printOpt1" sm={1}></Label>
                             <Label for="printOpt2" sm={2}>Sort W2s By</Label>
-                                <Col sm={3} style={{ zIndex: 101 }}>
+                                <Col sm={4} style={{ zIndex: 101 }}>
                                     <Select
                                         name="selSortBy"
                                         ref='selSortBy'
@@ -296,6 +314,7 @@ class PrintW2s extends React.Component {
                                         searchable ={false}
                                         isClearable={true}
                                         options={printOptions}
+                                        isDisabled={this.state.isDisabledOpt}
                                         />
                                 </Col>
                         </FormGroup>
@@ -315,12 +334,10 @@ class PrintW2s extends React.Component {
                                     <Input type="number" onChange={this.onYearChange} innerRef={(inputPrintToSel) => this.inputPrintToSel = inputPrintToSel} name="selPrintTo" id="selPrintFrm"/>
                             </Col>
                         </FormGroup>
-                        <FormGroup row>
-                            <Label for="printOpt3" sm={3}></Label>
-                            <Col>
-                            <Button color="info" onClick={() => this.onCheckboxPrinClick(1)} active={this.state.cSelected.includes(1)}>Test Print</Button>
-                            </Col>
-                        </FormGroup>
+                        <FormGroup row style={{ paddingLeft: 20 }}>
+                            <Label for="periodBy11" sm={3}></Label>
+                            <CustomInput onClick={() => this.onTestPrint(1)} type="checkbox" innerRef={(inputTestPrint) => this.testPrintOnly = inputTestPrint} id="inputTestPrint" defaultChecked={false} name="inputTestPrint" label="Test Print" />
+                       </FormGroup>
                         </Form>
                     </ModalBody>
                     <ModalFooter>

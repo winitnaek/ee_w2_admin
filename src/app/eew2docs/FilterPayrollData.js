@@ -698,10 +698,10 @@ class FilterPayrollData extends Component {
                                 <Label for="filterType" sm={2}>Action</Label>
                                 <Col sm={7}>
                                     <ButtonGroup>
-                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(1)} active={this.state.pSelected === 1}>View W2</Button>
-                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(2)} active={this.state.pSelected === 2}>Generate W2</Button>
-                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(3)} active={this.state.pSelected === 3}>Publish W2</Button>
-                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(4)} active={this.state.pSelected === 4}>Un-Publish W2</Button>
+                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(1)} active={this.state.pSelected === 1}>View</Button>
+                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(2)} active={this.state.pSelected === 2}>Generate</Button>
+                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(3)} active={this.state.pSelected === 3}>Publish</Button>
+                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(4)} active={this.state.pSelected === 4}>Un-Publish</Button>
                                     </ButtonGroup>
                                 </Col>
                             </FormGroup>
