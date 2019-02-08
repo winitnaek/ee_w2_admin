@@ -575,7 +575,7 @@ class FilterPayrollData extends Component {
                     className={selZindx}
                     value={this.state.selectedTransmitter}
                     onChange={this.handleTransmitterChange}
-                    searchable ={true}
+                    isSearchable ={false}
                     options={this.state.ops}
                     />
             </Col>
@@ -589,7 +589,7 @@ class FilterPayrollData extends Component {
                         className={selZindx}
                         value={this.state.selectedCompany}
                         onChange={this.handleCompanyChange}
-                        searchable ={false}
+                        isSearchable ={false}
                         isClearable ={false}
                         isOptionDisabled={(option) => option.disabled === 'yes'}
                         isMulti={false}

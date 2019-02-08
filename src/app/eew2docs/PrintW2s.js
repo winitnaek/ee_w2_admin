@@ -346,7 +346,7 @@ class PrintW2s extends React.Component {
                                         defaultValue={printOptions[0]}
                                         value={this.state.selectedPrintOption}
                                         onChange={this.handleSortByChange}
-                                        searchable ={false}
+                                        isSearchable ={false}
                                         isClearable={true}
                                         options={printOptions}
                                         isDisabled={this.state.isDisabledOpt}
