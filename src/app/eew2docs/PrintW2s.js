@@ -91,7 +91,8 @@ class PrintW2s extends React.Component {
                 disableMeSel:disableMeSel,
                 totalRec:totalRec,
                 selecRec:selecRec,
-                w2sselected:w2sselected
+                w2sselected:w2sselected,
+                filterlabel:this.props.filterlabel
             };
             this.toggleUIPrintOk = this.toggleUIPrintOk.bind(this);
             this.toggleUIPrintCancel = this.toggleUIPrintCancel.bind(this);
@@ -313,7 +314,16 @@ class PrintW2s extends React.Component {
                     <ModalHeader toggle={this.toggleUIPrintCancel}>Print W2 Records</ModalHeader>
                     <ModalBody>
                     <Form>
-                        
+                        <FormGroup row>
+                        <Label for="periodBy1" sm={1}></Label>
+                        <Col sm={10}>
+                        <Alert color="primary">
+                            {this.state.filterlabel}
+                        </Alert>
+                        </Col>
+                        </FormGroup>
+                    </Form>
+                    <Form>
                         <FormGroup row>
                             <Label for="printOpt3" sm={1}></Label>
                             <Label for="printOpt4" sm={2}>Print</Label>
