@@ -523,7 +523,11 @@ class FilterPayrollData extends Component {
                 this.state.companies.forEach(function (comp) {
                     com.push({'value':comp.fein,'label':comp.name, disabled:'no'});
                 });
-                this.setState({companies:com});
+                let enableAction=false;
+                if(rowscount==1){
+                    enableAction = true;
+                }
+                this.setState({companies:com,disableviewpdf:enableAction,disablegenpdf:enableAction,disablepubpdf:enableAction,disableunpubpdf:enableAction});
             }
         }
         let eew2ActionView = null;
