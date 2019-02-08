@@ -1,6 +1,6 @@
 import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
-import {Alert, Button, ButtonGroup, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Label, Col, Form,Input,Tooltip,FormFeedback,CustomInput} from 'reactstrap';
+import {Alert, Button, ButtonGroup, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Label, Col, Form,Input,Tooltip,FormFeedback,CustomInput,Badge} from 'reactstrap';
 import JqxDateTimeInput from '../../deps/jqwidgets-react/react_jqxdatetimeinput.js';
 import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
 import {RN_EEW2_RECORDS} from '../../base/constants/RenderNames';
@@ -365,7 +365,7 @@ class PrintW2s extends React.Component {
                         </FormGroup>
                         <FormGroup row>
                             <Label for="printOpt7" sm={3}></Label>
-                            <Label for="printOpt8" sm={4}>Number of W2s selected : {this.state.w2sselected}</Label>
+                            <Label for="printOpt8" sm={4}>Number of W2s selected  <Badge color="info">{this.state.w2sselected}</Badge></Label>
                         </FormGroup>
                         <FormGroup row>
                             <Label for="printOpt3" sm={1}></Label>
