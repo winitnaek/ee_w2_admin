@@ -221,7 +221,7 @@ class PrintW2s extends React.Component {
     }
     setEnableDisableForPrint(isEnabled){
         this.setState({
-            disableMe:isEnabled,isDisabledOpt: isEnabled,disableviewpdf:!isEnabled
+            disableMe:isEnabled,isDisabledOpt: isEnabled,disableviewpdf:!isEnabled,rSelected:1
         }); 
         this.inputPrintFrmSel.disabled=isEnabled;
         this.inputPrintToSel.disabled=isEnabled;
@@ -327,11 +327,11 @@ class PrintW2s extends React.Component {
                             <Label for="printOpt4" sm={2}>W2 Range</Label>
                             <Label for="printOpt5" sm={1}>From</Label>
                             <Col sm={2}>
-                                    <Input type="number" onChange={this.onYearChange} innerRef={(inputPrintFrm) => this.inputPrintFrmSel = inputPrintFrm} name="selPrintFrm" id="selPrintFrm"/>
+                                    <Input type="number" min={1} onChange={this.onYearChange} innerRef={(inputPrintFrm) => this.inputPrintFrmSel = inputPrintFrm} name="selPrintFrm" id="selPrintFrm"/>
                             </Col>
                             <Label for="printOpt6" sm={1}>To</Label>
                             <Col sm={2}>
-                                    <Input type="number" onChange={this.onYearChange} innerRef={(inputPrintToSel) => this.inputPrintToSel = inputPrintToSel} name="selPrintTo" id="selPrintFrm"/>
+                                    <Input type="number" min={1} onChange={this.onYearChange} innerRef={(inputPrintToSel) => this.inputPrintToSel = inputPrintToSel} name="selPrintTo" id="selPrintFrm"/>
                             </Col>
                         </FormGroup>
                         <FormGroup row style={{ paddingLeft: 20 }}>

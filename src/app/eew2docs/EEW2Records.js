@@ -263,7 +263,7 @@ class EEW2Records extends React.Component {
 
             }
         }else{
-            this.showAlert(true,'Publish W2','Please select at least one employee record from grid or check Select All option to Un-Publish W2 output.');
+            this.showAlert(true,'Publish W2','Please select at least one employee record from the grid or check Select All option to Un-Publish W2 output.');
         }
     }
     publishW2(){
@@ -349,14 +349,19 @@ class EEW2Records extends React.Component {
                 })
             }
         }else{
-            this.showAlert(true,'Publish W2','Please select at least one employee record from grid or check Select All option to Publish W2 output.');
+            this.showAlert(true,'Publish W2','Please select at least one employee record from the grid or check Select All option to Publish W2 output.');
         }
     }
     
     printW2s(){
-        this.setState({
-            showPrint: true
-        });
+        let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
+        if(selIndexes.length >0 || this.state.allSelected){
+            this.setState({
+                showPrint: true
+            });
+        }else{
+            this.showAlert(true,'Print W2','Please select at least one employee record from the grid or check Select All option to Print W2s.');
+        }
     }
     toggleSuccess(message){
         this.setState({
@@ -417,7 +422,7 @@ class EEW2Records extends React.Component {
                 })
             }
        }else{
-            this.showAlert(true,'Generate W2','Please select at least one employee record from grid or check Select All option to Generate W2s.');
+            this.showAlert(true,'Generate W2','Please select at least one employee record from the grid or check Select All option to Generate W2s.');
        }
     }
     tick(){
