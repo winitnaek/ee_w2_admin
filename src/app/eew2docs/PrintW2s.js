@@ -41,6 +41,16 @@ class PrintW2s extends React.Component {
                 pagesize: 5,
                 localdata: data
             };
+            console.log('this.props.totalRec');
+            console.log(this.props.totalRec);
+            let totalRec = this.props.totalRec;
+            let optSelec = this.props.optSelec;
+            let rSelected = optSelec;
+            let selecRec = this.props.selecRec;
+            let w2sselected = totalRec;
+            if(optSelec==2){
+                w2sselected = selecRec;
+            }
             this.state = {
                 source: source,
                 modal: true,
@@ -71,9 +81,12 @@ class PrintW2s extends React.Component {
                 closeAll: false,
                 selectedPrintOption:printOptions[0],
                 cSelected: [],
-                rSelected:1,
+                rSelected:rSelected,
                 isDisabledOpt:false,
-                disableMe:false
+                disableMe:false,
+                totalRec:totalRec,
+                selecRec:selecRec,
+                w2sselected:w2sselected
             };
             this.toggleUIPrintOk = this.toggleUIPrintOk.bind(this);
             this.toggleUIPrintCancel = this.toggleUIPrintCancel.bind(this);
@@ -81,7 +94,6 @@ class PrintW2s extends React.Component {
             this.toggleaddEmpsSel = this.toggleaddEmpsSel.bind(this);
             this.changeBackdrop = this.changeBackdrop.bind(this);
             this.onActionBtnSelected = this.onActionBtnSelected.bind(this);
-            this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
             this.onSetQuarter = this.onSetQuarter.bind(this);
             this.onPerformAction = this.onPerformAction.bind(this);
             this.toggleempInfo = this.toggleempInfo.bind(this);
@@ -128,9 +140,6 @@ class PrintW2s extends React.Component {
     }
     onActionBtnSelected(pSelected) {
         this.setState({ pSelected });
-    }
-    onRadioBtnClick(rSelected) {
-        this.setState({ rSelected });
     }
     /**
      * onSetQuarter
@@ -210,7 +219,17 @@ class PrintW2s extends React.Component {
         this.setState({ cSelected: [...this.state.cSelected] });
     }
     onRadioPrinClick(rSelected) {
-        this.setState({ rSelected });
+        let w2sselected;
+        if(rSelected==1){
+            w2sselected = this.state.totalRec;
+        }else if(rSelected==2){
+            w2sselected = this.state.selecRec;
+        }else if(rSelected==3){
+            w2sselected = 'XYZ';
+        }else if(rSelected==4){
+            w2sselected = 'PQR';
+        }
+        this.setState({rSelected:rSelected, w2sselected:w2sselected});
     }
     onTestPrint(selected){
        if(this.testPrintOnly.checked){
@@ -220,8 +239,14 @@ class PrintW2s extends React.Component {
        }
     }
     setEnableDisableForPrint(isEnabled){
+        let w2sselected;
+        if(isEnabled){
+            w2sselected='';
+        }else{
+            w2sselected=this.state.totalRec;
+        }
         this.setState({
-            disableMe:isEnabled,isDisabledOpt: isEnabled,disableviewpdf:!isEnabled,rSelected:1
+            disableMe:isEnabled,isDisabledOpt: isEnabled,disableviewpdf:!isEnabled,rSelected:1,w2sselected:w2sselected
         }); 
         this.inputPrintFrmSel.disabled=isEnabled;
         this.inputPrintToSel.disabled=isEnabled;
@@ -285,9 +310,10 @@ class PrintW2s extends React.Component {
                             <Label for="printOpt4" sm={2}>Print</Label>
                             <Col sm={6}>
                             <ButtonGroup>
-                                <Button outline color="primary" onClick={() => this.onRadioPrinClick(1)} active={this.state.rSelected===1} disabled={this.state.disableMe} >All W-2s</Button>
-                                <Button outline color="primary" onClick={() => this.onRadioPrinClick(2)} active={this.state.rSelected===2} disabled={this.state.disableMe} >Selected W-2s</Button>
-                                <Button outline color="primary" onClick={() => this.onRadioPrinClick(3)} active={this.state.rSelected===3} disabled={this.state.disableMe} >Not Printed W2s</Button>
+                                <Button outline color="primary" onClick={() => this.onRadioPrinClick(1)} active={this.state.rSelected===1} disabled={this.state.disableMe} >All</Button>
+                                <Button outline color="primary" onClick={() => this.onRadioPrinClick(2)} active={this.state.rSelected===2} disabled={this.state.disableMe} >Selected</Button>
+                                <Button outline color="primary" onClick={() => this.onRadioPrinClick(3)} active={this.state.rSelected===3} disabled={this.state.disableMe} >Not Printed</Button>
+                                <Button outline color="primary" onClick={() => this.onRadioPrinClick(4)} active={this.state.rSelected===4} disabled={this.state.disableMe} >Printed</Button>
                             </ButtonGroup>
                             </Col>
                         </FormGroup>
@@ -320,7 +346,7 @@ class PrintW2s extends React.Component {
                         </FormGroup>
                         <FormGroup row>
                             <Label for="printOpt7" sm={3}></Label>
-                            <Label for="printOpt8" sm={4}>Number of W2s selected : 1</Label>
+                            <Label for="printOpt8" sm={4}>Number of W2s selected : {this.state.w2sselected}</Label>
                         </FormGroup>
                         <FormGroup row>
                             <Label for="printOpt3" sm={1}></Label>

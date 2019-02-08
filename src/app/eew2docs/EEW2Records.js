@@ -117,7 +117,10 @@ class EEW2Records extends React.Component {
                 showClientKitDetPdf: false
             },
             showPrint:false,
-            openFromGrid:false
+            openFromGrid:false,
+            totalRec:'',
+            selecRec:'',
+            optSelec:''
         };
         //this.interval = setInterval(this.handleInProgress.bind(this), 60000);
     }
@@ -355,9 +358,16 @@ class EEW2Records extends React.Component {
     
     printW2s(){
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
+        let optSelec=1;
+        if(this.state.allSelected){
+            optSelec =1;
+        }else if(selIndexes.length > 0 && this.state.allSelected==false){
+            optSelec =2;
+        }
         if(selIndexes.length >0 || this.state.allSelected){
+            let totalRecordsInGrid = this.state.source.totalrecords
             this.setState({
-                showPrint: true
+                showPrint: true, selecRec:selIndexes.length,optSelec:optSelec,totalRec:totalRecordsInGrid
             });
         }else{
             this.showAlert(true,'Print W2','Please select at least one employee record from the grid or check Select All option to Print W2s.');
@@ -692,7 +702,7 @@ class EEW2Records extends React.Component {
         let uiAlert    =   <UIAlert handleClick={this.hideUIAlert}  showAlert={this.state.showAlert} aheader={this.state.aheader} abody={this.state.abody} abtnlbl={'Ok'}/>;
         let uiDelConfirm = <UIConfirm handleOk={this.handleConfirmOk} handleCancel={this.handleConfirmCancel}  showConfirm={this.state.showConfirm} cheader={this.state.cheader} cbody={this.state.cbody} okbtnlbl={'Ok'} cancelbtnlbl={'Cancel'}/>;
 
-        let printW2s = <PrintW2s handleOk={this.handlePrintOk} handleCancel={this.handlePrintCancel} showPrint={this.state.showPrint} />
+        let printW2s = <PrintW2s handleOk={this.handlePrintOk} handleCancel={this.handlePrintCancel} showPrint={this.state.showPrint} totalRec={this.state.totalRec} optSelec={this.state.optSelec} selecRec={this.state.selecRec}/>
 
         let data = this.props.eew2data;
         let cbody  = 'Select All'; //this.getSelAllMessage();
