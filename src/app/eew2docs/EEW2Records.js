@@ -613,7 +613,7 @@ class EEW2Records extends React.Component {
     }
     handleShowMessages(rowdata, title) {
         this.setState({
-            title: (!title ? `Showing Viewable/Downloadable Artifacts for ${rowdata.compName}` : title),
+            title: (!title ? `${rowdata.compName}` : title),
             audits: {
                 showMessages: true,
                 inputParams: rowdata
@@ -625,7 +625,7 @@ class EEW2Records extends React.Component {
         let isSumPdf = (OUTPUT_CLIENT_SUM === pdfType);
         let isDetPdf = (OUTPUT_CLIENT_DTL === pdfType);
         this.setState({
-            title: (!title ? `Showing Viewable/Downloadable Artifacts for ${rowdata.compName}` : title),
+            title: (!title ? `${rowdata.compName}` : title),
             audits: {
                 showClientKitSumPdf: isSumPdf,
                 showClientKitDetPdf: isDetPdf
