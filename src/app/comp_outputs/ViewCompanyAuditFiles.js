@@ -272,38 +272,38 @@ class ViewCompanyAuditFiles extends Component {
                 <div class="d-flex m-auto justify-content-center align-items-center text-align-center">
                         <div class={false ? 'd-none' : 'd-block p-2'}>
                             <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onCkSumSel()} id="ckSumIcon"><i class='far fa-list-alt fa-lg'></i></a>
-                            <Tooltip className={false ? 'd-none' : 'd-block'} placement="bottom" isOpen={this.state.ckSumSelTip} target="ckSumIcon" toggle={this.toggleCkSumSelTip}>
+                            <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.ckSumSelTip} target="ckSumIcon" toggle={this.toggleCkSumSelTip}>
                                 Show Client Kit Summary PDF
                             </Tooltip>
                         </div>
                         <div class={false ? 'd-none' : 'd-block p-2'}>
                             <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onCkDetSel()} id="ckDetIcon"><i class='fas fa-list-alt fa-lg'></i></a>
-                            <Tooltip className={false ? 'd-none' : 'd-block'} placement="bottom" isOpen={this.state.ckDetSelTip} target="ckDetIcon" toggle={this.toggleCkDetSelTip}>
+                            <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.ckDetSelTip} target="ckDetIcon" toggle={this.toggleCkDetSelTip}>
                                 Show Client Kit Details PDF
                             </Tooltip>
                         </div>
                         <div class={false ? 'd-none' : 'd-block p-2'}>
                             <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onAuditSel()} id="auditIcon"><i class='fas fa-download fa-lg'></i></a>
-                            <Tooltip className={false ? 'd-none' : 'd-block'} placement="bottom" isOpen={this.state.auditSelTip} target="auditIcon" toggle={this.toggleAuditSelTip}>
+                            <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.auditSelTip} target="auditIcon" toggle={this.toggleAuditSelTip}>
                                 Download Audit Logs
                             </Tooltip>
                         </div>
                         <div class={false ? 'd-none' : 'd-block p-2'}>
                             <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'} onClick={() => this.onMsgSel()} id="msgIcon"><i class='fas fa-envelope fa-lg'></i></a>
-                            <Tooltip className={false ? 'd-none' : 'd-block'} placement="bottom" isOpen={this.state.msgSelTip} target="msgIcon" toggle={this.toggleMsgSelTip}>
+                            <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.msgSelTip} target="msgIcon" toggle={this.toggleMsgSelTip}>
                                 Show Messages
                             </Tooltip>
                         </div>
                        
                         <div class={false ? 'd-none' : 'd-block p-2'}>
                             <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onPrintSel()} id="turboIcon"><i class='fas fa-check fa-lg'></i></a>
-                            <Tooltip className={false ? 'd-none' : 'd-block'} placement="bottom" isOpen={this.state.turboSelTip} target="turboIcon" toggle={this.toggleTurboSelTip}>
+                            <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.turboSelTip} target="turboIcon" toggle={this.toggleTurboSelTip}>
                                Turbo Tax
                             </Tooltip>
                         </div>
                         <div class={false ? 'd-none' : 'd-block p-2'}>
                             <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onPrintSel()} id="printIcon"><i class='fas fa-print fa-lg'></i></a>
-                            <Tooltip className={false ? 'd-none' : 'd-block'} placement="bottom" isOpen={this.state.printSelTip} target="printIcon" toggle={this.togglePrintSelTip}>
+                            <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.printSelTip} target="printIcon" toggle={this.togglePrintSelTip}>
                                 Print All W2 PDFs
                             </Tooltip>
                         </div>
