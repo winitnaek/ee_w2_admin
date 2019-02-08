@@ -310,7 +310,7 @@ class PrintW2s extends React.Component {
         return (
             <div>
                 <Modal size="lg" isOpen={this.props.showPrint} backdrop="static">
-                    <ModalHeader>Print W2 Records</ModalHeader>
+                    <ModalHeader toggle={this.toggleUIPrintCancel}>Print W2 Records</ModalHeader>
                     <ModalBody>
                     <Form>
                         
