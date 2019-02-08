@@ -51,6 +51,10 @@ class PrintW2s extends React.Component {
             if(optSelec==2){
                 w2sselected = selecRec;
             }
+            let disableMeSel=false;
+            if(selecRec==0){
+                disableMeSel=true;
+            }
             this.state = {
                 source: source,
                 modal: true,
@@ -84,6 +88,7 @@ class PrintW2s extends React.Component {
                 rSelected:rSelected,
                 isDisabledOpt:false,
                 disableMe:false,
+                disableMeSel:disableMeSel,
                 totalRec:totalRec,
                 selecRec:selecRec,
                 w2sselected:w2sselected
@@ -240,13 +245,17 @@ class PrintW2s extends React.Component {
     }
     setEnableDisableForPrint(isEnabled){
         let w2sselected;
+        let disableMeSel = false;
         if(isEnabled){
             w2sselected='';
         }else{
             w2sselected=this.state.totalRec;
         }
+        if(this.state.selecRec==0){
+            disableMeSel = true;
+        }
         this.setState({
-            disableMe:isEnabled,isDisabledOpt: isEnabled,disableviewpdf:!isEnabled,rSelected:1,w2sselected:w2sselected
+            disableMe:isEnabled,disableMeSel:disableMeSel,isDisabledOpt: isEnabled,disableviewpdf:!isEnabled,rSelected:1,w2sselected:w2sselected
         }); 
         this.inputPrintFrmSel.disabled=isEnabled;
         this.inputPrintToSel.disabled=isEnabled;
@@ -311,7 +320,7 @@ class PrintW2s extends React.Component {
                             <Col sm={6}>
                             <ButtonGroup>
                                 <Button outline color="primary" onClick={() => this.onRadioPrinClick(1)} active={this.state.rSelected===1} disabled={this.state.disableMe} >All</Button>
-                                <Button outline color="primary" onClick={() => this.onRadioPrinClick(2)} active={this.state.rSelected===2} disabled={this.state.disableMe} >Selected</Button>
+                                <Button outline color="primary" onClick={() => this.onRadioPrinClick(2)} active={this.state.rSelected===2} disabled={this.state.disableMeSel} >Selected</Button>
                                 <Button outline color="primary" onClick={() => this.onRadioPrinClick(3)} active={this.state.rSelected===3} disabled={this.state.disableMe} >Not Printed</Button>
                                 <Button outline color="primary" onClick={() => this.onRadioPrinClick(4)} active={this.state.rSelected===4} disabled={this.state.disableMe} >Printed</Button>
                             </ButtonGroup>
