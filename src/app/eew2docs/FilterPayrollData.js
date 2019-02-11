@@ -641,8 +641,7 @@ class FilterPayrollData extends Component {
                     </Tooltip>
             </FormGroup>
             <FormGroup row>
-                <Label for="periodBy1" sm={1}></Label>
-                <Col sm={10} style={{ zIndex: 90 }}>
+                <Col sm={12} style={{ zIndex: 90 }}>
                 <JqxGrid ref='eew2ActionGrid'
                     width={'100%'} source={dataAdapter} pageable={true} pagermode ={'simple'}
                     sortable={false} altrows={false} enabletooltips={false}
