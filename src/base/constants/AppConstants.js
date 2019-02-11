@@ -5,6 +5,7 @@ export const BY_PAYROLLRUN_DATE = '2'
 export const OUTPUT_CLIENT_SUM = 'CLIENT_KIT_SUM';
 export const OUTPUT_CLIENT_DTL = 'CLIENT_KIT_DTL';
 export const OUTPUT_AUDIT = 'AUDIT';
+export const OUTPUT_TURBO_TAX = 'TURBO_TAX';
 export const OUTPUT_MESSAGES = 'MESSAGES';
 export const OUTPUT_PRINT = 'PRINT';
 

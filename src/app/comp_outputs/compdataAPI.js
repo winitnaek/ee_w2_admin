@@ -6,6 +6,9 @@ import { OUTPUT_MESSAGES } from '../../base/constants/AppConstants';
 
 
 class compdataAPI {
+    static isCompConfForTurboTaxImport(dataset, compId) {
+        
+    }
     static getCompanyAuditData(dataset, reqNo, compId, fileType) {
         let paramurl = OUTPUT_MESSAGES === fileType 
         ? `${'?dataset='}${dataset}${'&requestno='}${reqNo}` 
