@@ -702,7 +702,7 @@ class EEW2Records extends React.Component {
         let uiAlert    =   <UIAlert handleClick={this.hideUIAlert}  showAlert={this.state.showAlert} aheader={this.state.aheader} abody={this.state.abody} abtnlbl={'Ok'}/>;
         let uiDelConfirm = <UIConfirm handleOk={this.handleConfirmOk} handleCancel={this.handleConfirmCancel}  showConfirm={this.state.showConfirm} cheader={this.state.cheader} cbody={this.state.cbody} okbtnlbl={'Ok'} cancelbtnlbl={'Cancel'}/>;
         let data = this.props.eew2data;
-        let printW2s = <PrintW2s handleOk={this.handlePrintOk} handleCancel={this.handlePrintCancel} showPrint={this.state.showPrint} totalRec={this.state.totalRec} optSelec={this.state.optSelec} selecRec={this.state.selecRec} filterlabel={data.filterlabel}/>
+        let printW2s = <PrintW2s handleOk={this.handlePrintOk} handleCancel={this.handlePrintCancel} showPrint={this.state.showPrint} totalRec={this.state.totalRec} optSelec={this.state.optSelec} selecRec={this.state.selecRec} filterlabel={'Number of W2s selected for the print for Year '+data.eew2recordInput.year}/>
         let cbody  = 'Select All'; //this.getSelAllMessage();
         let selectall = <div><a href="#" style={divStyleFirst} onClick={() => this.selectAllClk()} id="selectAllid"><i class="fas fa-check-square fa-lg"></i></a>
         <Tooltip placement="top" isOpen={this.state.selectAll} target="selectAllid" toggle={this.toggleSelAll}>
