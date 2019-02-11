@@ -277,6 +277,7 @@ class ViewCompanyAuditFiles extends Component {
                 this.state.ckSumSel = false;
                 this.state.ckDetSel = false;
                 this.state.auditSel = false;
+                this.state.turboTaxSel = false;
                 this.state.printSel = false;
                 return;
             case OUTPUT_CLIENT_SUM:
@@ -284,6 +285,7 @@ class ViewCompanyAuditFiles extends Component {
                 this.state.ckSumSel = true;
                 this.state.ckDetSel = false;
                 this.state.auditSel = false;
+                this.state.turboTaxSel = false;
                 this.state.printSel = false;
                 return;
             case OUTPUT_CLIENT_DTL:
@@ -291,6 +293,7 @@ class ViewCompanyAuditFiles extends Component {
                 this.state.ckSumSel = false;
                 this.state.ckDetSel = true;
                 this.state.auditSel = false;
+                this.state.turboTaxSel = false;
                 this.state.printSel = false;
                 return;
             case OUTPUT_AUDIT:
