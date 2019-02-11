@@ -271,9 +271,7 @@ class ViewCompanyAuditFiles extends Component {
                 <Modal size="lg"  style={{ 'max-width': window.innerWidth-200}} isOpen={this.props.view} toggle={this.toggle} backdrop="static" className="align-items: center;justify-content: center">
               
                 <ModalHeader toggle={this.toggle} > 
-                    <h3 class="text-center text-bsi">{this.props.title + ' '}
-                        <small>{'(Tax Year: ' + this.props.year + ')'}</small>
-                    </h3>
+                  {this.props.title + ' '} {'(Tax Year: ' + this.props.year + ')'}
                 </ModalHeader>
                
                 <ModalBody>
@@ -304,7 +302,7 @@ class ViewCompanyAuditFiles extends Component {
                         </div>
                        
                         <div id="turboTaxIconDiv" class={false ? 'd-none' : 'd-block p-2'}>
-                            <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onTurboTaxSel()} id="turboIcon"><i class='far fa-check-square fa-lg'></i></a>
+                            <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onTurboTaxSel()} id="turboIcon"><i class='far fa-check-square fa-lg' color='red'></i></a>
                             <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.turboSelTip} target="turboIcon" toggle={this.toggleTurboSelTip}>
                                Turbo Tax
                             </Tooltip>
