@@ -807,7 +807,8 @@ class EEW2Records extends React.Component {
                 {uiAlert}
                 {uiDelConfirm}
                 {this.state.showPDF ? (<ViewPDF view={this.state.showPDF} title={this.state.title} handleHidePDF={this.handleHidePDF} />) : null}
-                {this.state.showAudits ? (<ViewCompanyAuditFiles isOpen="true" title={this.state.title} view="true" actions={this.props.actions}
+                {this.state.showAudits ? (<ViewCompanyAuditFiles isOpen="true" year={this.props.eew2data.eew2recordInput.year} 
+                                                title={this.state.title} view="true" actions={this.props.actions}
                                                 audits={this.state.audits} viewcompdata={this.props.viewcompdata} getOutputFilters={this.getOutputFilters} 
                                                 handleShowAuditPDF={this.handleShowAuditPDF} handleHideAuditPDF={this.handleHideAuditPDF} />) : null}
                 {this.state.showPrint ? (printW2s):null}

@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Tooltip } from 'reactstrap';
-import { divStyleFloatNone, NON_PDF_ANCHOR_ID, OUTPUT_AUDIT, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, OUTPUT_MESSAGES, OUTPUT_PRINT, PDF_ANCHOR_ID } from '../../base/constants/AppConstants';
+import { divStyleFloatNone, NON_PDF_ANCHOR_ID, OUTPUT_TURBO_TAX, OUTPUT_AUDIT, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, OUTPUT_MESSAGES, OUTPUT_PRINT, PDF_ANCHOR_ID } from '../../base/constants/AppConstants';
 import Messages from '../comp_outputs/Messages';
 import compApi from './compdataAPI';
 
@@ -30,6 +30,7 @@ class ViewCompanyAuditFiles extends Component {
             printSelTip: false,
             turboSelTip:false,
             title: this.props.title,
+            year: this.props.year,
             messages: []
         };
         this.toggle = this.toggle.bind(this);
@@ -48,6 +49,7 @@ class ViewCompanyAuditFiles extends Component {
         this.onAuditSel = this.onAuditSel.bind(this);
         this.onMsgSel = this.onMsgSel.bind(this);
         this.onPrintSel = this.onPrintSel.bind(this);
+        this.onTurboTaxSel = this.onTurboTaxSel.bind(this);
         this.onOutputTypeSel = this.onOutputTypeSel.bind(this);
         this.getAuditFileType = this.getAuditFileType.bind(this);
         this.downloadAuditZip = this.downloadAuditZip.bind(this);
@@ -220,6 +222,10 @@ class ViewCompanyAuditFiles extends Component {
         this.onOutputTypeSel(OUTPUT_PRINT);
         this.handlePrint();
     }
+    onTurboTaxSel() {
+        this.onOutputTypeSel(OUTPUT_TURBO_TAX);
+        this.handlePopulateAudit();
+    }
     onOutputTypeSel(outpType) {
         switch (outpType) {
             case OUTPUT_MESSAGES:
@@ -264,8 +270,10 @@ class ViewCompanyAuditFiles extends Component {
             <div>
                 <Modal size="lg"  style={{ 'max-width': window.innerWidth-200}} isOpen={this.props.view} toggle={this.toggle} backdrop="static" className="align-items: center;justify-content: center">
               
-                <ModalHeader toggle={this.toggle}  > 
-                    <h3 class="text-center text-bsi">{this.props.title}</h3>
+                <ModalHeader toggle={this.toggle} > 
+                    <h3 class="text-center text-bsi">{this.props.title + ' '}
+                        <small>{'(Tax Year: ' + this.props.year + ')'}</small>
+                    </h3>
                 </ModalHeader>
                
                 <ModalBody>
@@ -295,8 +303,8 @@ class ViewCompanyAuditFiles extends Component {
                             </Tooltip>
                         </div>
                        
-                        <div class={false ? 'd-none' : 'd-block p-2'}>
-                            <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onPrintSel()} id="turboIcon"><i class='fas fa-check fa-lg'></i></a>
+                        <div id="turboTaxIconDiv" class={false ? 'd-none' : 'd-block p-2'}>
+                            <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onTurboTaxSel()} id="turboIcon"><i class='far fa-check-square fa-lg'></i></a>
                             <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.turboSelTip} target="turboIcon" toggle={this.toggleTurboSelTip}>
                                Turbo Tax
                             </Tooltip>
