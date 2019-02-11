@@ -96,4 +96,7 @@ export const divStylePA={
     textAling: 'center',
     fontSize: '24px',
     marginLeft: '20px'
-}
+};
+export const divStyleRedColor={
+    color: '#FF0000'
+};

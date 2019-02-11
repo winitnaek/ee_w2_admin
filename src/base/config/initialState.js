@@ -20,6 +20,7 @@ export default {
   },
   viewcompdata: {
     messages: [],
-    outputDoc: {}
+    outputDoc: {},
+    isConfForTurboTax: {}
   }
 }

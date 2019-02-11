@@ -17,6 +17,13 @@ export default function viewcompdataReducer(state = initialState.viewcompdata, a
           outputDoc: state.outputDoc
         });
       }
+      case types.TURBO_TAX_IMPORT_COMP_CHECK_SUCCESS:
+      {
+        return Object.assign({}, ...state, {
+          messages: {},
+          isConfForTurboTax: action.isConfForTurboTax
+        });
+      }
     case types.GET_COMPANY_FILE_ERROR:
       {
         return Object.assign({}, ...state, {

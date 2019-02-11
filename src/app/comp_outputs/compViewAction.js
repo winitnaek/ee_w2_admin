@@ -23,9 +23,30 @@ export function getAuditOutputError(outputDoc) {
     };
 }
 
-export function getAuditOutput(dataset, compId, reqNo, fileType) {
+export function checkIfCompConfForTurboTaxImportSuccess(isConfForTurboTax) {
+    return {
+        type: types.TURBO_TAX_IMPORT_COMP_CHECK_SUCCESS,
+        isConfForTurboTax: isConfForTurboTax
+    };
+}
+
+export function checkIfCompConfForTurboTaxImport(dataset, compId) {
     return function (dispatch, getState) {
-        return compdataApi.getCompanyAuditData(dataset, reqNo, compId, fileType).then(output => {
+        return compdataApi.isCompConfForTurboTaxImport(dataset, compId).then(isConfigured => {
+            if (isConfigured) {
+                    dispatch(checkIfCompConfForTurboTaxImportSuccess(isConfigured));
+            } else {
+                throw isConfigured;
+            }
+        }).catch(error => {
+            throw error;
+        });
+    };
+}
+
+export function getAuditOutput(dataset, compId, reqNo, fileType, year) {
+    return function (dispatch, getState) {
+        return compdataApi.getCompanyAuditData(dataset, reqNo, compId, fileType, year).then(output => {
             if (output) {
                 if (OUTPUT_MESSAGES != fileType) {
                     dispatch(getAuditOutputSuccess(output));

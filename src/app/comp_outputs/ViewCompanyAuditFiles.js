@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Tooltip } from 'reactstrap';
-import { divStyleFloatNone, NON_PDF_ANCHOR_ID, OUTPUT_TURBO_TAX, OUTPUT_AUDIT, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, OUTPUT_MESSAGES, OUTPUT_PRINT, PDF_ANCHOR_ID } from '../../base/constants/AppConstants';
+import { divStyleRedColor, divStyleFloatNone, NON_PDF_ANCHOR_ID, OUTPUT_TURBO_TAX, OUTPUT_AUDIT, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, OUTPUT_MESSAGES, OUTPUT_PRINT, PDF_ANCHOR_ID } from '../../base/constants/AppConstants';
 import Messages from '../comp_outputs/Messages';
 import compApi from './compdataAPI';
 
@@ -19,6 +19,7 @@ class ViewCompanyAuditFiles extends Component {
             ckSumSel: false,
             ckDetSel: false,
             auditSel: false,
+            turboTaxSel: false,
             msgSel: this.props.audits.showMessages,
             inputParams: this.props.audits.inputParams,
             renderMsg: false,
@@ -28,7 +29,7 @@ class ViewCompanyAuditFiles extends Component {
             auditSelTip: false,
             msgSelTip: false,
             printSelTip: false,
-            turboSelTip:false,
+            turboTaxSelTip: false,
             title: this.props.title,
             year: this.props.year,
             messages: []
@@ -41,6 +42,7 @@ class ViewCompanyAuditFiles extends Component {
         this.toggleMsgSelTip = this.toggleMsgSelTip.bind(this);
         this.togglePrintSelTip = this.togglePrintSelTip.bind(this);
         this.toggleTurboSelTip = this.toggleTurboSelTip.bind(this);
+        this.checkIfTurboTaxIsApplicable = this.checkIfTurboTaxIsApplicable.bind(this);
         this.handlePopulateAudit = this.handlePopulateAudit.bind(this);
         this.renderPDFData = this.renderPDFData.bind(this);
         this.renderErrorPDF = this.renderErrorPDF.bind(this);
@@ -53,6 +55,7 @@ class ViewCompanyAuditFiles extends Component {
         this.onOutputTypeSel = this.onOutputTypeSel.bind(this);
         this.getAuditFileType = this.getAuditFileType.bind(this);
         this.downloadAuditZip = this.downloadAuditZip.bind(this);
+        this.downloadTurboTaxFile = this.downloadTurboTaxFile.bind(this);
         this.flipPdfAnchor = this.flipPdfAnchor.bind(this);
     }
 
@@ -64,6 +67,7 @@ class ViewCompanyAuditFiles extends Component {
         let fileType = this.state.ckDetSel ? OUTPUT_CLIENT_DTL : OUTPUT_CLIENT_SUM;
         fileType = this.state.msgSel ? OUTPUT_MESSAGES : fileType;
         fileType = this.state.auditSel ? OUTPUT_AUDIT : fileType;
+        fileType = this.state.turboTaxSel ? OUTPUT_TURBO_TAX : fileType;
         return fileType;
     }
 
@@ -75,8 +79,9 @@ class ViewCompanyAuditFiles extends Component {
         let compId = outputFilters.compId;
         let reqNo = outputFilters.reqNo;
         let fileType = this.getAuditFileType();
+        let year = this.state.year;
         //
-        this.props.actions.getAuditOutput(dataset, compId, reqNo, fileType).then(() => {
+        this.props.actions.getAuditOutput(dataset, compId, reqNo, fileType, year).then(() => {
             console.debug('Get Company Output Done.');
 
             if ($('#errAlrtCont')) {
@@ -93,6 +98,8 @@ class ViewCompanyAuditFiles extends Component {
                 this.renderPDFData(this.props.viewcompdata.outputDoc);
             } else if (OUTPUT_AUDIT === fileType && this.props.viewcompdata.outputDoc) {
                 this.downloadAuditZip(this.props.viewcompdata.outputDoc);
+            } else { // TurboTax
+                this.downloadTurboTaxFile(this.props.viewcompdata.outputDoc);
             }
         }).catch(error => {
             $('#errAlrt').html(error);
@@ -133,7 +140,17 @@ class ViewCompanyAuditFiles extends Component {
             window.URL.revokeObjectURL(data);
         }, 100);
     }
-   
+    downloadTurboTaxFile(output) {
+        const data = window.URL.createObjectURL(output);
+        var link = document.createElement('a');
+        link.href = data;
+        link.download = "TurboTax.zip";
+        link.click();
+        setTimeout(function () {
+            // For Firefox it is necessary to delay revoking the ObjectURL
+            window.URL.revokeObjectURL(data);
+        }, 100);
+    }
     renderPDFData(output) {
         let dataPdf = window.URL.createObjectURL(output);
         let frameObj = document.getElementById(PDF_ANCHOR_ID);
@@ -199,7 +216,7 @@ class ViewCompanyAuditFiles extends Component {
     }
     toggleTurboSelTip() {
         this.setState({
-            turboSelTip: !this.state.turboSelTip
+            turboTaxSelTip: !this.state.turboTaxSelTip
         });
     }
     onCkSumSel() {
@@ -225,6 +242,30 @@ class ViewCompanyAuditFiles extends Component {
     onTurboTaxSel() {
         this.onOutputTypeSel(OUTPUT_TURBO_TAX);
         this.handlePopulateAudit();
+    }
+    checkIfTurboTaxIsApplicable() {
+        let outputFilters = this.getOutputFilters(this.state.inputParams);
+        let dataset = outputFilters.dataset;
+        let compId = outputFilters.compId;
+        //
+        this.props.actions.checkIfCompConfForTurboTaxImport(dataset, compId).then(() => {
+            if ($('#errAlrtCont')) {
+                $('#errAlrtCont').addClass('d-none');
+            }
+
+            let isConfForTurboTax = this.props.viewcompdata.isConfForTurboTax;
+
+            if (isConfForTurboTax) {
+                $('#turboTaxIconDiv').removeClass('d-none');
+            } else {
+                $('#turboTaxIconDiv').addClass('d-none');
+            }
+
+            console.debug("Is configured for TurboTax?", isConfForTurboTax);
+        }).catch(error => {
+            $('#errAlrt').html(error);
+            $('#errAlrtCont').removeClass('d-none');
+        });
     }
     onOutputTypeSel(outpType) {
         switch (outpType) {
@@ -254,6 +295,11 @@ class ViewCompanyAuditFiles extends Component {
                 return;
             case OUTPUT_AUDIT:
                 this.state.auditSel = true;
+                this.state.turboTaxSel = false;
+                return;
+            case OUTPUT_TURBO_TAX:
+                this.state.turboTaxSel = true;
+                this.state.auditSel = false;
                 return;
             default: // "Print" is selected
                // alert("'Print' option is selected!");
@@ -263,6 +309,7 @@ class ViewCompanyAuditFiles extends Component {
     componentDidMount() {
         this.getOutputFilters = this.props.getOutputFilters;
         this.onMsgSel();
+        this.checkIfTurboTaxIsApplicable();
     }
     render() {
        
@@ -303,10 +350,10 @@ class ViewCompanyAuditFiles extends Component {
                             </Tooltip>
                         </div>
                        
-                        <div id="turboTaxIconDiv" class={false ? 'd-none' : 'd-block p-2'}>
-                            <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onTurboTaxSel()} id="turboIcon"><i class='far fa-check-square fa-lg'></i></a>
-                            <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.turboSelTip} target="turboIcon" toggle={this.toggleTurboSelTip}>
-                               Turbo Tax
+                        <div id="turboTaxIconDiv" class={/* false ? */ 'd-none' /* : 'd-block p-2' */}>
+                            <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onTurboTaxSel()} id="turboIcon"><i class='far fa-check-square fa-lg' style={divStyleRedColor}></i></a>
+                            <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.turboTaxSelTip} target="turboIcon" toggle={this.toggleTurboSelTip}>
+                               Download Turbo Tax File
                             </Tooltip>
                         </div>
                         <div class={false ? 'd-none' : 'd-block p-2'}>
