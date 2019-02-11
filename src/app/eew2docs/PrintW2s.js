@@ -254,6 +254,8 @@ class PrintW2s extends React.Component {
         }
         if(this.state.selecRec==0){
             disableMeSel = true;
+        }else if(this.state.selecRec > 0 && isEnabled){
+            disableMeSel = true;
         }
         this.setState({
             disableMe:isEnabled,disableMeSel:disableMeSel,isDisabledOpt: isEnabled,disableviewpdf:!isEnabled,rSelected:1,w2sselected:w2sselected
@@ -318,7 +320,7 @@ class PrintW2s extends React.Component {
                         <Label for="periodBy1" sm={1}></Label>
                         <Col sm={10}>
                         <Alert color="primary">
-                            {this.state.filterlabel}
+                            {this.state.filterlabel} <Badge color="info">{this.state.w2sselected}</Badge>
                         </Alert>
                         </Col>
                         </FormGroup>
@@ -362,10 +364,6 @@ class PrintW2s extends React.Component {
                                         isDisabled={this.state.isDisabledOpt}
                                         />
                                 </Col>
-                        </FormGroup>
-                        <FormGroup row>
-                            <Label for="printOpt7" sm={3}></Label>
-                            <Label for="printOpt8" sm={4}>Number of W2s selected  <Badge color="info">{this.state.w2sselected}</Badge></Label>
                         </FormGroup>
                         <FormGroup row>
                             <Label for="printOpt3" sm={1}></Label>

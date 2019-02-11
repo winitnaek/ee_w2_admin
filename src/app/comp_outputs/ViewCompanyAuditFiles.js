@@ -318,9 +318,7 @@ class ViewCompanyAuditFiles extends Component {
                 <Modal size="lg"  style={{ 'max-width': window.innerWidth-200}} isOpen={this.props.view} toggle={this.toggle} backdrop="static" className="align-items: center;justify-content: center">
               
                 <ModalHeader toggle={this.toggle} > 
-                    <h3 class="text-center text-bsi">{this.props.title + ' '}
-                        <small>{'(Tax Year: ' + this.props.year + ')'}</small>
-                    </h3>
+                  {this.props.title + ' '} {'(Tax Year: ' + this.props.year + ')'}
                 </ModalHeader>
                
                 <ModalBody>
