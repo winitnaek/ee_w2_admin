@@ -7,7 +7,7 @@ import UIConfirm from '../common/UIConfirm';
 const viewer_path = '/pdfjs/web/viewer.html?file=';
 const viewer_url = window.location.protocol + '//' + window.location.host + viewer_path;
 const printdataset = "00_EE_W2_DATA";
-const printId= "236305,236309";
+const printId= "236305";
 
 class ViewCompanyAuditFiles extends Component {
     constructor(props) {
