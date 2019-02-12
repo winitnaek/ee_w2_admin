@@ -1,9 +1,8 @@
 import { Component } from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Tooltip } from 'reactstrap';
-import { divStyleRedColor, divStyleFloatNone, NON_PDF_ANCHOR_ID, OUTPUT_TURBO_TAX, OUTPUT_AUDIT, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, OUTPUT_MESSAGES, OUTPUT_PRINT, PDF_ANCHOR_ID } from '../../base/constants/AppConstants';
+import { divStyleFloatNone, divStyleRedColor, NON_PDF_ANCHOR_ID, OUTPUT_AUDIT, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, OUTPUT_MESSAGES, OUTPUT_PRINT, OUTPUT_TURBO_TAX, PDF_ANCHOR_ID } from '../../base/constants/AppConstants';
 import Messages from '../comp_outputs/Messages';
-import compApi from './compdataAPI';
-
+import UIConfirm from '../common/UIConfirm';
 
 const viewer_path = '/pdfjs/web/viewer.html?file=';
 const viewer_url = window.location.protocol + '//' + window.location.host + viewer_path;
@@ -32,7 +31,10 @@ class ViewCompanyAuditFiles extends Component {
             turboTaxSelTip: false,
             title: this.props.title,
             year: this.props.year,
-            messages: []
+            messages: [],
+            showTurboTaxConfirm: false,
+            cheader: '',
+            cbody: ''
         };
         this.toggle = this.toggle.bind(this);
         this.changeBackdrop = this.changeBackdrop.bind(this);
@@ -52,11 +54,15 @@ class ViewCompanyAuditFiles extends Component {
         this.onMsgSel = this.onMsgSel.bind(this);
         this.onPrintSel = this.onPrintSel.bind(this);
         this.onTurboTaxSel = this.onTurboTaxSel.bind(this);
+        this.getTurboTaxConfMessage = this.getTurboTaxConfMessage.bind(this);
         this.onOutputTypeSel = this.onOutputTypeSel.bind(this);
         this.getAuditFileType = this.getAuditFileType.bind(this);
         this.downloadAuditZip = this.downloadAuditZip.bind(this);
         this.downloadTurboTaxFile = this.downloadTurboTaxFile.bind(this);
         this.flipPdfAnchor = this.flipPdfAnchor.bind(this);
+        this.handleTurboTaxConfirmOk = this.handleTurboTaxConfirmOk.bind(this);
+        this.handleTurboTaxConfirmCancel = this.handleTurboTaxConfirmCancel.bind(this);
+        this.showTurboTaxConfirm = this.showTurboTaxConfirm.bind(this);
     }
 
     toggle() {
@@ -240,8 +246,10 @@ class ViewCompanyAuditFiles extends Component {
         this.handlePrint();
     }
     onTurboTaxSel() {
-        this.onOutputTypeSel(OUTPUT_TURBO_TAX);
-        this.handlePopulateAudit();
+        this.showTurboTaxConfirm(true, 'Terms and Conditions', this.getTurboTaxConfMessage());
+    }
+    getTurboTaxConfMessage() {
+        return `By opting to utilize the TurboTax® W-2 Import Service (the "Service") you are consenting to the provision of information regarding your organization and employees, some of which may be personally identifiable, to Intuit Inc. ("Intuit"), which owns and operates the Service. Business Software, Inc. ("BSI") will have no responsibility for, or control over, such information while using the Service. Instead, the handling, use, disclosure and disposition of such information will be governed by the terms of Intuit's privacy policies and statements. BSI does not make any warranties or representations express or implied, regarding the Service or the accuracy of any results obtained through its use. Use of the Service is at your own risk and BSI will have no liability of any kind whatsoever in connection with such use.`;
     }
     checkIfTurboTaxIsApplicable() {
         let outputFilters = this.getOutputFilters(this.state.inputParams);
@@ -277,6 +285,7 @@ class ViewCompanyAuditFiles extends Component {
                 this.state.ckSumSel = false;
                 this.state.ckDetSel = false;
                 this.state.auditSel = false;
+                this.state.turboTaxSel = false;
                 this.state.printSel = false;
                 return;
             case OUTPUT_CLIENT_SUM:
@@ -284,6 +293,7 @@ class ViewCompanyAuditFiles extends Component {
                 this.state.ckSumSel = true;
                 this.state.ckDetSel = false;
                 this.state.auditSel = false;
+                this.state.turboTaxSel = false;
                 this.state.printSel = false;
                 return;
             case OUTPUT_CLIENT_DTL:
@@ -291,6 +301,7 @@ class ViewCompanyAuditFiles extends Component {
                 this.state.ckSumSel = false;
                 this.state.ckDetSel = true;
                 this.state.auditSel = false;
+                this.state.turboTaxSel = false;
                 this.state.printSel = false;
                 return;
             case OUTPUT_AUDIT:
@@ -311,11 +322,33 @@ class ViewCompanyAuditFiles extends Component {
         this.onMsgSel();
         this.checkIfTurboTaxIsApplicable();
     }
+    handleTurboTaxConfirmOk(){
+        this.handleTurboTaxConfirmCancel();
+        this.onOutputTypeSel(OUTPUT_TURBO_TAX);
+        this.handlePopulateAudit();
+    }
+    handleTurboTaxConfirmCancel() {
+        this.setState({
+            showTurboTaxConfirm: !this.state.showTurboTaxConfirm,
+            turboTaxSel: false
+        });
+    }
+    showTurboTaxConfirm(cshow, cheader, cbody) {
+        this.setState({
+            showTurboTaxConfirm: cshow,
+            cheader: cheader,
+            cbody: cbody
+        });
+    }
     render() {
        
         return (
             <div>
-                <Modal size="lg"  style={{ 'max-width': window.innerWidth-200}} isOpen={this.props.view} toggle={this.toggle} backdrop="static" className="align-items: center;justify-content: center">
+                <UIConfirm handleOk={this.handleTurboTaxConfirmOk} handleCancel={this.handleTurboTaxConfirmCancel}  
+                    showConfirm={this.state.showTurboTaxConfirm} cheader={this.state.cheader} cbody={this.state.cbody} 
+                    okbtnlbl={'Ok'} cancelbtnlbl={'Cancel'}/>
+                {(true || !this.state.showTurboTaxConfirm) ? 
+                (<Modal size="lg"  style={{ 'max-width': window.innerWidth-200}} isOpen={this.props.view} toggle={this.toggle} backdrop="static" className="align-items: center;justify-content: center">
               
                 <ModalHeader toggle={this.toggle} > 
                   {this.props.title + ' '} {'(Tax Year: ' + this.props.year + ')'}
@@ -379,7 +412,7 @@ class ViewCompanyAuditFiles extends Component {
                 <ModalFooter>
                     <Button color="secondary" onClick={this.toggle}>Close</Button>
                 </ModalFooter>
-                </Modal>;
+                </Modal>) : null }
             </div>
         );
     }
