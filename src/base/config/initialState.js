@@ -1,5 +1,6 @@
 export default {
   outputgeninprogress: {},
+  printinprogress:{},
   w2data: {
     loadeew2: false,
     eew2id: ''

@@ -17,7 +17,7 @@ class EEW2RecordsGrid extends React.Component {
 
         if(eew2data && eew2data.eew2ecords){
             return(<EEW2Records eew2data={this.props.eew2data} w2data={this.props.w2data} viewcompdata={this.props.viewcompdata} 
-                compdata={this.props.compdata} isoutinprogress={this.props.isoutinprogress} 
+                compdata={this.props.compdata} isoutinprogress={this.props.isoutinprogress} isprintinprogress={this.props.isprintinprogress} 
                 actions={this.props.actions}/>);
         }else if(eew2data && eew2data.eew2ecords && eew2data.eew2ecords.type=='AppError'){
             return(<div>
@@ -62,6 +62,7 @@ function mapStateToProps(state) {
     return {
         eew2data: state.eew2data,
         isoutinprogress: state.outputgeninprogress,
+        isprintinprogress: state.printinprogress,
         w2data:state.w2data,
         compdata:state.compdata,
         viewcompdata: state.viewcompdata

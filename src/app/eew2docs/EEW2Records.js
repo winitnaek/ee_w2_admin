@@ -810,6 +810,12 @@ class EEW2Records extends React.Component {
                 <Alert color="danger" isOpen={this.props.isoutinprogress.status==='Failed'}>
                     <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner"></i> Output Generation Failed. <Button style={{padding:'0em'}}  onClick={() => this.onViewFailedMessages(this.props.isoutinprogress.requestno,this.props.isoutinprogress.compName,this.props.isoutinprogress.compFein)} color="link">View Messages</Button></span>
                 </Alert>
+                <Alert color="success" isOpen={this.props.isprintinprogress.status==='In-Progress'}>
+                    <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner fa-spin"></i> Printing W2s is In-Progress.</span>
+                </Alert>
+                <Alert color="danger" isOpen={this.props.isprintinprogress.status==='Failed'}>
+                    <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner"></i> Printing of W2s Failed. Please contact your system administrator.</span>
+                </Alert>
                 {this.state.allSelected ? selectall: selectallnone}
                 <a href="#"  style={divStyle} onClick={() => this.resetAll()} id="resetAll"><i class='fas fa-redo-alt fa-lg'></i></a>
                 <Tooltip placement="right" isOpen={this.state.resetAll} target="resetAll" toggle={this.toggleRstAll}>

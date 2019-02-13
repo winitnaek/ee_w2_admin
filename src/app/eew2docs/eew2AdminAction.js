@@ -133,15 +133,15 @@ export function isOutputGenerationFailed(outputgeninprogress) {
 export function isPrintGenerationInprogress(dataset) {
     return function (dispatch, getState) {
         const state = getState();
-        return eew2AdminAPI.isPrintGenerationInprogress(dataset).then(outputgeninprogress => {
-            if(outputgeninprogress.status && outputgeninprogress.message){
+        return eew2AdminAPI.isPrintGenerationInprogress(dataset).then(printinprogress => {
+            if(printinprogress.status && printinprogress.message){
                 let arr = [];
                 arr.push([]);
                 dispatch(isPrintGenerationFailed(arr));
-                throw outputgeninprogress;
+                throw printinprogress;
             }else{
-                if(outputgeninprogress){
-                   dispatch(isPrintGenerationSuccess(outputgeninprogress));
+                if(printinprogress){
+                   dispatch(isPrintGenerationSuccess(printinprogress));
                 }
             }
         }).catch(error => {
@@ -149,11 +149,11 @@ export function isPrintGenerationInprogress(dataset) {
         });
     };
 }
-export function isPrintGenerationSuccess(outputgeninprogress) {
-    return { type: types.GET_PRINT_INPROGRESS_SUCCESS, outputgeninprogress };
+export function isPrintGenerationSuccess(printinprogress) {
+    return { type: types.GET_PRINT_INPROGRESS_SUCCESS, printinprogress };
 }
-export function isPrintGenerationFailed(outputgeninprogress) {
-    return { type: types.GET_PRINT_INPROGRESS_ERROR, outputgeninprogress };
+export function isPrintGenerationFailed(printinprogress) {
+    return { type: types.GET_PRINT_INPROGRESS_ERROR, printinprogress };
 }
 export function getTransmitters(dataset) {
     return function (dispatch, getState) {
