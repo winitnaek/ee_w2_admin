@@ -1,5 +1,5 @@
 export default {
-  outputgeninprogress: false,
+  outputgeninprogress: {},
   w2data: {
     loadeew2: false,
     eew2id: ''
