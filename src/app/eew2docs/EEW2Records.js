@@ -38,7 +38,8 @@ class EEW2Records extends React.Component {
                     { name: 'generatedDateTime', type: 'date' },
                     { name: 'empkey', type: 'string' },
                     { name: 'last4digits', type: 'string' },
-                    { name: 'year', type: 'int' }
+                    { name: 'year', type: 'int' },
+                    { name: 'correction', type: 'boolean' }
                 ],
                 url: getRecsUrl,
                 type: "POST",
@@ -714,6 +715,13 @@ class EEW2Records extends React.Component {
             {cbody}
         </Tooltip></div>
         
+        let corrrenderer = (row, column, value) => {
+            if(value){
+                return '<div style="text-align:center;padding-top:5px;" class="align-self-center align-middle"><i class="fas fa-check"></i></div>';
+            }else{
+                return '';
+            }
+        }
         let printrenderer = (row, column, value) => {
             if(value){
                 return '<div style="text-align:center;padding-top:5px;" class="align-self-center align-middle"><i class="fas fa-check"></i></div>';
@@ -750,8 +758,9 @@ class EEW2Records extends React.Component {
                     return `<a href="#" data-toggle="tooltip" class="tooltipempw2" title="View W2 PDF"><div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadPdfData('${ndex}')}>${rowdata.empLname}</button></div></a>`;
                    },filtertype: 'input'},
                 { text: '  SSN  ', datafield: 'last4digits', cellsalign: 'center', align: 'center', width: 'auto', filterable: false, sortable: false },
-                { text: 'Published', datafield: 'isPublished',cellsalign: 'center', align: 'center', cellsrenderer: pubrenderer,  width: 'auto',filtertype: 'bool', },
-                { text: 'Printed', datafield: 'isPrinted', cellsalign: 'center', align: 'center', cellsrenderer: printrenderer, width: 'auto', filtertype: 'bool',},
+                { text: 'Published', datafield: 'isPublished',cellsalign: 'center', align: 'center', cellsrenderer: pubrenderer,  width: 'auto',filtertype: 'bool' },
+                { text: 'Printed', datafield: 'isPrinted', cellsalign: 'center', align: 'center', cellsrenderer: printrenderer, width: 'auto', filtertype: 'bool' },
+                { text: 'Corrected', datafield: 'correction', cellsalign: 'center', align: 'center', cellsrenderer:     corrrenderer, width: 'auto', filtertype: 'bool' }
             ];
         return (
             <div>
