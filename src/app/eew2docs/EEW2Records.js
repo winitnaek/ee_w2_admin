@@ -43,6 +43,7 @@ class EEW2Records extends React.Component {
                 ],
                 url: getRecsUrl,
                 type: "POST",
+                contenttype: "application/json",
                 data: eeW2GetRecInput,
                 filter: function() {
                     // update the grid and send a request to the server.
@@ -705,7 +706,11 @@ class EEW2Records extends React.Component {
                         // alert(data["filtervalue" + i]);
                     }
                 }
-                return data;
+                try {
+                    return JSON.stringify(data);
+                } catch (error) {
+                    return data;
+                }
             },
             downloadComplete: function(data, status, xhr) {
                 if (!source.totalrecords) {
