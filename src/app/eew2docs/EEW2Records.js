@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Tooltip, Button} from 'reactstrap';
+import { Alert, Tooltip, Button } from 'reactstrap';
 import { divStyle, divStyleBot, divStyleFirst, divStyleFirstBot, divStyleR, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, PDF_ANCHOR_ID, DFLT_PAGE_SIZE } from '../../base/constants/AppConstants';
 import { RN_FILTER_PAYROLL_DATA } from '../../base/constants/RenderNames';
 import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
@@ -122,7 +122,8 @@ class EEW2Records extends React.Component {
             selecRec:'',
             optSelec:''
         };
-        //this.interval = setInterval(this.handleInProgress.bind(this), 60000);
+        this.handleInProgress();
+        this.interval = setInterval(this.handleInProgress.bind(this), 30000);
     }
     handleInProgress(){
         const dataset = appDataset();
@@ -406,6 +407,7 @@ class EEW2Records extends React.Component {
                 console.log('generateOutput eew2recordInput ==>');
                 console.log(eew2recordInput);
                 this.props.actions.generateOutputs(eew2recordInput).then(response => {
+                    this.handleInProgress();
                     this.refs.eew2Grid.clearselection();
                     this.toggleSuccess('Employee W2 Output Generated Successfully!');
                     this.interval = setInterval(this.tick.bind(this), 300000);
@@ -784,8 +786,8 @@ class EEW2Records extends React.Component {
                 <Tooltip placement="top" isOpen={this.state.publishW2} target="publishW2" toggle={this.togglePubW2Sel}>
                    Publish W2
                 </Tooltip>
-                <a href="#" style={divStyleR} onClick={() => this.generateOutput()} id="generateOutput"><i class='fas fa-calculator fa-lg'></i></a>
-                <Tooltip placement="bottom" isOpen={this.state.generateOutput} target="generateOutput" toggle={this.togglePstSel}>
+                <a href="#" style={divStyleR} onClick={() => this.generateOutput()} id="generateOutput"><i class='fas fa-tasks fa-lg'></i></a>
+                <Tooltip placement="left" isOpen={this.state.generateOutput} target="generateOutput" toggle={this.togglePstSel}>
                     Generate W2
                 </Tooltip>
                 <JqxGrid ref='eew2Grid'
@@ -803,7 +805,7 @@ class EEW2Records extends React.Component {
                 <Tooltip placement="right" isOpen={this.state.exptoCsvTip} target="exportToCsv" toggle={this.toggleExpCsv}>
                     Export To CSV
                 </Tooltip>
-                {this.props.isoutinprogress ? (<span href="#"  style={divStyleR} id="inProgressSpinner"> <i class="fas fa-spinner fa-spin"></i> Output Generation is in Progress..</span>) : null}
+                {this.props.isoutinprogress.status==='In-Progress' ? (<span href="#"  style={divStyleR} id="inProgressSpinner"> <i class="fas fa-spinner fa-spin"></i> Output Generation is in Progress..</span>) : null}
                 {uiAlert}
                 {uiDelConfirm}
                 {this.state.showPDF ? (<ViewPDF view={this.state.showPDF} title={this.state.title} handleHidePDF={this.handleHidePDF} />) : null}
