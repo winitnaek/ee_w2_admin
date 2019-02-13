@@ -12,7 +12,8 @@ import FilterPayrollData from './FilterPayrollData';
 
 const viewer_path ='/pdfjs/web/viewer.html?file=';
 const viewer_url  = window.location.protocol+'//'+window.location.host+viewer_path;
-
+const PRINTGEN_TIMER =10000;
+const TICK_TIMER=300000;
 class EEW2Records extends React.Component {
     constructor(props) {
         super(props);
@@ -127,8 +128,8 @@ class EEW2Records extends React.Component {
             optSelec:''
         };
         this.handleInProgress();
-        this.interval = setInterval(this.handleInProgress.bind(this), 30000);
-        this.interval = setInterval(this.handlePrintProgress.bind(this), 30000);
+        this.interval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
+       // this.interval = setInterval(this.handlePrintProgress.bind(this), PRINTGEN_TIMER);
     }
     handleInProgress(){
         const dataset = appDataset();
@@ -145,7 +146,6 @@ class EEW2Records extends React.Component {
         this.setState({ hover: false });    
     }
     goToFilterPage() {
-        //renderW2AdmApplication(appAnchor(), RN_FILTER_PAYROLL_DATA);
         this.setState({ openFromGrid: true });   
     }
     toggleFromGrid(){
@@ -237,7 +237,7 @@ class EEW2Records extends React.Component {
                         });
                         this.refs.eew2Grid.updatebounddata('data');
                         this.toggleSuccess('Un-Publishing of W2s initiated for the selected Employees.');
-                        this.interval = setInterval(this.tick.bind(this), 300000);
+                        this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
                         return response
                     }).catch(error => {
                         throw new SubmissionError(error)
@@ -268,7 +268,7 @@ class EEW2Records extends React.Component {
                     //this.refs.eew2Grid.clearselection();
                     this.refs.eew2Grid.updatebounddata('data');
                     this.toggleSuccess('Un-Publishing of W2s initiated for the selected Employees.');
-                    this.interval = setInterval(this.tick.bind(this), 300000);
+                    this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
                     return response
                 }).catch(error => {
                     throw new SubmissionError(error)
@@ -325,7 +325,7 @@ class EEW2Records extends React.Component {
                         });
                         this.refs.eew2Grid.updatebounddata('data');
                         this.toggleSuccess('Publishing of W2s initiated for the selected Employees.');
-                        this.interval = setInterval(this.tick.bind(this), 300000);
+                        this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
                         return response
                     }).catch(error => {
                         throw new SubmissionError(error)
@@ -355,7 +355,7 @@ class EEW2Records extends React.Component {
                     });
                     this.refs.eew2Grid.updatebounddata('data');
                     this.toggleSuccess('Publishing of W2s initiated for the selected Employees.');
-                    this.interval = setInterval(this.tick.bind(this), 300000);
+                    this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
                     return response
                 }).catch(error => {
                     throw new SubmissionError(error)
@@ -419,7 +419,7 @@ class EEW2Records extends React.Component {
                     this.handleInProgress();
                     this.refs.eew2Grid.clearselection();
                     this.toggleSuccess('Generation of W2s initiated for the selected Employees.');
-                    this.interval = setInterval(this.tick.bind(this), 300000);
+                    this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
                     return response
                 }).catch(error => {
                     throw new SubmissionError(error)
@@ -436,7 +436,7 @@ class EEW2Records extends React.Component {
                 this.props.actions.generateOutputs(eew2recordInput).then(response => {
                     this.refs.eew2Grid.clearselection();
                     this.toggleSuccess('Generation of W2s initiated for the selected Employees.');
-                    this.interval = setInterval(this.tick.bind(this), 300000);
+                    this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
                     return response
                 }).catch(error => {
                     throw new SubmissionError(error)
