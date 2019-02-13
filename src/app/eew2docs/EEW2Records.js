@@ -85,6 +85,7 @@ class EEW2Records extends React.Component {
             this.handlePrintOk = this.handlePrintOk.bind(this);
             this.handlePrintCancel = this.handlePrintCancel.bind(this);
             this.toggleFromGrid = this.toggleFromGrid.bind(this);
+            this.onViewFailedMessages = this.onViewFailedMessages.bind(this);
             
         this.state = {
             source: source,
@@ -614,11 +615,25 @@ class EEW2Records extends React.Component {
         });
     }
     handleShowMessages(rowdata, title) {
+        console.log('rowdata');
+        console.log(rowdata);
         this.setState({
             title: (!title ? `${rowdata.compName}` : title),
             audits: {
                 showMessages: true,
                 inputParams: rowdata
+            },
+            showAudits: true
+        });
+    }
+    onViewFailedMessages(requestno,title,fein){
+        let rowdata ={"compFein": "101202303","compName":"Bennys Restaurants","requestno":"212"};
+        this.setState({
+            title: (!title ? `${rowdata.compName}` : title),
+            audits: {
+                showMessages: true,
+                inputParams: rowdata,
+                disableOtherIcons:true
             },
             showAudits: true
         });
@@ -769,6 +784,12 @@ class EEW2Records extends React.Component {
                 <Alert color="success" isOpen={this.state.outputSuccess}>
                     {this.state.outputMessage}
                 </Alert>
+                <Alert color="success" isOpen={this.props.isoutinprogress.status==='In-Progress'}>
+                    <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner fa-spin"></i> Output Generation is in Progress..</span>
+                </Alert>
+                <Alert color="danger" isOpen={true}>
+                    <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner"></i> Output Generation Failed. <Button style={{padding:'0em'}}  onClick={() => this.onViewFailedMessages(this.props.isoutinprogress.requestno,'Bennys Restaurants','101202303')} color="link">View Messages</Button></span>
+                </Alert>
                 {this.state.allSelected ? selectall: selectallnone}
                 <a href="#"  style={divStyle} onClick={() => this.resetAll()} id="resetAll"><i class='fas fa-redo-alt fa-lg'></i></a>
                 <Tooltip placement="right" isOpen={this.state.resetAll} target="resetAll" toggle={this.toggleRstAll}>
@@ -805,7 +826,7 @@ class EEW2Records extends React.Component {
                 <Tooltip placement="right" isOpen={this.state.exptoCsvTip} target="exportToCsv" toggle={this.toggleExpCsv}>
                     Export To CSV
                 </Tooltip>
-                {this.props.isoutinprogress.status==='In-Progress' ? (<span href="#"  style={divStyleR} id="inProgressSpinner"> <i class="fas fa-spinner fa-spin"></i> Output Generation is in Progress..</span>) : null}
+               
                 {uiAlert}
                 {uiDelConfirm}
                 {this.state.showPDF ? (<ViewPDF view={this.state.showPDF} title={this.state.title} handleHidePDF={this.handleHidePDF} />) : null}

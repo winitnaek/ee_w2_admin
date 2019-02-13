@@ -47,6 +47,15 @@ export const divStyleFloatNone = {
     fontSize: '24px',
     marginLeft: '20px'
 };
+export const divStyleDisable = {
+    display: 'block',
+    paddingBottom: '8px',
+    transition: 'all 0.3s ease',
+    textAling: 'center',
+    fontSize: '24px',
+    marginLeft: '20px',
+    pointerEvents:'none'
+};
 export const divStyleBot = {
     display: 'block',
     paddingTop: '8px',

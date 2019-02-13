@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Tooltip } from 'reactstrap';
-import { divStyleFloatNone, divStyleRedColor, NON_PDF_ANCHOR_ID, OUTPUT_AUDIT, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, OUTPUT_MESSAGES, OUTPUT_PRINT, OUTPUT_TURBO_TAX, PDF_ANCHOR_ID } from '../../base/constants/AppConstants';
+import {divStyleDisable, divStyleFloatNone, divStyleRedColor, NON_PDF_ANCHOR_ID, OUTPUT_AUDIT, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, OUTPUT_MESSAGES, OUTPUT_PRINT, OUTPUT_TURBO_TAX, PDF_ANCHOR_ID } from '../../base/constants/AppConstants';
 import Messages from '../comp_outputs/Messages';
 import UIConfirm from '../common/UIConfirm';
 
@@ -12,6 +12,10 @@ const printId= "236305,236309";
 class ViewCompanyAuditFiles extends Component {
     constructor(props) {
         super(props);
+        let disableMe = false;
+        if(this.props.audits.disableOtherIcons){
+            disableMe=true;
+        }
         this.state = {
             modal: true,
             backdrop: 'static',
@@ -34,7 +38,8 @@ class ViewCompanyAuditFiles extends Component {
             messages: [],
             showTurboTaxConfirm: false,
             cheader: '',
-            cbody: ''
+            cbody: '',
+            disableMe:disableMe
         };
         this.toggle = this.toggle.bind(this);
         this.changeBackdrop = this.changeBackdrop.bind(this);
@@ -341,7 +346,6 @@ class ViewCompanyAuditFiles extends Component {
         });
     }
     render() {
-       
         return (
             <div>
                 <UIConfirm handleOk={this.handleTurboTaxConfirmOk} handleCancel={this.handleTurboTaxConfirmCancel}  
@@ -357,19 +361,19 @@ class ViewCompanyAuditFiles extends Component {
                 <ModalBody>
                 <div class="d-flex m-auto justify-content-center align-items-center text-align-center">
                         <div class={false ? 'd-none' : 'd-block p-2'}>
-                            <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onCkSumSel()} id="ckSumIcon"><i class='far fa-list-alt fa-lg'></i></a>
+                            <a href="#" style={this.state.disableMe==true ? divStyleDisable:divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onCkSumSel()} id="ckSumIcon"><i class='far fa-list-alt fa-lg'></i></a>
                             <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.ckSumSelTip} target="ckSumIcon" toggle={this.toggleCkSumSelTip}>
                                 Show Client Kit Summary PDF
                             </Tooltip>
                         </div>
                         <div class={false ? 'd-none' : 'd-block p-2'}>
-                            <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onCkDetSel()} id="ckDetIcon"><i class='fas fa-list-alt fa-lg'></i></a>
+                            <a href="#" style={this.state.disableMe ? divStyleDisable:divStyleFloatNone} class={false ? 'd-none' : 'd-block'} disable  onClick={() => this.onCkDetSel()} id="ckDetIcon"><i class='fas fa-list-alt fa-lg'></i></a>
                             <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.ckDetSelTip} target="ckDetIcon" toggle={this.toggleCkDetSelTip}>
                                 Show Client Kit Details PDF
                             </Tooltip>
                         </div>
                         <div class={false ? 'd-none' : 'd-block p-2'}>
-                            <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onAuditSel()} id="auditIcon"><i class='fas fa-download fa-lg'></i></a>
+                            <a href="#" style={this.state.disableMe ? divStyleDisable:divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onAuditSel()} id="auditIcon"><i class='fas fa-download fa-lg'></i></a>
                             <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.auditSelTip} target="auditIcon" toggle={this.toggleAuditSelTip}>
                                 Download Audit Logs
                             </Tooltip>
@@ -382,13 +386,13 @@ class ViewCompanyAuditFiles extends Component {
                         </div>
                        
                         <div id="turboTaxIconDiv" class={/* false ? */ 'd-none' /* : 'd-block p-2' */}>
-                            <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onTurboTaxSel()} id="turboIcon"><i class='far fa-check-square fa-lg' style={divStyleRedColor}></i></a>
+                            <a href="#" style={this.state.disableMe ? divStyleDisable:divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onTurboTaxSel()} id="turboIcon"><i class='far fa-check-square fa-lg' style={divStyleRedColor}></i></a>
                             <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.turboTaxSelTip} target="turboIcon" toggle={this.toggleTurboSelTip}>
                                Download Turbo Tax File
                             </Tooltip>
                         </div>
                         <div class={false ? 'd-none' : 'd-block p-2'}>
-                            <a href="#" style={divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onPrintSel()} id="printIcon"><i class='fas fa-print fa-lg'></i></a>
+                            <a href="#" style={this.state.disableMe ? divStyleDisable:divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onPrintSel()} id="printIcon"><i class='fas fa-print fa-lg'></i></a>
                             <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.printSelTip} target="printIcon" toggle={this.togglePrintSelTip}>
                                 Print All W2 PDFs
                             </Tooltip>
