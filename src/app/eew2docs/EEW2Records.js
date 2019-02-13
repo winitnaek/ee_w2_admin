@@ -629,7 +629,7 @@ class EEW2Records extends React.Component {
         });
     }
     onViewFailedMessages(requestno,title,fein){
-        let rowdata ={"compFein": "101202303","compName":"Bennys Restaurants","requestno":"212"};
+        let rowdata ={"compFein": fein,"compName":title,"requestno":requestno};
         this.setState({
             title: (!title ? `${rowdata.compName}` : title),
             audits: {
