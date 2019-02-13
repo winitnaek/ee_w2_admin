@@ -107,7 +107,7 @@ class eew2AdminAPI {  static geteew2records(eew2recordInput) {
           return response.json();
         }else{
           var errorCode =  response.status;
-          var errorMsg  =  'Unable to Publish or Unpublish EE W2 Records. '+ADMIN_ERROR_MSG;
+          var errorMsg  =  'Unable Get Output Generation Inprogress. '+ADMIN_ERROR_MSG;
           return new AppError(errorMsg, errorCode);
         } 
       })
@@ -180,6 +180,30 @@ class eew2AdminAPI {  static geteew2records(eew2recordInput) {
         }else{
           var errorCode =  response.status;
           var errorMsg  =  'Unable to Get Employees. '+ADMIN_ERROR_MSG;
+          return new AppError(errorMsg, errorCode);
+        } 
+      })
+      .catch(error => {
+        return error;
+      });
+  }
+  static isPrintGenerationInprogress(dataset) {
+    let paramurl = `${'?dataset='}${dataset}`;
+    var svcs_url = `${svcs.GET_ISPRINT_GEN_INPROGRESS}${paramurl}`;
+    
+    return fetch(URLUtils.buildURL(svcs_url), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin'
+    })
+      .then(response => {
+        if(response.ok){
+          return response.json();
+        }else{
+          var errorCode =  response.status;
+          var errorMsg  =  'Unable Get Print Generation Inprogress. '+ADMIN_ERROR_MSG;
           return new AppError(errorMsg, errorCode);
         } 
       })

@@ -787,8 +787,8 @@ class EEW2Records extends React.Component {
                 <Alert color="success" isOpen={this.props.isoutinprogress.status==='In-Progress'}>
                     <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner fa-spin"></i> Output Generation is in Progress..</span>
                 </Alert>
-                <Alert color="danger" isOpen={true}>
-                    <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner"></i> Output Generation Failed. <Button style={{padding:'0em'}}  onClick={() => this.onViewFailedMessages(this.props.isoutinprogress.requestno,'Bennys Restaurants','101202303')} color="link">View Messages</Button></span>
+                <Alert color="danger" isOpen={this.props.isoutinprogress.status==='Failed'}>
+                    <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner"></i> Output Generation Failed. <Button style={{padding:'0em'}}  onClick={() => this.onViewFailedMessages(this.props.isoutinprogress.requestno,this.props.isoutinprogress.compName,this.props.isoutinprogress.compFein)} color="link">View Messages</Button></span>
                 </Alert>
                 {this.state.allSelected ? selectall: selectallnone}
                 <a href="#"  style={divStyle} onClick={() => this.resetAll()} id="resetAll"><i class='fas fa-redo-alt fa-lg'></i></a>

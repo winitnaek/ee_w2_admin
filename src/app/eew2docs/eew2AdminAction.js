@@ -112,7 +112,7 @@ export function isOutputGenerationInprogress(dataset) {
             if(outputgeninprogress.status && outputgeninprogress.message){
                 let arr = [];
                 arr.push([]);
-                dispatch(isOutputGenerationSuccessFailed(arr));
+                dispatch(isOutputGenerationFailed(arr));
                 throw outputgeninprogress;
             }else{
                 if(outputgeninprogress){
@@ -127,8 +127,33 @@ export function isOutputGenerationInprogress(dataset) {
 export function isOutputGenerationSuccess(outputgeninprogress) {
     return { type: types.POST_OUTPUTGEN_INPROGRESS_SUCCESS, outputgeninprogress };
 }
-export function isOutputGenerationSuccessFailed(outputgeninprogress) {
+export function isOutputGenerationFailed(outputgeninprogress) {
     return { type: types.POST_OUTPUTGEN_INPROGRESS_ERROR, outputgeninprogress };
+}
+export function isPrintGenerationInprogress(dataset) {
+    return function (dispatch, getState) {
+        const state = getState();
+        return eew2AdminAPI.isPrintGenerationInprogress(dataset).then(outputgeninprogress => {
+            if(outputgeninprogress.status && outputgeninprogress.message){
+                let arr = [];
+                arr.push([]);
+                dispatch(isPrintGenerationFailed(arr));
+                throw outputgeninprogress;
+            }else{
+                if(outputgeninprogress){
+                   dispatch(isPrintGenerationSuccess(outputgeninprogress));
+                }
+            }
+        }).catch(error => {
+            generateAppErrorEvent(error.type,error.status,error.message,error);
+        });
+    };
+}
+export function isPrintGenerationSuccess(outputgeninprogress) {
+    return { type: types.GET_PRINT_INPROGRESS_SUCCESS, outputgeninprogress };
+}
+export function isPrintGenerationFailed(outputgeninprogress) {
+    return { type: types.GET_PRINT_INPROGRESS_ERROR, outputgeninprogress };
 }
 export function getTransmitters(dataset) {
     return function (dispatch, getState) {
