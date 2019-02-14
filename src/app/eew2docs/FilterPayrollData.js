@@ -32,6 +32,15 @@ class FilterPayrollData extends Component {
         });
         //ops = _.uniqWith(ops, _.isEqual);
         let data = [];
+        let isOpenFromGrid=false;
+        let isTrmSelDisabled=false;
+        let isEmpSelDisabled=true;
+        if(this.props.openFromGrid){
+            isOpenFromGrid=true;
+            isTrmSelDisabled=true;
+            isEmpSelDisabled=true;
+            data=this.props.initgridData;
+        }
         let source =
         {
             datatype: "json",
@@ -43,10 +52,7 @@ class FilterPayrollData extends Component {
             pagesize: 5,
             localdata: data
         };
-        let isOpenFromGrid=false;
-        if(this.props.openFromGrid){
-            isOpenFromGrid=true;
-        }
+        
         this.state = {
             source: source,
             modal: true,
@@ -71,12 +77,13 @@ class FilterPayrollData extends Component {
             ops:ops,
             inputValue: '',
             value:'',
-            isEmpSelDisabled:true,
+            isEmpSelDisabled:isEmpSelDisabled,
             empInfo:false,
             selAllInfo:false,
             showActionAlert:false,
             actionAlertMessage:'',
-            openFromGrid:isOpenFromGrid
+            openFromGrid:isOpenFromGrid,
+            isTrmSelDisabled:isTrmSelDisabled
         };
         this.toggle = this.toggle.bind(this);
         this.toggleaddEmpsSel = this.toggleaddEmpsSel.bind(this);
@@ -96,7 +103,6 @@ class FilterPayrollData extends Component {
         this.tick2 = this.tick2.bind(this);
         this.onDismiss = this.onDismiss.bind(this);
         this.onActionDone = this.onActionDone.bind(this);
-       
     }
     onDismiss() {
         this.setState({ visible: false });
@@ -326,6 +332,7 @@ class FilterPayrollData extends Component {
         }
         eew2data.filterlabel = fLabel;
         eew2data.eew2recordInput = eew2recordInput;
+        eew2data.w2dgridata = this.state.w2dgridata;
         return eew2data;
     }
     /**
@@ -396,7 +403,7 @@ class FilterPayrollData extends Component {
      * @param {*} actionClicked 
      */
     onResetSelection(actionClicked){
-        this.setState({w2dgridata:[], selectedTransmitter: null , selectedCompany: null, selectedEmployees: null,disableaddemp:true,addEmps:false,gridHasData:false,disableviewpdf:true,disablegenpdf:true,disablepubpdf:true,disableunpubpdf:true,isEmpSelDisabled:true});
+        this.setState({w2dgridata:[], isTrmSelDisabled:false, selectedTransmitter: null , selectedCompany: null, selectedEmployees: null,disableaddemp:true,addEmps:false,gridHasData:false,disableviewpdf:true,disablegenpdf:true,disablepubpdf:true,disableunpubpdf:true,isEmpSelDisabled:true});
         this.yearSelected.disabled=false;
         this.yearSelected.value=(CURRENT_YR-1);
         this.latestOnly.checked=true;
@@ -578,6 +585,7 @@ class FilterPayrollData extends Component {
                     ref='selTransmitter'
                     className={selZindx}
                     value={this.state.selectedTransmitter}
+                    isDisabled={this.state.isTrmSelDisabled}
                     onChange={this.handleTransmitterChange}
                     isSearchable ={false}
                     options={this.state.ops}
@@ -702,9 +710,9 @@ class FilterPayrollData extends Component {
                                 <Col sm={7}>
                                     <ButtonGroup>
                                         <Button outline color="info" onClick={() => this.onActionBtnSelected(1)} active={this.state.pSelected === 1}>View</Button>
-                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(2)} active={this.state.pSelected === 2}>Generate</Button>
-                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(3)} active={this.state.pSelected === 3}>Publish</Button>
-                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(4)} active={this.state.pSelected === 4}>Un-Publish</Button>
+                                        <Button disabled={this.state.openFromGrid} outline color="info" onClick={() => this.onActionBtnSelected(2)} active={this.state.pSelected === 2}>Generate</Button>
+                                        <Button disabled={this.state.openFromGrid}  outline color="info" onClick={() => this.onActionBtnSelected(3)} active={this.state.pSelected === 3}>Publish</Button>
+                                        <Button disabled={this.state.openFromGrid} outline color="info" onClick={() => this.onActionBtnSelected(4)} active={this.state.pSelected === 4}>Un-Publish</Button>
                                     </ButtonGroup>
                                 </Col>
                             </FormGroup>

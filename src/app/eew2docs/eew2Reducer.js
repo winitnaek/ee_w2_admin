@@ -16,6 +16,7 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         transmitters:state.transmitters,
         eew2ecords: Object.assign([], ...state.eew2ecords, action.eew2data.eew2ecords),
         eew2recordInput: action.eew2data.eew2recordInput,
+        w2dgridata: action.eew2data.w2dgridata,
         eew2pdf: {}, 
       });
     }
@@ -35,7 +36,8 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         transmitters:state.transmitters,
         eew2ecords: Object.assign([], ...state.eew2ecords, state.eew2ecords),
         eew2pdf: action.eew2pdf, 
-        eew2recordInput: state.eew2recordInput
+        eew2recordInput: state.eew2recordInput,
+        w2dgridata: state.w2dgridata
       });
     }
     case types.GET_EEW2PDF_ERROR: {
@@ -45,7 +47,8 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         transmitters:state.transmitters,
         eew2ecords: Object.assign([], ...state.eew2ecords, state.eew2ecords),
         eew2pdf: action.eew2pdf,
-        eew2recordInput: state.eew2recordInput
+        eew2recordInput: state.eew2recordInput,
+        w2dgridata: state.w2dgridata
       });
     }
     case types.POST_GENERATE_OUTPUTS_SUCCESS:{
@@ -55,7 +58,8 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         transmitters:state.transmitters,
         eew2ecords: Object.assign([], ...state.eew2ecords, action.eew2ecords),
         eew2pdf: {},
-        eew2recordInput: state.eew2recordInput 
+        eew2recordInput: state.eew2recordInput,
+        w2dgridata: state.w2dgridata 
       });
     }
     case types.POST_GENERATE_OUTPUTS_ERROR:{
@@ -65,7 +69,8 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         transmitters:state.transmitters,
         eew2ecords: [],
         eew2pdf: {},
-        eew2recordInput: state.eew2recordInput 
+        eew2recordInput: state.eew2recordInput,
+        w2dgridata: state.w2dgridata 
       });
     }
     case types.POST_PUBUNPUB_OUTPUTS_SUCCESS:{
@@ -76,7 +81,8 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         eew2ecords: Object.assign([], ...state.eew2ecords, state.eew2ecords),
         pubunpubcnt:action.pubunpubcnt,
         eew2pdf: {},
-        eew2recordInput: state.eew2recordInput 
+        eew2recordInput: state.eew2recordInput,
+        w2dgridata: state.w2dgridata 
       });
     }
     case types.POST_PUBUNPUB_OUTPUTS_ERROR:{
@@ -87,7 +93,8 @@ export default function eew2Reducer(state = initialState.eew2data, action) {
         eew2ecords: Object.assign([], ...state.eew2ecords, state.eew2ecords),
         pubunpubcnt:action.pubunpubcnt,
         eew2pdf: {},
-        eew2recordInput: state.eew2recordInput 
+        eew2recordInput: state.eew2recordInput,
+        w2dgridata: state.w2dgridata 
       });
     }
     case types.GET_TRANSMITTER_SUCCESS:{

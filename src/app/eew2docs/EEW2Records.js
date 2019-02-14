@@ -129,7 +129,7 @@ class EEW2Records extends React.Component {
         };
         this.handleInProgress();
         this.interval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
-       // this.interval = setInterval(this.handlePrintProgress.bind(this), PRINTGEN_TIMER);
+        this.interval = setInterval(this.handlePrintProgress.bind(this), PRINTGEN_TIMER);
     }
     handleInProgress(){
         const dataset = appDataset();
@@ -727,7 +727,7 @@ class EEW2Records extends React.Component {
                 throw new Error(error);
             }
         });
-        let filter = <FilterPayrollData openFromGrid={this.state.openFromGrid} toggleFromGrid={this.toggleFromGrid}/>
+        let filter = <FilterPayrollData openFromGrid={this.state.openFromGrid} toggleFromGrid={this.toggleFromGrid} initgridData={ this.props.eew2data.w2dgridata}/>
         let uiAlert    =   <UIAlert handleClick={this.hideUIAlert}  showAlert={this.state.showAlert} aheader={this.state.aheader} abody={this.state.abody} abtnlbl={'Ok'}/>;
         let uiDelConfirm = <UIConfirm handleOk={this.handleConfirmOk} handleCancel={this.handleConfirmCancel}  showConfirm={this.state.showConfirm} cheader={this.state.cheader} cbody={this.state.cbody} okbtnlbl={'Ok'} cancelbtnlbl={'Cancel'}/>;
         let data = this.props.eew2data;
