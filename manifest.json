@@ -12,7 +12,7 @@
         "id":"b55f51a1-0273-4457-8226-013a35d32080",
         "groupId":"Group1", 
         "title": "Manage W2 Records",
-        "icon": "fas fa-filter fa-sm",
+        "icon": "fas fa-file-alt fa-sm",
         "tooltip": "Manage W2 Records",
         "renderName": "filterpayrolldata",
         "visible": true
