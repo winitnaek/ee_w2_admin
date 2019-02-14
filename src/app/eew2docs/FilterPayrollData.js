@@ -65,7 +65,7 @@ class FilterPayrollData extends Component {
             selectedCompany:'',
             selectedEmployees:[],
             addEmps:false,
-            w2dgridata:[],
+            w2dgridata:data,
             disableaddemp:true,
             isCompLoading:false,
             isEmpsLoading:false,
