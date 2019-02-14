@@ -36,10 +36,12 @@ class FilterPayrollData extends Component {
         let isTrmSelDisabled=false;
         let isEmpSelDisabled=true;
         if(this.props.openFromGrid){
-            isOpenFromGrid=true;
-            isTrmSelDisabled=true;
-            isEmpSelDisabled=true;
             data=this.props.initgridData;
+            if(data.length >0){
+                isOpenFromGrid=true;
+                isTrmSelDisabled=true;
+                isEmpSelDisabled=true;  
+            }
         }
         let source =
         {
@@ -516,25 +518,27 @@ class FilterPayrollData extends Component {
         eew2data.eew2ecords=[];
         //this.props.loadPeriodicData(eew2data);
         const removeMe = (id) => {
-            console.log(id);
-            var selectedrowindex = this.refs.eew2ActionGrid.getselectedrowindex();
-            console.log('selectedrowindex '+selectedrowindex);
-            var rowscount = this.refs.eew2ActionGrid.getdatainformation().rowscount;
-            console.log('rowscount '+rowscount);
-            if (selectedrowindex >= 0 && selectedrowindex < rowscount) {
-                var id = this.refs.eew2ActionGrid.getrowid(selectedrowindex);
-                var commit = this.refs.eew2ActionGrid.deleterow(id);
-                this.state.w2dgridata.splice(selectedrowindex,1);
-                this.setState({selectedTransmitter: null , selectedCompany: null, selectedEmployees: null});
-                let com =[];
-                this.state.companies.forEach(function (comp) {
-                    com.push({'value':comp.fein,'label':comp.name, disabled:'no'});
-                });
-                let enableAction=false;
-                if(rowscount==1){
-                    enableAction = true;
+            if(!this.state.openFromGrid){
+                console.log(id);
+                var selectedrowindex = this.refs.eew2ActionGrid.getselectedrowindex();
+                console.log('selectedrowindex '+selectedrowindex);
+                var rowscount = this.refs.eew2ActionGrid.getdatainformation().rowscount;
+                console.log('rowscount '+rowscount);
+                if (selectedrowindex >= 0 && selectedrowindex < rowscount) {
+                    var id = this.refs.eew2ActionGrid.getrowid(selectedrowindex);
+                    var commit = this.refs.eew2ActionGrid.deleterow(id);
+                    this.state.w2dgridata.splice(selectedrowindex,1);
+                    this.setState({selectedTransmitter: null , selectedCompany: null, selectedEmployees: null});
+                    let com =[];
+                    this.state.companies.forEach(function (comp) {
+                        com.push({'value':comp.fein,'label':comp.name, disabled:'no'});
+                    });
+                    let enableAction=false;
+                    if(rowscount==1){
+                        enableAction = true;
+                    }
+                    this.setState({companies:com,disableviewpdf:enableAction,disablegenpdf:enableAction,disablepubpdf:enableAction,disableunpubpdf:enableAction});
                 }
-                this.setState({companies:com,disableviewpdf:enableAction,disablegenpdf:enableAction,disablepubpdf:enableAction,disableunpubpdf:enableAction});
             }
         }
         let eew2ActionView = null;
