@@ -708,16 +708,14 @@ class FilterPayrollData extends Component {
                                     {this.state.actionAlertMessage}
                                     </Alert></Col></FormGroup></Form>) : null}
                             <Form>
-                            <FormGroup row>
+                            <FormGroup row hidden>
                                 <Label for="filterType" sm={1}></Label>
                                 <Label for="filterType" sm={2}>Action</Label>
                                 <Col sm={7}>
-                                    <ButtonGroup>
-                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(1)} active={this.state.pSelected === 1}>View</Button>
-                                        <Button disabled={this.state.openFromGrid} outline color="info" onClick={() => this.onActionBtnSelected(2)} active={this.state.pSelected === 2}>Generate</Button>
-                                        <Button disabled={this.state.openFromGrid}  outline color="info" onClick={() => this.onActionBtnSelected(3)} active={this.state.pSelected === 3}>Publish</Button>
-                                        <Button disabled={this.state.openFromGrid} outline color="info" onClick={() => this.onActionBtnSelected(4)} active={this.state.pSelected === 4}>Un-Publish</Button>
-                                    </ButtonGroup>
+                                    <Button outline color="info" onClick={() => this.onActionBtnSelected(1)} active={this.state.pSelected === 1}>View</Button>
+                                    <Button hidden disabled={this.state.openFromGrid} outline color="info" onClick={() => this.onActionBtnSelected(2)} active={this.state.pSelected === 2}>Generate</Button>
+                                    <Button hidden disabled={this.state.openFromGrid}  outline color="info" onClick={() => this.onActionBtnSelected(3)} active={this.state.pSelected === 3}>Publish</Button>
+                                    <Button hidden disabled={this.state.openFromGrid} outline color="info" onClick={() => this.onActionBtnSelected(4)} active={this.state.pSelected === 4}>Un-Publish</Button>
                                 </Col>
                             </FormGroup>
                             {eew2ActionView}
