@@ -91,7 +91,7 @@ class EEW2Records extends React.Component {
             this.toggleFromGrid = this.toggleFromGrid.bind(this);
             this.onViewFailedMessages = this.onViewFailedMessages.bind(this);
             this.handlePrintProgress = this.handlePrintProgress.bind(this);
-            
+            this.hlptogglettt1 = this.hlptogglettt1.bind(this);
         this.state = {
             source: source,
             exptoExlTip:false,
@@ -127,11 +127,17 @@ class EEW2Records extends React.Component {
             totalRec:'',
             selecRec:'',
             optSelec:'',
-            divStyleRD:false
+            divStyleRD:false,
+            hlptooltipOpen1:false
         };
         //this.handleInProgress();
         this.interval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
         //this.interval = setInterval(this.handlePrintProgress.bind(this), PRINTGEN_TIMER);
+    }
+    hlptogglettt1() {
+        this.setState({
+          hlptooltipOpen1: !this.state.hlptooltipOpen1
+        });
     }
     handleInProgress(){
         const dataset = appDataset();
@@ -829,10 +835,12 @@ class EEW2Records extends React.Component {
             <div>
                 <h3 class="text-bsi">Manage W2 Records 
                     <a href="#" onClick={() => this.goToFilterPage()} id="filterDataId"><i class="fas fa-filter fa-xs" title="Filter"></i></a>
-                    <Tooltip placement="right" isOpen={this.state.filterData} target="filterDataId" toggle={this.toggleFilDat}>
+                    <Tooltip placement="top" isOpen={this.state.filterData} target="filterDataId" toggle={this.toggleFilDat}>
                     Filter
                     </Tooltip>
+                    &nbsp;<a target="_blank" id="_ew2_hlpttip1" href="javascript:window.open('/help/ew2','_blank');"><i class="fas fa-question-circle fa-xs pl-1"></i></a><Tooltip placement="right" isOpen={this.state.hlptooltipOpen1} target="_ew2_hlpttip1" toggle={this.hlptogglettt1}>Help</Tooltip>
                 </h3>
+                
                 <Alert color="primary">
                     {data.filterlabel}
                 </Alert>

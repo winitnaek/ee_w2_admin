@@ -85,7 +85,8 @@ class FilterPayrollData extends Component {
             showActionAlert:false,
             actionAlertMessage:'',
             openFromGrid:isOpenFromGrid,
-            isTrmSelDisabled:isTrmSelDisabled
+            isTrmSelDisabled:isTrmSelDisabled,
+            hlptooltipOpen:false
         };
         this.toggle = this.toggle.bind(this);
         this.toggleaddEmpsSel = this.toggleaddEmpsSel.bind(this);
@@ -105,10 +106,16 @@ class FilterPayrollData extends Component {
         this.tick2 = this.tick2.bind(this);
         this.onDismiss = this.onDismiss.bind(this);
         this.onActionDone = this.onActionDone.bind(this);
+        this.hlptogglettt = this.hlptogglettt.bind(this);
+    }
+    hlptogglettt() {
+        this.setState({
+          hlptooltipOpen: !this.state.hlptooltipOpen
+        });
     }
     onDismiss() {
         this.setState({ visible: false });
-      }
+    }
     onYearChange(e){
         //console.log('Year val');
         //console.log(e.target.value);
@@ -696,11 +703,11 @@ class FilterPayrollData extends Component {
                 <Button color="secondary" className="btn btn-primary mr-auto" onClick={() => this.onResetSelection(4)}>Reset</Button>
                 <Button disabled={this.state.disableunpubpdf} onClick={() => this.onPerformAction(4)}  color="success">Un-Publish W2s</Button>{' '}
              </ModalFooter>
-        }
+        } 
         return (
             <div>
                 <Modal size="lg" isOpen={this.state.modal} toggle={this.toggle} className={this.props.className} backdrop={this.state.backdrop}>
-                    <ModalHeader toggle={this.toggle}>Manage W2 Records</ModalHeader>
+                    <ModalHeader toggle={this.toggle}>Manage W2 Records <a target="_blank" id="_ew2_hlpttip" href="javascript:window.open('/help/ew2','_blank');"><i class="fas fa-question-circle fa-lg pl-1"></i></a><Tooltip placement="right" isOpen={this.state.hlptooltipOpen} target="_ew2_hlpttip" toggle={this.hlptogglettt}>Help</Tooltip></ModalHeader>
                     <ModalBody>
                      {this.state.showActionAlert ==true ?(<Form>
                             <FormGroup row><Label for="periodBy1" sm={1}></Label><Col sm={10}>
