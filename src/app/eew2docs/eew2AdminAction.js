@@ -251,8 +251,8 @@ export function stageRecsToPrint(w2PrintRequestInput ) {
     };
 }
 export function stageRecsToPrintSuccess(printIdMap) {
-    return { type: types.POST_PUBUNPUB_OUTPUTS_SUCCESS, printIdMap };
+    return { type: types.POST_STAGE_PRINT_SUCCESS, printIdMap };
 }
 export function stageRecsToPrintFailed(printIdMap) {
-    return { type: types.POST_PUBUNPUB_OUTPUTS_ERROR, printIdMap };
+    return { type: types.POST_STAGE_PRINT_ERROR, printIdMap };
 }
