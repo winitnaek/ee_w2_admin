@@ -6,7 +6,7 @@ import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
 import {RN_EEW2_RECORDS} from '../../base/constants/RenderNames';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {loadPeriodicData,loadEEW2Records,stageRecsToPrint}  from './eew2AdminAction';
+import {loadPeriodicData,loadEEW2Records,stageRecsToPrint,getRecsToPrintCount}  from './eew2AdminAction';
 import eew2Api from './eew2AdminAPI';
 import Select from 'react-select';
 import AsyncSelect from 'react-select/lib/Async';
@@ -187,7 +187,7 @@ class PrintW2s extends React.Component {
             if(data.empid=='All'){
                 w2RequestInputs.push({"transmitterId":data.tranFein,"companyId":data.compFein,"empId":"","allRecs":true,"requestno":data.requestno});
             }else{
-             var  empId = data.requestno+"~"+data.compFein+"~"+data.empKey;
+             var  empId = data.requestno+"~"+data.compFein+"~"+data.empkey;
                 w2RequestInputs.push({"transmitterId":'',"companyId":'',"empId":empId,"allRecs":false,"requestno":data.requestno});
             }
         });
@@ -272,13 +272,22 @@ class PrintW2s extends React.Component {
         this.setState({ cSelected: [...this.state.cSelected] });
     }
     onRadioPrinClick(rSelected) {
+        var eew2data = this.getRequestData(rSelected);
+         console.log("Data input received:"+eew2data);
+        this.props.getRecsToPrintCount(eew2data).then(response => {
+            this.setState({ w2sselected:response.w2selected});
+  
+        return response
+    }).catch(error => {
+        throw new SubmissionError(error)
+    })
         let w2sselected;
         if(rSelected==1){
             w2sselected = this.state.totalRec;
         }else if(rSelected==2){
             w2sselected = this.state.selecRec;
         }else if(rSelected==3){
-            w2sselected = 'XYZ';
+            w2sselected ='XYZ';
         }else if(rSelected==4){
             w2sselected = 'PQR';
         }
@@ -445,6 +454,6 @@ function mapStateToProps(state) {
     }
 }
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({ loadEEW2Records ,loadPeriodicData,stageRecsToPrint}, dispatch)
+    return bindActionCreators({ loadEEW2Records ,loadPeriodicData,stageRecsToPrint,getRecsToPrintCount}, dispatch)
 }
 export default connect(mapStateToProps,mapDispatchToProps)(PrintW2s);
