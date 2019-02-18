@@ -238,11 +238,11 @@ export function stageRecsToPrint(w2PrintRequestInput ) {
         const state = getState();
         return eew2AdminAPI.stageRecordsToPrint(w2PrintRequestInput).then(printIdMap => {
             if(printIdMap.status && printIdMap.message){
-                dispatch(publishUnpublishEEW2Failed(0));
+                dispatch(stageRecsToPrintFailed(0));
                 throw printIdMap;
             }else{
                 if(printIdMap){
-                   dispatch(publishUnpublishEEW2Success(printIdMap));
+                   dispatch(stageRecsToPrintSuccess(printIdMap));
                }
             }
         }).catch(error => {
