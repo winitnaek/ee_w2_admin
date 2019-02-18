@@ -6,7 +6,7 @@ import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
 import {RN_EEW2_RECORDS} from '../../base/constants/RenderNames';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {loadPeriodicData,loadEEW2Records,getTransmitters,getCompaniesByTransmitter,publishUnpublishEEW2Records,generateOutputs}  from './eew2AdminAction';
+import {loadPeriodicData,loadEEW2Records,getTransmitters,getCompaniesByTransmitter,publishUnpublishEEW2Records,generateOutputs,isOutputGenerationInprogress}  from './eew2AdminAction';
 import eew2Api from './eew2AdminAPI';
 import Select from 'react-select';
 import AsyncSelect from 'react-select/lib/Async';
@@ -18,6 +18,7 @@ const GENERATE_W2S = 2;
 const PUBLISH_W2S = 3;
 const UNPUBLISH_W2S = 4;
 const ALERTINTERVAL = 300000;
+const PRINTGEN_TIMER =10000;
 const CURRENT_YR = new Date().getFullYear();
 /**
  * FilterPayrollData
@@ -86,7 +87,8 @@ class FilterPayrollData extends Component {
             actionAlertMessage:'',
             openFromGrid:isOpenFromGrid,
             isTrmSelDisabled:isTrmSelDisabled,
-            hlptooltipOpen:false
+            hlptooltipOpen:false,
+            divStyleGenD:false
         };
         this.toggle = this.toggle.bind(this);
         this.toggleaddEmpsSel = this.toggleaddEmpsSel.bind(this);
@@ -107,6 +109,26 @@ class FilterPayrollData extends Component {
         this.onDismiss = this.onDismiss.bind(this);
         this.onActionDone = this.onActionDone.bind(this);
         this.hlptogglettt = this.hlptogglettt.bind(this);
+
+        this.interval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
+    }
+    handleInProgress(){
+        const dataset = appDataset();
+        this.props.isOutputGenerationInprogress(dataset).then(response => {
+            if(this.props.isoutinprogress.status==='In-Progress'){
+                console.log('isOutputGenerationInprogress In-Progress');
+                this.setState({divStyleGenD:true, showActionAlert: false});
+            }else if(this.props.isoutinprogress.status==='Failed'){
+                console.log('isOutputGenerationInprogress Failed');
+                this.setState({divStyleGenD:false,showActionAlert: false});
+            }else if(!this.props.isoutinprogress.status || this.props.isoutinprogress.status==='Processed'){
+                this.setState({divStyleGenD:false});
+                console.log('isOutputGenerationInprogress Processed');
+            }
+            return response
+        }).catch(error => {
+            throw new SubmissionError(error)
+        });
     }
     hlptogglettt() {
         this.setState({
@@ -714,13 +736,19 @@ class FilterPayrollData extends Component {
                                     <Alert color="success" isOpen={this.state.showActionAlert} toggle={this.onDismiss}>
                                     {this.state.actionAlertMessage}
                                     </Alert></Col></FormGroup></Form>) : null}
+                            {this.props.isoutinprogress.status==='In-Progress' ?(<Form>
+                            <FormGroup row><Label for="periodBy1" sm={1}></Label><Col sm={10}>
+                            <Alert color="success" isOpen={this.props.isoutinprogress.status==='In-Progress'}>
+                                <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner fa-spin"></i> Output Generation is In-Progress.</span>
+                            </Alert>
+                            </Col></FormGroup></Form>) : null}
                             <Form>
-                            <FormGroup row hidden>
+                            <FormGroup row>
                                 <Label for="filterType" sm={1}></Label>
                                 <Label for="filterType" sm={2}>Action</Label>
                                 <Col sm={7}>
-                                    <Button outline color="info" onClick={() => this.onActionBtnSelected(1)} active={this.state.pSelected === 1}>View</Button>
-                                    <Button hidden disabled={this.state.openFromGrid} outline color="info" onClick={() => this.onActionBtnSelected(2)} active={this.state.pSelected === 2}>Generate</Button>
+                                    <Button outline disabled={this.state.divStyleGenD}  color="info" onClick={() => this.onActionBtnSelected(1)} active={this.state.pSelected === 1}>View</Button>
+                                    <Button disabled={this.state.openFromGrid} outline color="info" onClick={() => this.onActionBtnSelected(2)} active={this.state.pSelected === 2}>Generate</Button>
                                     <Button hidden disabled={this.state.openFromGrid}  outline color="info" onClick={() => this.onActionBtnSelected(3)} active={this.state.pSelected === 3}>Publish</Button>
                                     <Button hidden disabled={this.state.openFromGrid} outline color="info" onClick={() => this.onActionBtnSelected(4)} active={this.state.pSelected === 4}>Un-Publish</Button>
                                 </Col>
@@ -736,10 +764,11 @@ class FilterPayrollData extends Component {
 }
 function mapStateToProps(state) {
     return {
-        eew2data: state.eew2data
+        eew2data: state.eew2data,
+        isoutinprogress: state.outputgeninprogress
     }
 }
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({ loadEEW2Records ,loadPeriodicData,getTransmitters,getCompaniesByTransmitter,publishUnpublishEEW2Records,generateOutputs}, dispatch)
+    return bindActionCreators({ loadEEW2Records ,loadPeriodicData,getTransmitters,getCompaniesByTransmitter,publishUnpublishEEW2Records,generateOutputs,isOutputGenerationInprogress}, dispatch)
 }
 export default connect(mapStateToProps,mapDispatchToProps)(FilterPayrollData);

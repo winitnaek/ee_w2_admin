@@ -151,7 +151,7 @@ class EEW2Records extends React.Component {
             }else if(this.props.isoutinprogress.status==='Failed'){
                 console.log('isOutputGenerationInprogress Failed');
                 this.setState({divStyleRD:false,outputSuccess: false});
-            }else if(this.props.isoutinprogress.status==='Processed'){
+            }else if(!this.props.isoutinprogress.status || this.props.isoutinprogress.status==='Processed'){
                 this.setState({divStyleRD:false});
                 console.log('isOutputGenerationInprogress Processed');
             }
