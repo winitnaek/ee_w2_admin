@@ -10,6 +10,7 @@ import ViewCompanyAuditFiles from '../comp_outputs/ViewCompanyAuditFiles';
 import PrintW2s from './PrintW2s';
 import FilterPayrollData from './FilterPayrollData';
 import eew2Api from './eew2AdminAPI';
+
 const viewer_path ='/pdfjs/web/viewer.html?file=';
 const viewer_url  = window.location.protocol+'//'+window.location.host+viewer_path;
 const PRINTGEN_TIMER =10000;
@@ -92,6 +93,7 @@ class EEW2Records extends React.Component {
             this.onViewFailedMessages = this.onViewFailedMessages.bind(this);
             this.handlePrintProgress = this.handlePrintProgress.bind(this);
             this.hlptogglettt1 = this.hlptogglettt1.bind(this);
+            
         this.state = {
             source: source,
             exptoExlTip:false,
@@ -127,14 +129,15 @@ class EEW2Records extends React.Component {
             totalRec:'',
             selecRec:'',
             optSelec:'',
+            recordsSelected:'',
             divStyleRD:false,
             hlptooltipOpen1:false
         };
         //this.handleInProgress();
         this.interval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
-        //this.interval = setInterval(this.handlePrintProgress.bind(this), PRINTGEN_TIMER);
+       // this.interval = setInterval(this.handlePrintProgress.bind(this), PRINTGEN_TIMER);
     }
-    hlptogglettt1() {
+     hlptogglettt1() {
         this.setState({
           hlptooltipOpen1: !this.state.hlptooltipOpen1
         });
@@ -188,7 +191,7 @@ class EEW2Records extends React.Component {
             this.refs.eew2Grid.clearselection();
             this.showConfirm(true,'Select All', this.getSelAllMessage());
         }
-      
+        
     }
     getSelAllMessage(){
         let grindRecInputData  = this.props.eew2data.eew2recordInput;
@@ -391,15 +394,25 @@ class EEW2Records extends React.Component {
     printW2s(){
         let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
         let optSelec=1;
+        var recSelected=[];
         if(this.state.allSelected){
             optSelec =1;
         }else if(selIndexes.length > 0 && this.state.allSelected==false){
             optSelec =2;
         }
+      if(selIndexes.length >0 || this.state.allSelected){
+            this.setState({outputSuccess: false});
+            if(selIndexes.length >0){
+               selIndexes.forEach(index => {
+                    let data = this.refs.eew2Grid.getrowdata(index);
+                    recSelected.push(data);
+                });
+            }
+        }
         if(selIndexes.length >0 || this.state.allSelected){
             let totalRecordsInGrid = this.state.source.totalrecords
-            this.setState({
-                showPrint: true, selecRec:selIndexes.length,optSelec:optSelec,totalRec:totalRecordsInGrid
+           this.setState({
+                showPrint: true, selecRec:selIndexes.length,optSelec:optSelec,totalRec:totalRecordsInGrid,recordsSelected:recSelected
             });
         }else{
             this.showAlert(true,'Print W2','Please select at least one employee record from the grid or check Select All option to Print W2s.');
@@ -421,8 +434,9 @@ class EEW2Records extends React.Component {
        let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
        this.setState({outputSuccess: false});
        if(selIndexes.length >0 || this.state.allSelected){
-            this.toggleSuccessNew('Initiating W2 Generation...', true);
-            if(selIndexes.length >0){
+        this.toggleSuccessNew('Initiating W2 Generation...', true);
+           
+         if(selIndexes.length >0){
                 const dataset = appDataset();
                 let taxYear = "";
                 selIndexes.forEach(index => {
@@ -448,8 +462,8 @@ class EEW2Records extends React.Component {
                     this.setState({outputSuccess: false});
                     this.refs.eew2Grid.clearselection();
                     this.toggleSuccessNew('Generation of W2s initiated for the selected Employees.',true);
-                    this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
-                    this.handleInProgress();
+                   this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
+                   this.handleInProgress();
                     return response
                 }).catch(error => {
                     throw new SubmissionError(error)
@@ -772,7 +786,7 @@ class EEW2Records extends React.Component {
         let uiAlert    =   <UIAlert handleClick={this.hideUIAlert}  showAlert={this.state.showAlert} aheader={this.state.aheader} abody={this.state.abody} abtnlbl={'Ok'}/>;
         let uiDelConfirm = <UIConfirm handleOk={this.handleConfirmOk} handleCancel={this.handleConfirmCancel}  showConfirm={this.state.showConfirm} cheader={this.state.cheader} cbody={this.state.cbody} okbtnlbl={'Ok'} cancelbtnlbl={'Cancel'}/>;
         let data = this.props.eew2data;
-        let printW2s = <PrintW2s handleOk={this.handlePrintOk} handleCancel={this.handlePrintCancel} showPrint={this.state.showPrint} totalRec={this.state.totalRec} optSelec={this.state.optSelec} selecRec={this.state.selecRec} filterlabel={'Number of W2s selected for the print for Year '+data.eew2recordInput.year}/>
+        let printW2s = <PrintW2s handleOk={this.handlePrintOk} handleCancel={this.handlePrintCancel} showPrint={this.state.showPrint} totalRec={this.state.totalRec} optSelec={this.state.optSelec} selecRec={this.state.selecRec} filterlabel={'Number of W2s selected for the print for Year '+data.eew2recordInput.year} recordsSelected={this.state.recordsSelected} year={data.eew2recordInput.year}/>
         let cbody  = 'Select All'; //this.getSelAllMessage();
         let selectall = <div><a href="#" style={divStyleFirst} onClick={() => this.selectAllClk()} id="selectAllid"><i class="fas fa-check-square fa-lg"></i></a>
         <Tooltip placement="top" isOpen={this.state.selectAll} target="selectAllid" toggle={this.toggleSelAll}>
@@ -836,11 +850,11 @@ class EEW2Records extends React.Component {
                 <h3 class="text-bsi">Manage W2 Records 
                     <a href="#" onClick={() => this.goToFilterPage()} id="filterDataId"><i class="fas fa-filter fa-xs" title="Filter"></i></a>
                     <Tooltip placement="top" isOpen={this.state.filterData} target="filterDataId" toggle={this.toggleFilDat}>
+                   
                     Filter
-                    </Tooltip>
-                    &nbsp;<a target="_blank" id="_ew2_hlpttip1" href="javascript:window.open('/help/ew2','_blank');"><i class="fas fa-question-circle fa-xs pl-1"></i></a><Tooltip placement="right" isOpen={this.state.hlptooltipOpen1} target="_ew2_hlpttip1" toggle={this.hlptogglettt1}>Help</Tooltip>
+                    </Tooltip> 
+                     &nbsp;<a target="_blank" id="_ew2_hlpttip1" href="javascript:window.open('/help/ew2','_blank');"><i class="fas fa-question-circle fa-xs pl-1"></i></a><Tooltip placement="right" isOpen={this.state.hlptooltipOpen1} target="_ew2_hlpttip1" toggle={this.hlptogglettt1}>Help</Tooltip>
                 </h3>
-                
                 <Alert color="primary">
                     {data.filterlabel}
                 </Alert>
@@ -865,14 +879,17 @@ class EEW2Records extends React.Component {
                     Reset Selection
                 </Tooltip>
                 <a href="#" style={this.state.divStyleRD==false ? divStyleR: divStyleRDisable} onClick={() => this.printW2s()} id="printW2s"><i class='fas fa-print fa-lg'></i></a>
+               
                 <Tooltip placement="right" isOpen={this.state.printW2s} target="printW2s" toggle={this.togglePrintW2s}>
                    Print W2s
                 </Tooltip>
                 <a href="#" style={this.state.divStyleRD==false ? divStyleR: divStyleRDisable} onClick={() => this.unpublishW2()} id="unpublishW2"><i class='fas fa-calendar-minus fa-lg'></i></a>
+              
                 <Tooltip placement="bottom" isOpen={this.state.unpublishW2} target="unpublishW2" toggle={this.toggleUnPubW2Sel}>
                    Un-Publish W2
                 </Tooltip>
                 <a href="#" style={this.state.divStyleRD==false ? divStyleR: divStyleRDisable} onClick={() => this.publishW2()} id="publishW2"><i class='fas fa-calendar-plus fa-lg'></i></a>
+               
                 <Tooltip placement="top" isOpen={this.state.publishW2} target="publishW2" toggle={this.togglePubW2Sel}>
                    Publish W2
                 </Tooltip>

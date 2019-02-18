@@ -211,5 +211,50 @@ class eew2AdminAPI {  static geteew2records(eew2recordInput) {
         return error;
       });
   }
+
+  static stageRecordsToPrint(eew2data) {
+    let tt1 = JSON.stringify({
+      "dataset": "00_EE_W2_DATA",
+      "isLatest": true,
+      "isCorrection": false,
+      "printType": "P",
+      "year": 2017,
+      "sortOrder": "A",
+      "fromEmpNo": "100000",
+      "toEmpNo": "535650",
+      "isTestMode": false,
+      "w2RequestInputs": [
+          {
+              "transmitterid": "",
+              "companyId": "",
+              "empid": "",
+              "allRecs": true,
+              "requestno": 0
+          }
+      ]
+  });
+ let tt = JSON.stringify(eew2data);
+    var svcs_url = `${svcs.POST_STAGE_RECORDS_TO_PRINT}`;
+    return fetch(URLUtils.buildURL(svcs_url), {
+      method: 'POST',
+      body: tt,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin'
+    })
+      .then(response => {
+        if(response.ok){
+          return response.json();
+        }else{
+          var errorCode =  response.status;
+          var errorMsg  =  'Unable to stage print request. '+ADMIN_ERROR_MSG;
+          return new AppError(errorMsg, errorCode);
+        } 
+      })
+      .catch(error => {
+        return error;
+      });
+  }
 }
 export default eew2AdminAPI;
