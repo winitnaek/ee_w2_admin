@@ -256,5 +256,31 @@ class eew2AdminAPI {  static geteew2records(eew2recordInput) {
         return error;
       });
   }
+
+
+  static getRecsToPrintCount(eew2data) {
+  let tt = JSON.stringify(eew2data);
+    var svcs_url = `${svcs.GET_RECORDS_TO_PRINT_COUNT}`;
+    return fetch(URLUtils.buildURL(svcs_url), {
+      method: 'POST',
+      body: tt,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin'
+    })
+      .then(response => {
+        if(response.ok){
+          return response.json();
+        }else{
+          var errorCode =  response.status;
+          var errorMsg  =  'Unable to getRecsToPrintCount. '+ADMIN_ERROR_MSG;
+          return new AppError(errorMsg, errorCode);
+        } 
+      })
+      .catch(error => {
+        return error;
+      });
+  }
 }
 export default eew2AdminAPI;

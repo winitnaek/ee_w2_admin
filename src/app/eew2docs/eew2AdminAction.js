@@ -256,3 +256,27 @@ export function stageRecsToPrintSuccess(printIdMap) {
 export function stageRecsToPrintFailed(printIdMap) {
     return { type: types.POST_STAGE_PRINT_ERROR, printIdMap };
 }
+
+export function getRecsToPrintCount(w2PrintRequestInput ) {
+    return function (dispatch, getState) {
+        const state = getState();
+        return eew2AdminAPI.getRecsToPrintCount(w2PrintRequestInput).then(w2selected => {
+            if(w2selected.status && w2selected.message){
+                dispatch(getRecsToPrintCountFailed(0));
+                throw w2selected;
+            }else{
+               // if(w2selected){
+                   dispatch(getRecsToPrintCountSuccess(w2selected));
+              // }
+            }
+        }).catch(error => {
+            generateAppErrorEvent(error.type,error.status,error.message,error);
+        });
+    };
+}
+export function getRecsToPrintCountSuccess(w2selected) {
+    return { type: types.POST_STAGE_PRINT_SUCCESS, w2selected };
+}
+export function getRecsToPrintCountFailed(w2selected) {
+    return { type: types.POST_STAGE_PRINT_ERROR, w2selected };
+}
