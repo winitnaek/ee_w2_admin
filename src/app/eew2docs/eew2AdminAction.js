@@ -230,3 +230,29 @@ export function getEmployeesSuccess(cemployees) {
 export function getEmployeesFailed(cemployees) {
     return { type: types.GET_EMPLOYEES_ERROR, cemployees };
 }
+
+
+
+export function stageRecsToPrint(w2PrintRequestInput ) {
+    return function (dispatch, getState) {
+        const state = getState();
+        return eew2AdminAPI.stageRecordsToPrint(w2PrintRequestInput).then(printIdMap => {
+            if(printIdMap.status && printIdMap.message){
+                dispatch(stageRecsToPrintFailed(0));
+                throw printIdMap;
+            }else{
+                if(printIdMap){
+                   dispatch(stageRecsToPrintSuccess(printIdMap));
+               }
+            }
+        }).catch(error => {
+            generateAppErrorEvent(error.type,error.status,error.message,error);
+        });
+    };
+}
+export function stageRecsToPrintSuccess(printIdMap) {
+    return { type: types.POST_STAGE_PRINT_SUCCESS, printIdMap };
+}
+export function stageRecsToPrintFailed(printIdMap) {
+    return { type: types.POST_STAGE_PRINT_ERROR, printIdMap };
+}

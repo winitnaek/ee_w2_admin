@@ -6,7 +6,7 @@ import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
 import {RN_EEW2_RECORDS} from '../../base/constants/RenderNames';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {loadPeriodicData,loadEEW2Records}  from './eew2AdminAction';
+import {loadPeriodicData,loadEEW2Records,stageRecsToPrint}  from './eew2AdminAction';
 import eew2Api from './eew2AdminAPI';
 import Select from 'react-select';
 import AsyncSelect from 'react-select/lib/Async';
@@ -30,6 +30,7 @@ class PrintW2s extends React.Component {
             });
             //ops = _.uniqWith(ops, _.isEqual);
             let data = [];
+           data = this.props.eew2data;
             let source =
             {
                 datatype: "json",
@@ -43,6 +44,7 @@ class PrintW2s extends React.Component {
             };
             console.log('this.props.totalRec');
             console.log(this.props.totalRec);
+            
             let totalRec = this.props.totalRec;
             let optSelec = this.props.optSelec;
             let rSelected = optSelec;
@@ -67,11 +69,11 @@ class PrintW2s extends React.Component {
                 selectedCompany:'',
                 selectedEmployees:[],
                 addEmps:false,
-                w2dgridata:[],
+                w2dgridata:this.props.recordsSelected,
                 disableaddemp:true,
                 isCompLoading:false,
                 isEmpsLoading:false,
-                disableviewpdf:true,
+                disableviewpdf:false,
                 gridHasData:false,
                 ops:ops,
                 inputValue: '',
@@ -92,7 +94,10 @@ class PrintW2s extends React.Component {
                 totalRec:totalRec,
                 selecRec:selecRec,
                 w2sselected:w2sselected,
-                filterlabel:this.props.filterlabel
+                filterlabel:this.props.filterlabel,
+                year:this.props.year
+                
+               
             };
             this.toggleUIPrintOk = this.toggleUIPrintOk.bind(this);
             this.toggleUIPrintCancel = this.toggleUIPrintCancel.bind(this);
@@ -169,19 +174,61 @@ class PrintW2s extends React.Component {
      * @param {*} fromBtn 
      */
     getRequestData(actionClicked){
-       
+        var fLabel;
+      //  var eew2data={};
+        var w2PrintRequestInput ={};
+        const dataset = appDataset();
+        console.log(this.state.w2dgridata);
+        console.log("SortBY:"+this.state.selectedPrintOption);
+       var w2RequestInputs=[];
+        this.state.w2dgridata.forEach(function (data) {
+            console.log('requestno');
+            console.log(data.requestno);
+            if(data.empid=='All'){
+                w2RequestInputs.push({"transmitterId":data.tranFein,"companyId":data.compFein,"empId":"","allRecs":true,"requestno":data.requestno});
+            }else{
+             var  empId = data.requestno+"~"+data.compFein+"~"+data.empKey;
+                w2RequestInputs.push({"transmitterId":'',"companyId":'',"empId":empId,"allRecs":false,"requestno":data.requestno});
+            }
+        });
+        let optSelec = this.props.optSelec;
+       let printType = '';
+        if(this.state.rSelected == 1)
+        printType = 'A';
+        else if(this.state.rSelected == 2)
+        printType = 'S';
+        else if(this.state.rSelected == 3)
+        printType = 'P';
+        else if(this.state.rSelected == 4)
+        printType = 'M';
+
+        w2PrintRequestInput = {
+                 "dataset": dataset,
+                 "isLatest": (this.latestOnly.checked==true) ? true:false,
+                 "year": this.state.year,
+                 "isCorrection":true, 
+                 "printType":printType,
+               "sortOrder":this.state.selectedPrintOption.value,
+                "fromEmpNo":'',
+               "toEmpNo":'',
+              "isTestMode":this.testPrintOnly.checked,
+              "w2RequestInputs": w2RequestInputs
+             };
+             console.log('stageRecordsToPrint ===>');
+             console.log(w2PrintRequestInput);
+        
+        return w2PrintRequestInput;
     }
     /**
      * onPerformAction
      * @param {*} actionClicked 
      */
     onPerformAction(actionClicked){
-        if(actionClicked==PRINT_PDFS){
-            var eew2data = this.getRequestData(actionClicked);
-            eew2data.eew2ecords=[];
-            this.props.loadEEW2Records(eew2data);
+     var eew2data = this.getRequestData(actionClicked);
+            console.log("Data input received:"+eew2data);
+           this.props.stageRecsToPrint(eew2data);
             renderW2AdmApplication(appAnchor(),RN_EEW2_RECORDS);
-        }
+        
     }
     /**
      * onActionDone
@@ -385,7 +432,7 @@ class PrintW2s extends React.Component {
                     </ModalBody>
                     <ModalFooter>
                         <Button color="secondary" className="btn btn-primary mr-auto" onClick={() => this.toggleUIPrintCancel()}>Cancel</Button>{' '}
-                        <Button disabled={this.state.disableviewpdf} onClick={() => this.toggleUIPrintOk()}  color="success">Print W2s</Button>
+                        <Button disabled={this.state.disableviewpdf} onClick={() => this.onPerformAction(1)}  color="success">Print W2s</Button>
                     </ModalFooter>
                 </Modal>
             </div>
@@ -398,6 +445,6 @@ function mapStateToProps(state) {
     }
 }
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({ loadEEW2Records ,loadPeriodicData}, dispatch)
+    return bindActionCreators({ loadEEW2Records ,loadPeriodicData,stageRecsToPrint}, dispatch)
 }
 export default connect(mapStateToProps,mapDispatchToProps)(PrintW2s);

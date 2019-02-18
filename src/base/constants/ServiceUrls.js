@@ -12,3 +12,4 @@ export const POST_PRINT_JNLP='/getRecsToPrintJnlp';
 export const GET_IS_COMP_CONF_FOR_TURBO_TAX='/isCompanyConfiguredForTurboTaxImport';
 export const GET_TURBO_TAX_OUTPUT='/getTurboTaxOutputs';
 export const GET_ISPRINT_GEN_INPROGRESS='/isPrintGenerationInprogress';
+export const POST_STAGE_RECORDS_TO_PRINT='/stageRecordsToPrint/';
