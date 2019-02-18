@@ -707,7 +707,7 @@ class FilterPayrollData extends Component {
         return (
             <div>
                 <Modal size="lg" isOpen={this.state.modal} toggle={this.toggle} className={this.props.className} backdrop={this.state.backdrop}>
-                    <ModalHeader toggle={this.toggle}>Manage W2 Records <a target="_blank" id="_ew2_hlpttip" href="javascript:window.open('/help/ew2','_blank');"><i class="fas fa-question-circle fa-lg pl-1"></i></a><Tooltip placement="right" isOpen={this.state.hlptooltipOpen} target="_ew2_hlpttip" toggle={this.hlptogglettt}>Help</Tooltip></ModalHeader>
+                    <ModalHeader toggle={this.toggle}>Manage W2 Records <a target="_blank" id="_ew2_hlpttip" href="javascript:window.open('/help/ew2','_blank');"><i class="fas fa-question-circle fa-sm pl-1"></i></a><Tooltip placement="right" isOpen={this.state.hlptooltipOpen} target="_ew2_hlpttip" toggle={this.hlptogglettt}>Help</Tooltip></ModalHeader>
                     <ModalBody>
                      {this.state.showActionAlert ==true ?(<Form>
                             <FormGroup row><Label for="periodBy1" sm={1}></Label><Col sm={10}>
