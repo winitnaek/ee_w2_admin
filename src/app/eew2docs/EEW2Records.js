@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Tooltip, Button } from 'reactstrap';
-import { divStyle, divStyleBot, divStyleFirst, divStyleFirstBot, divStyleR, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, PDF_ANCHOR_ID, DFLT_PAGE_SIZE } from '../../base/constants/AppConstants';
+import { divStyle, divStyleBot, divStyleFirst, divStyleFirstBot, divStyleR, OUTPUT_CLIENT_DTL, OUTPUT_CLIENT_SUM, PDF_ANCHOR_ID, DFLT_PAGE_SIZE,divStyleRDisable } from '../../base/constants/AppConstants';
 import { RN_FILTER_PAYROLL_DATA } from '../../base/constants/RenderNames';
 import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
 import UIAlert from '../common/UIAlert';
@@ -9,7 +9,7 @@ import ViewPDF from '../common/ViewPDF';
 import ViewCompanyAuditFiles from '../comp_outputs/ViewCompanyAuditFiles';
 import PrintW2s from './PrintW2s';
 import FilterPayrollData from './FilterPayrollData';
-
+import eew2Api from './eew2AdminAPI';
 const viewer_path ='/pdfjs/web/viewer.html?file=';
 const viewer_url  = window.location.protocol+'//'+window.location.host+viewer_path;
 const PRINTGEN_TIMER =10000;
@@ -63,6 +63,7 @@ class EEW2Records extends React.Component {
                 }
             };
             this.toggleSuccess = this.toggleSuccess.bind(this);
+            this.toggleSuccessNew = this.toggleSuccessNew.bind(this);
             this.toggleExpExl=this.toggleExpExl.bind(this);
             this.toggleExpCsv=this.toggleExpCsv.bind(this);
             this.toggleSelAll=this.toggleSelAll.bind(this);
@@ -90,7 +91,7 @@ class EEW2Records extends React.Component {
             this.toggleFromGrid = this.toggleFromGrid.bind(this);
             this.onViewFailedMessages = this.onViewFailedMessages.bind(this);
             this.handlePrintProgress = this.handlePrintProgress.bind(this);
-            
+            this.hlptogglettt1 = this.hlptogglettt1.bind(this);
         this.state = {
             source: source,
             exptoExlTip:false,
@@ -125,15 +126,36 @@ class EEW2Records extends React.Component {
             openFromGrid:false,
             totalRec:'',
             selecRec:'',
-            optSelec:''
+            optSelec:'',
+            divStyleRD:false,
+            hlptooltipOpen1:false
         };
-        this.handleInProgress();
+        //this.handleInProgress();
         this.interval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
-       // this.interval = setInterval(this.handlePrintProgress.bind(this), PRINTGEN_TIMER);
+        //this.interval = setInterval(this.handlePrintProgress.bind(this), PRINTGEN_TIMER);
+    }
+    hlptogglettt1() {
+        this.setState({
+          hlptooltipOpen1: !this.state.hlptooltipOpen1
+        });
     }
     handleInProgress(){
         const dataset = appDataset();
-        this.props.actions.isOutputGenerationInprogress(dataset)
+        this.props.actions.isOutputGenerationInprogress(dataset).then(response => {
+            if(this.props.isoutinprogress.status==='In-Progress'){
+                console.log('isOutputGenerationInprogress In-Progress');
+                this.setState({divStyleRD:true, outputSuccess: false});
+            }else if(this.props.isoutinprogress.status==='Failed'){
+                console.log('isOutputGenerationInprogress Failed');
+                this.setState({divStyleRD:false,outputSuccess: false});
+            }else if(this.props.isoutinprogress.status==='Processed'){
+                this.setState({divStyleRD:false});
+                console.log('isOutputGenerationInprogress Processed');
+            }
+            return response
+        }).catch(error => {
+            throw new SubmissionError(error)
+        });
     }
     handlePrintProgress(){
         const dataset = appDataset();
@@ -166,7 +188,7 @@ class EEW2Records extends React.Component {
             this.refs.eew2Grid.clearselection();
             this.showConfirm(true,'Select All', this.getSelAllMessage());
         }
-        
+      
     }
     getSelAllMessage(){
         let grindRecInputData  = this.props.eew2data.eew2recordInput;
@@ -389,10 +411,17 @@ class EEW2Records extends React.Component {
             outputMessage:message
         });
     }
+    toggleSuccessNew(message, isShowOn){
+        this.setState({
+            outputSuccess: isShowOn,
+            outputMessage:message
+        });
+    }
     generateOutput(){
        let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
+       this.setState({outputSuccess: false});
        if(selIndexes.length >0 || this.state.allSelected){
-            this.setState({outputSuccess: false});
+            this.toggleSuccessNew('Initiating W2 Generation...', true);
             if(selIndexes.length >0){
                 const dataset = appDataset();
                 let taxYear = "";
@@ -416,10 +445,11 @@ class EEW2Records extends React.Component {
                 console.log('generateOutput eew2recordInput ==>');
                 console.log(eew2recordInput);
                 this.props.actions.generateOutputs(eew2recordInput).then(response => {
-                    this.handleInProgress();
+                    this.setState({outputSuccess: false});
                     this.refs.eew2Grid.clearselection();
-                    this.toggleSuccess('Generation of W2s initiated for the selected Employees.');
+                    this.toggleSuccessNew('Generation of W2s initiated for the selected Employees.',true);
                     this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
+                    this.handleInProgress();
                     return response
                 }).catch(error => {
                     throw new SubmissionError(error)
@@ -433,14 +463,25 @@ class EEW2Records extends React.Component {
                 };
                 console.log('generateOutput eew2recordInput ==>');
                 console.log(eew2recordInput);
-                this.props.actions.generateOutputs(eew2recordInput).then(response => {
+                eew2Api.generateOutputs(eew2recordInput).then(response => response).then((repos) => {
+                    console.log('Generate output count received : '+repos)
+                    this.setState({outputSuccess: false});
+                    this.toggleSuccessNew('Generation of W2s initiated for the selected Employees.', true);
                     this.refs.eew2Grid.clearselection();
-                    this.toggleSuccess('Generation of W2s initiated for the selected Employees.');
+                    this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
+                    this.handleInProgress();
+                    return repos
+                });
+                /*this.props.actions.generateOutputs(eew2recordInput).then(response => {
+                    this.setState({outputSuccess: false});
+                    //this.handleInProgress();
+                    this.refs.eew2Grid.clearselection();
+                    this.toggleSuccessNew('Generation of W2s initiated for the selected Employees.', true);
                     this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
                     return response
                 }).catch(error => {
                     throw new SubmissionError(error)
-                })
+                })*/
             }
        }else{
             this.showAlert(true,'Generate W2','Please select at least one employee record from the grid or check Select All option to Generate W2s.');
@@ -727,7 +768,7 @@ class EEW2Records extends React.Component {
                 throw new Error(error);
             }
         });
-        let filter = <FilterPayrollData openFromGrid={this.state.openFromGrid} toggleFromGrid={this.toggleFromGrid}/>
+        let filter = <FilterPayrollData openFromGrid={this.state.openFromGrid} toggleFromGrid={this.toggleFromGrid} initgridData={ this.props.eew2data.w2dgridata}/>
         let uiAlert    =   <UIAlert handleClick={this.hideUIAlert}  showAlert={this.state.showAlert} aheader={this.state.aheader} abody={this.state.abody} abtnlbl={'Ok'}/>;
         let uiDelConfirm = <UIConfirm handleOk={this.handleConfirmOk} handleCancel={this.handleConfirmCancel}  showConfirm={this.state.showConfirm} cheader={this.state.cheader} cbody={this.state.cbody} okbtnlbl={'Ok'} cancelbtnlbl={'Cancel'}/>;
         let data = this.props.eew2data;
@@ -794,10 +835,12 @@ class EEW2Records extends React.Component {
             <div>
                 <h3 class="text-bsi">Manage W2 Records 
                     <a href="#" onClick={() => this.goToFilterPage()} id="filterDataId"><i class="fas fa-filter fa-xs" title="Filter"></i></a>
-                    <Tooltip placement="right" isOpen={this.state.filterData} target="filterDataId" toggle={this.toggleFilDat}>
+                    <Tooltip placement="top" isOpen={this.state.filterData} target="filterDataId" toggle={this.toggleFilDat}>
                     Filter
                     </Tooltip>
+                    &nbsp;<a target="_blank" id="_ew2_hlpttip1" href="javascript:window.open('/help/ew2','_blank');"><i class="fas fa-question-circle fa-xs pl-1"></i></a><Tooltip placement="right" isOpen={this.state.hlptooltipOpen1} target="_ew2_hlpttip1" toggle={this.hlptogglettt1}>Help</Tooltip>
                 </h3>
+                
                 <Alert color="primary">
                     {data.filterlabel}
                 </Alert>
@@ -821,19 +864,19 @@ class EEW2Records extends React.Component {
                 <Tooltip placement="right" isOpen={this.state.resetAll} target="resetAll" toggle={this.toggleRstAll}>
                     Reset Selection
                 </Tooltip>
-                <a href="#" style={divStyleR} onClick={() => this.printW2s()} id="printW2s"><i class='fas fa-print fa-lg'></i></a>
+                <a href="#" style={this.state.divStyleRD==false ? divStyleR: divStyleRDisable} onClick={() => this.printW2s()} id="printW2s"><i class='fas fa-print fa-lg'></i></a>
                 <Tooltip placement="right" isOpen={this.state.printW2s} target="printW2s" toggle={this.togglePrintW2s}>
                    Print W2s
                 </Tooltip>
-                <a href="#" style={divStyleR} onClick={() => this.unpublishW2()} id="unpublishW2"><i class='fas fa-calendar-minus fa-lg'></i></a>
+                <a href="#" style={this.state.divStyleRD==false ? divStyleR: divStyleRDisable} onClick={() => this.unpublishW2()} id="unpublishW2"><i class='fas fa-calendar-minus fa-lg'></i></a>
                 <Tooltip placement="bottom" isOpen={this.state.unpublishW2} target="unpublishW2" toggle={this.toggleUnPubW2Sel}>
                    Un-Publish W2
                 </Tooltip>
-                <a href="#" style={divStyleR} onClick={() => this.publishW2()} id="publishW2"><i class='fas fa-calendar-plus fa-lg'></i></a>
+                <a href="#" style={this.state.divStyleRD==false ? divStyleR: divStyleRDisable} onClick={() => this.publishW2()} id="publishW2"><i class='fas fa-calendar-plus fa-lg'></i></a>
                 <Tooltip placement="top" isOpen={this.state.publishW2} target="publishW2" toggle={this.togglePubW2Sel}>
                    Publish W2
                 </Tooltip>
-                <a href="#" style={divStyleR} onClick={() => this.generateOutput()} id="generateOutput"><i class='fas fa-tasks fa-lg'></i></a>
+                <a href="#" style={this.state.divStyleRD==false ? divStyleR: divStyleRDisable} onClick={() => this.generateOutput()} id="generateOutput"><i class='fas fa-tasks fa-lg'></i></a>
                 <Tooltip placement="left" isOpen={this.state.generateOutput} target="generateOutput" toggle={this.togglePstSel}>
                     Generate W2
                 </Tooltip>

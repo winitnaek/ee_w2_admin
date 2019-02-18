@@ -32,6 +32,17 @@ class FilterPayrollData extends Component {
         });
         //ops = _.uniqWith(ops, _.isEqual);
         let data = [];
+        let isOpenFromGrid=false;
+        let isTrmSelDisabled=false;
+        let isEmpSelDisabled=true;
+        if(this.props.openFromGrid){
+            data=this.props.initgridData;
+            if(data.length >0){
+                isOpenFromGrid=true;
+                isTrmSelDisabled=true;
+                isEmpSelDisabled=true;  
+            }
+        }
         let source =
         {
             datatype: "json",
@@ -43,10 +54,7 @@ class FilterPayrollData extends Component {
             pagesize: 5,
             localdata: data
         };
-        let isOpenFromGrid=false;
-        if(this.props.openFromGrid){
-            isOpenFromGrid=true;
-        }
+        
         this.state = {
             source: source,
             modal: true,
@@ -59,7 +67,7 @@ class FilterPayrollData extends Component {
             selectedCompany:'',
             selectedEmployees:[],
             addEmps:false,
-            w2dgridata:[],
+            w2dgridata:data,
             disableaddemp:true,
             isCompLoading:false,
             isEmpsLoading:false,
@@ -71,12 +79,14 @@ class FilterPayrollData extends Component {
             ops:ops,
             inputValue: '',
             value:'',
-            isEmpSelDisabled:true,
+            isEmpSelDisabled:isEmpSelDisabled,
             empInfo:false,
             selAllInfo:false,
             showActionAlert:false,
             actionAlertMessage:'',
-            openFromGrid:isOpenFromGrid
+            openFromGrid:isOpenFromGrid,
+            isTrmSelDisabled:isTrmSelDisabled,
+            hlptooltipOpen:false
         };
         this.toggle = this.toggle.bind(this);
         this.toggleaddEmpsSel = this.toggleaddEmpsSel.bind(this);
@@ -96,11 +106,16 @@ class FilterPayrollData extends Component {
         this.tick2 = this.tick2.bind(this);
         this.onDismiss = this.onDismiss.bind(this);
         this.onActionDone = this.onActionDone.bind(this);
-       
+        this.hlptogglettt = this.hlptogglettt.bind(this);
+    }
+    hlptogglettt() {
+        this.setState({
+          hlptooltipOpen: !this.state.hlptooltipOpen
+        });
     }
     onDismiss() {
         this.setState({ visible: false });
-      }
+    }
     onYearChange(e){
         //console.log('Year val');
         //console.log(e.target.value);
@@ -326,6 +341,7 @@ class FilterPayrollData extends Component {
         }
         eew2data.filterlabel = fLabel;
         eew2data.eew2recordInput = eew2recordInput;
+        eew2data.w2dgridata = this.state.w2dgridata;
         return eew2data;
     }
     /**
@@ -396,7 +412,7 @@ class FilterPayrollData extends Component {
      * @param {*} actionClicked 
      */
     onResetSelection(actionClicked){
-        this.setState({w2dgridata:[], selectedTransmitter: null , selectedCompany: null, selectedEmployees: null,disableaddemp:true,addEmps:false,gridHasData:false,disableviewpdf:true,disablegenpdf:true,disablepubpdf:true,disableunpubpdf:true,isEmpSelDisabled:true});
+        this.setState({w2dgridata:[], isTrmSelDisabled:false, selectedTransmitter: null , selectedCompany: null, selectedEmployees: null,disableaddemp:true,addEmps:false,gridHasData:false,disableviewpdf:true,disablegenpdf:true,disablepubpdf:true,disableunpubpdf:true,isEmpSelDisabled:true});
         this.yearSelected.disabled=false;
         this.yearSelected.value=(CURRENT_YR-1);
         this.latestOnly.checked=true;
@@ -509,25 +525,27 @@ class FilterPayrollData extends Component {
         eew2data.eew2ecords=[];
         //this.props.loadPeriodicData(eew2data);
         const removeMe = (id) => {
-            console.log(id);
-            var selectedrowindex = this.refs.eew2ActionGrid.getselectedrowindex();
-            console.log('selectedrowindex '+selectedrowindex);
-            var rowscount = this.refs.eew2ActionGrid.getdatainformation().rowscount;
-            console.log('rowscount '+rowscount);
-            if (selectedrowindex >= 0 && selectedrowindex < rowscount) {
-                var id = this.refs.eew2ActionGrid.getrowid(selectedrowindex);
-                var commit = this.refs.eew2ActionGrid.deleterow(id);
-                this.state.w2dgridata.splice(selectedrowindex,1);
-                this.setState({selectedTransmitter: null , selectedCompany: null, selectedEmployees: null});
-                let com =[];
-                this.state.companies.forEach(function (comp) {
-                    com.push({'value':comp.fein,'label':comp.name, disabled:'no'});
-                });
-                let enableAction=false;
-                if(rowscount==1){
-                    enableAction = true;
+            if(!this.state.openFromGrid){
+                console.log(id);
+                var selectedrowindex = this.refs.eew2ActionGrid.getselectedrowindex();
+                console.log('selectedrowindex '+selectedrowindex);
+                var rowscount = this.refs.eew2ActionGrid.getdatainformation().rowscount;
+                console.log('rowscount '+rowscount);
+                if (selectedrowindex >= 0 && selectedrowindex < rowscount) {
+                    var id = this.refs.eew2ActionGrid.getrowid(selectedrowindex);
+                    var commit = this.refs.eew2ActionGrid.deleterow(id);
+                    this.state.w2dgridata.splice(selectedrowindex,1);
+                    this.setState({selectedTransmitter: null , selectedCompany: null, selectedEmployees: null});
+                    let com =[];
+                    this.state.companies.forEach(function (comp) {
+                        com.push({'value':comp.fein,'label':comp.name, disabled:'no'});
+                    });
+                    let enableAction=false;
+                    if(rowscount==1){
+                        enableAction = true;
+                    }
+                    this.setState({companies:com,disableviewpdf:enableAction,disablegenpdf:enableAction,disablepubpdf:enableAction,disableunpubpdf:enableAction});
                 }
-                this.setState({companies:com,disableviewpdf:enableAction,disablegenpdf:enableAction,disablepubpdf:enableAction,disableunpubpdf:enableAction});
             }
         }
         let eew2ActionView = null;
@@ -578,6 +596,7 @@ class FilterPayrollData extends Component {
                     ref='selTransmitter'
                     className={selZindx}
                     value={this.state.selectedTransmitter}
+                    isDisabled={this.state.isTrmSelDisabled}
                     onChange={this.handleTransmitterChange}
                     isSearchable ={false}
                     options={this.state.ops}
@@ -684,11 +703,11 @@ class FilterPayrollData extends Component {
                 <Button color="secondary" className="btn btn-primary mr-auto" onClick={() => this.onResetSelection(4)}>Reset</Button>
                 <Button disabled={this.state.disableunpubpdf} onClick={() => this.onPerformAction(4)}  color="success">Un-Publish W2s</Button>{' '}
              </ModalFooter>
-        }
+        } 
         return (
             <div>
                 <Modal size="lg" isOpen={this.state.modal} toggle={this.toggle} className={this.props.className} backdrop={this.state.backdrop}>
-                    <ModalHeader toggle={this.toggle}>Manage W2 Records</ModalHeader>
+                    <ModalHeader toggle={this.toggle}>Manage W2 Records <a target="_blank" id="_ew2_hlpttip" href="javascript:window.open('/help/ew2','_blank');"><i class="fas fa-question-circle fa-sm pl-1"></i></a><Tooltip placement="right" isOpen={this.state.hlptooltipOpen} target="_ew2_hlpttip" toggle={this.hlptogglettt}>Help</Tooltip></ModalHeader>
                     <ModalBody>
                      {this.state.showActionAlert ==true ?(<Form>
                             <FormGroup row><Label for="periodBy1" sm={1}></Label><Col sm={10}>
@@ -696,16 +715,14 @@ class FilterPayrollData extends Component {
                                     {this.state.actionAlertMessage}
                                     </Alert></Col></FormGroup></Form>) : null}
                             <Form>
-                            <FormGroup row>
+                            <FormGroup row hidden>
                                 <Label for="filterType" sm={1}></Label>
                                 <Label for="filterType" sm={2}>Action</Label>
                                 <Col sm={7}>
-                                    <ButtonGroup>
-                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(1)} active={this.state.pSelected === 1}>View</Button>
-                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(2)} active={this.state.pSelected === 2}>Generate</Button>
-                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(3)} active={this.state.pSelected === 3}>Publish</Button>
-                                        <Button outline color="info" onClick={() => this.onActionBtnSelected(4)} active={this.state.pSelected === 4}>Un-Publish</Button>
-                                    </ButtonGroup>
+                                    <Button outline color="info" onClick={() => this.onActionBtnSelected(1)} active={this.state.pSelected === 1}>View</Button>
+                                    <Button hidden disabled={this.state.openFromGrid} outline color="info" onClick={() => this.onActionBtnSelected(2)} active={this.state.pSelected === 2}>Generate</Button>
+                                    <Button hidden disabled={this.state.openFromGrid}  outline color="info" onClick={() => this.onActionBtnSelected(3)} active={this.state.pSelected === 3}>Publish</Button>
+                                    <Button hidden disabled={this.state.openFromGrid} outline color="info" onClick={() => this.onActionBtnSelected(4)} active={this.state.pSelected === 4}>Un-Publish</Button>
                                 </Col>
                             </FormGroup>
                             {eew2ActionView}

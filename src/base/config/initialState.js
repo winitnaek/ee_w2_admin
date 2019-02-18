@@ -17,7 +17,8 @@ export default {
     eew2ecords: [],
     eew2recordInput: {},
     pubunpubcnt: 0,
-    genstatus: 0
+    genstatus: 0,
+    w2dgridata:[]
   },
   viewcompdata: {
     messages: [],

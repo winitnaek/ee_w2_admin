@@ -109,3 +109,13 @@ export const divStylePA={
 export const divStyleRedColor={
     color: '#FF0000'
 };
+export const divStyleRDisable = {
+    pointerEvents:'none',
+    display: 'block',
+    paddingBottom: '8px',
+    transition: 'all 0.3s ease',
+    textAling: 'center',
+    fontSize: '24px',
+    float: 'right',
+    marginLeft: '20px'
+};
