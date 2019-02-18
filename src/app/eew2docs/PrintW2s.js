@@ -226,7 +226,10 @@ class PrintW2s extends React.Component {
     onPerformAction(actionClicked){
      var eew2data = this.getRequestData(actionClicked);
             console.log("Data input received:"+eew2data);
-           this.props.stageRecsToPrint(eew2data);
+            eew2Api.stageRecordsToPrint(eew2data).then(response => response).then((repos) => {
+                console.log('StageRecsToPrint : '+repos)
+                return repos
+            });
             renderW2AdmApplication(appAnchor(),RN_EEW2_RECORDS);
         
     }
