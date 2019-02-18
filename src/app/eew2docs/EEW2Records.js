@@ -258,7 +258,7 @@ class EEW2Records extends React.Component {
                             });
                         });
                         this.refs.eew2Grid.updatebounddata('data');
-                        this.toggleSuccess('Un-Publishing of W2s initiated for the selected Employees.');
+                        this.toggleSuccess('Employee W2 Output Un-Published Successfully!');
                         this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
                         return response
                     }).catch(error => {
@@ -289,7 +289,7 @@ class EEW2Records extends React.Component {
                     });
                     //this.refs.eew2Grid.clearselection();
                     this.refs.eew2Grid.updatebounddata('data');
-                    this.toggleSuccess('Un-Publishing of W2s initiated for the selected Employees.');
+                    this.toggleSuccess('Employee W2 Output Un-Published Successfully!');
                     this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
                     return response
                 }).catch(error => {
@@ -346,7 +346,7 @@ class EEW2Records extends React.Component {
                             });
                         });
                         this.refs.eew2Grid.updatebounddata('data');
-                        this.toggleSuccess('Publishing of W2s initiated for the selected Employees.');
+                        this.toggleSuccess('Employee W2 Output Published Successfully!');
                         this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
                         return response
                     }).catch(error => {
@@ -376,7 +376,7 @@ class EEW2Records extends React.Component {
                         });
                     });
                     this.refs.eew2Grid.updatebounddata('data');
-                    this.toggleSuccess('Publishing of W2s initiated for the selected Employees.');
+                    this.toggleSuccess('Employee W2 Output Published Successfully!');
                     this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
                     return response
                 }).catch(error => {
