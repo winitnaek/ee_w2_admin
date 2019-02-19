@@ -130,10 +130,10 @@ export function isOutputGenerationSuccess(outputgeninprogress) {
 export function isOutputGenerationFailed(outputgeninprogress) {
     return { type: types.POST_OUTPUTGEN_INPROGRESS_ERROR, outputgeninprogress };
 }
-export function isPrintGenerationInprogress(dataset) {
+export function isPrintGenerationInprogress(dataset,printid) {
     return function (dispatch, getState) {
         const state = getState();
-        return eew2AdminAPI.isPrintGenerationInprogress(dataset).then(printinprogress => {
+        return eew2AdminAPI.isPrintGenerationInprogress(dataset,printid).then(printinprogress => {
             if(printinprogress.status && printinprogress.message){
                 let arr = [];
                 arr.push([]);

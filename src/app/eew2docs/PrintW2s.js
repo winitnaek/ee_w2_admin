@@ -7,6 +7,7 @@ import {RN_EEW2_RECORDS} from '../../base/constants/RenderNames';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {loadPeriodicData,loadEEW2Records,stageRecsToPrint,getRecsToPrintCount,isPrintGenerationInprogress}  from './eew2AdminAction';
+import {testjnlp}  from '../comp_outputs/compViewAction';
 import eew2Api from './eew2AdminAPI';
 import Select from 'react-select';
 import AsyncSelect from 'react-select/lib/Async';
@@ -97,7 +98,8 @@ class PrintW2s extends React.Component {
                 selecRec:selecRec,
                 w2sselected:w2sselected,
                 filterlabel:this.props.filterlabel,
-                year:this.props.year
+                year:this.props.year,
+                printIds:[]
                 
                
             };
@@ -122,7 +124,31 @@ class PrintW2s extends React.Component {
     }
     handlePrintProgress(){
         const dataset = appDataset();
-        this.props.isPrintGenerationInprogress(dataset)
+        console.log('this.state.printIds');
+        let printid = this.state.printIds;
+        console.log(printid);
+        if(this.state.printIds && this.state.printIds > 0){
+            this.props.isPrintGenerationInprogress(dataset,printid).then(response => {
+                if(this.props.isprintinprogress.status==='In-Progress'){
+                    console.log('isprintinprogress.status In-Progress');
+                    console.log(this.props.isprintinprogress.status);
+                }else if(this.props.isprintinprogress.status==='Failed'){
+                    clearInterval(this.printinterval);
+                    console.log('isprintinprogress.status Failed');
+                    console.log(this.props.isprintinprogress.status);
+                }else if(this.props.isprintinprogress.status==='Processed'){
+                    clearInterval(this.printinterval);
+                    console.log('isprintinprogress.status Processed');
+                    console.log(this.props.isprintinprogress.status);
+                    console.log('Now Launch JNLP from here ====================>');
+                    this.props.testjnlp(dataset, printid).then(() => {
+                    });
+                }
+                return response
+            }).catch(error => {
+                throw new SubmissionError(error)
+            });
+        }
     }
     toggleUIPrintOk() {
         this.props.handleOk();
@@ -233,15 +259,9 @@ class PrintW2s extends React.Component {
             console.log(eew2data);
             let printids=[];
             eew2Api.stageRecordsToPrint(eew2data).then(response => response).then((repos) => {
-                console.log(repos.printIds)
                 if(repos.printIds && repos.printIds.length >0){
-                    printids = repos.printIds;
-                    console.log(printids)
-                    printids.forEach(function (printid) {
-                        console.log('printids')
-                        console.log(printid)
-                        printids.push(printid);
-                    });
+                    console.log(repos.printIds[0])
+                    this.setState({printIds:repos.printIds[0]});
                     this.handlePrintProgress();
                     this.printinterval = setInterval(this.handlePrintProgress.bind(this), PRINTGEN_TIMER);
                 }
@@ -510,6 +530,6 @@ function mapStateToProps(state) {
     }
 }
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({ loadEEW2Records ,loadPeriodicData,stageRecsToPrint,getRecsToPrintCount,isPrintGenerationInprogress}, dispatch)
+    return bindActionCreators({ loadEEW2Records ,loadPeriodicData,stageRecsToPrint,getRecsToPrintCount,isPrintGenerationInprogress,testjnlp}, dispatch)
 }
 export default connect(mapStateToProps,mapDispatchToProps)(PrintW2s);

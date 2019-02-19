@@ -62,7 +62,6 @@ function mapStateToProps(state) {
     return {
         eew2data: state.eew2data,
         isoutinprogress: state.outputgeninprogress,
-        isprintinprogress: state.printinprogress,
         w2data:state.w2data,
         compdata:state.compdata,
         viewcompdata: state.viewcompdata

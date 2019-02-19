@@ -187,8 +187,8 @@ class eew2AdminAPI {  static geteew2records(eew2recordInput) {
         return error;
       });
   }
-  static isPrintGenerationInprogress(dataset) {
-    let paramurl = `${'?dataset='}${dataset}`;
+  static isPrintGenerationInprogress(dataset,printid) {
+    let paramurl = `${'?dataset='}${dataset}${'&printid='}${printid}`;
     var svcs_url = `${svcs.GET_ISPRINT_GEN_INPROGRESS}${paramurl}`;
     
     return fetch(URLUtils.buildURL(svcs_url), {
