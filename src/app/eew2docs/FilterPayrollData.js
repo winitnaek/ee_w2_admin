@@ -109,7 +109,6 @@ class FilterPayrollData extends Component {
         this.onDismiss = this.onDismiss.bind(this);
         this.onActionDone = this.onActionDone.bind(this);
         this.hlptogglettt = this.hlptogglettt.bind(this);
-
         this.interval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
     }
     handleInProgress(){
@@ -289,7 +288,7 @@ class FilterPayrollData extends Component {
         });
     }
     tick2(){
-        clearInterval(this.interval);
+        clearInterval(this.alertinterval);
         this.toggleActAlert('');
     }
     /**
@@ -382,7 +381,7 @@ class FilterPayrollData extends Component {
             eew2data.eew2ecords=[];
             this.props.generateOutputs(eew2data.eew2recordInput).then(response => {
                 this.toggleActAlert('Generation of W2s initiated for the selected Employees.');
-                this.interval = setInterval(this.tick2.bind(this), ALERTINTERVAL);
+                this.alertinterval = setInterval(this.tick2.bind(this), ALERTINTERVAL);
                 this.onActionDone(GENERATE_W2S);
                 return response
             }).catch(error => {
@@ -394,7 +393,7 @@ class FilterPayrollData extends Component {
             eew2data.eew2ecords=[];
             this.props.publishUnpublishEEW2Records(eew2data.eew2recordInput).then(response => {
                 this.toggleActAlert('Publishing  of W2s initiated for the selected Employees.');
-                this.interval = setInterval(this.tick2.bind(this), ALERTINTERVAL);
+                this.alertinterval = setInterval(this.tick2.bind(this), ALERTINTERVAL);
                 this.onActionDone(PUBLISH_W2S);
                 return response
             }).catch(error => {
@@ -406,7 +405,7 @@ class FilterPayrollData extends Component {
             eew2data.eew2ecords=[];
             this.props.publishUnpublishEEW2Records(eew2data.eew2recordInput).then(response => {
                 this.toggleActAlert('Un-Publishing  of W2s initiated for the selected Employees.');
-                this.interval = setInterval(this.tick2.bind(this), ALERTINTERVAL);
+                this.alertinterval = setInterval(this.tick2.bind(this), ALERTINTERVAL);
                 this.onActionDone(UNPUBLISH_W2S);
                 return response
             }).catch(error => {

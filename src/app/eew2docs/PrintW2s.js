@@ -6,7 +6,7 @@ import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
 import {RN_EEW2_RECORDS} from '../../base/constants/RenderNames';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {loadPeriodicData,loadEEW2Records,stageRecsToPrint,getRecsToPrintCount}  from './eew2AdminAction';
+import {loadPeriodicData,loadEEW2Records,stageRecsToPrint,getRecsToPrintCount,isPrintGenerationInprogress}  from './eew2AdminAction';
 import eew2Api from './eew2AdminAPI';
 import Select from 'react-select';
 import AsyncSelect from 'react-select/lib/Async';
@@ -15,6 +15,7 @@ import styles from '../../css/cfapp.css';
 const yearSpan = 7;
 const PRINT_PDFS = 1;
 const ALERTINTERVAL = 300000;
+const PRINTGEN_TIMER =10000;
 const CURRENT_YR = new Date().getFullYear();
 const printOptions = [
     { value: 'S', label: 'SSN'},
@@ -81,6 +82,7 @@ class PrintW2s extends React.Component {
                 isEmpSelDisabled:true,
                 empInfo:false,
                 selAllInfo:false,
+                selAllInfoc:false,
                 showActionAlert:false,
                 actionAlertMessage:'',
                 showPrint: this.props.showPrint,
@@ -109,18 +111,24 @@ class PrintW2s extends React.Component {
             this.onPerformAction = this.onPerformAction.bind(this);
             this.toggleempInfo = this.toggleempInfo.bind(this);
             this.toggleselAllInfo = this.toggleselAllInfo.bind(this);
+            this.toggleselAllInfoc=this.toggleselAllInfoc.bind(this);
             this.toggleActAlert = this.toggleActAlert.bind(this);
-            this.tick2 = this.tick2.bind(this);
             this.onDismiss = this.onDismiss.bind(this);
             this.onActionDone = this.onActionDone.bind(this);
             this.handleSortByChange = this.handleSortByChange.bind(this);
             this.onCheckboxPrinClick = this.onCheckboxPrinClick.bind(this);
             this.onTestPrint = this.onTestPrint.bind(this);
+            this.handlePrintProgress = this.handlePrintProgress.bind(this);
+    }
+    handlePrintProgress(){
+        const dataset = appDataset();
+        this.props.isPrintGenerationInprogress(dataset)
     }
     toggleUIPrintOk() {
         this.props.handleOk();
     }
     toggleUIPrintCancel() {
+        clearInterval(this.printinterval);
         this.props.handleCancel();
     }
     onDismiss() {
@@ -165,10 +173,6 @@ class PrintW2s extends React.Component {
             actionAlertMessage:message
         });
     }
-    tick2(){
-        clearInterval(this.interval);
-        this.toggleActAlert('');
-    }
     /**
      * getRequestData
      * @param {*} fromBtn 
@@ -206,7 +210,7 @@ class PrintW2s extends React.Component {
                  "dataset": dataset,
                  "isLatest": (this.latestOnly.checked==true) ? true:false,
                  "year": this.state.year,
-                 "isCorrection":true, 
+                 "isCorrection": (this.correctedOnly.checked==true) ? true:false,
                  "printType":printType,
                "sortOrder":this.state.selectedPrintOption.value,
                 "fromEmpNo":'',
@@ -225,13 +229,25 @@ class PrintW2s extends React.Component {
      */
     onPerformAction(actionClicked){
      var eew2data = this.getRequestData(actionClicked);
-            console.log("Data input received:"+eew2data);
+            console.log("Data input received:");
+            console.log(eew2data);
+            let printids=[];
             eew2Api.stageRecordsToPrint(eew2data).then(response => response).then((repos) => {
-                console.log('StageRecsToPrint : '+repos)
+                console.log(repos.printIds)
+                if(repos.printIds && repos.printIds.length >0){
+                    printids = repos.printIds;
+                    console.log(printids)
+                    printids.forEach(function (printid) {
+                        console.log('printids')
+                        console.log(printid)
+                        printids.push(printid);
+                    });
+                    this.handlePrintProgress();
+                    this.printinterval = setInterval(this.handlePrintProgress.bind(this), PRINTGEN_TIMER);
+                }
                 return repos
             });
-            renderW2AdmApplication(appAnchor(),RN_EEW2_RECORDS);
-        
+            //renderW2AdmApplication(appAnchor(),RN_EEW2_RECORDS);
     }
     /**
      * onActionDone
@@ -251,6 +267,7 @@ class PrintW2s extends React.Component {
         this.yearSelected.disabled=false;
         this.yearSelected.value=(CURRENT_YR-1);
         this.latestOnly.checked=true;
+        this.correctedOnly.checked=false;
         this.state.source.localdata=[];
         this.refs.eew2ActionGrid.clearselection();
         this.refs.eew2ActionGrid.updatebounddata('data');
@@ -263,6 +280,11 @@ class PrintW2s extends React.Component {
     toggleselAllInfo(){
         this.setState({
             selAllInfo: !this.state.selAllInfo
+        }); 
+    }
+    toggleselAllInfoc(){
+        this.setState({
+            selAllInfoc: !this.state.selAllInfoc
         }); 
     }
     onCheckboxPrinClick(selected) {
@@ -317,11 +339,12 @@ class PrintW2s extends React.Component {
             disableMeSel = true;
         }
         this.setState({
-            disableMe:isEnabled,disableMeSel:disableMeSel,isDisabledOpt: isEnabled,disableviewpdf:!isEnabled,rSelected:1,w2sselected:w2sselected
+            disableMe:isEnabled,disableMeSel:disableMeSel,isDisabledOpt: isEnabled,disableviewpdf:false,rSelected:1,w2sselected:w2sselected
         }); 
         this.inputPrintFrmSel.disabled=isEnabled;
         this.inputPrintToSel.disabled=isEnabled;
         this.latestOnly.disabled=isEnabled;
+        this.correctedOnly.disabled=isEnabled;
     }
     render() {
         var eew2data={};
@@ -374,6 +397,7 @@ class PrintW2s extends React.Component {
                 <Modal size="lg" isOpen={this.props.showPrint} backdrop="static">
                     <ModalHeader toggle={this.toggleUIPrintCancel}>Print W2 Records</ModalHeader>
                     <ModalBody>
+                       
                     <Form>
                         <FormGroup row>
                         <Label for="periodBy1" sm={1}></Label>
@@ -384,6 +408,25 @@ class PrintW2s extends React.Component {
                         </Col>
                         </FormGroup>
                     </Form>
+                    {this.props.isprintinprogress.status==='In-Progress' ?(<Form>
+                        <FormGroup row>
+                        <Label for="periodBy1" sm={1}></Label>
+                        <Col sm={10}>
+                        <Alert color="success" isOpen={this.props.isprintinprogress.status==='In-Progress'}>
+                            <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner fa-spin"></i> Printing W2s is In-Progress.</span>
+                        </Alert>
+                        </Col>
+                        </FormGroup>
+                    </Form>) : null}    
+                    {this.props.isprintinprogress.status==='Failed' ?(<Form>
+                        <FormGroup row>
+                        <Label for="periodBy1" sm={1}></Label>
+                        <Col sm={10}><Alert color="danger" isOpen={this.props.isprintinprogress.status==='Failed'}>
+                            <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner"></i> Printing of W2s Failed. Please contact your system administrator.</span>
+                        </Alert> 
+                        </Col>
+                        </FormGroup>
+                    </Form>) : null}   
                     <Form>
                         <FormGroup row>
                             <Label for="printOpt3" sm={1}></Label>
@@ -404,6 +447,15 @@ class PrintW2s extends React.Component {
                                 <a href="#" id="selAllInfoId"><i class="fas fa-info-circle fa-sm"></i></a>
                                 <Tooltip placement="right" isOpen={this.state.selAllInfo} target="selAllInfoId" toggle={this.toggleselAllInfo}>
                                 Select latest records from all the previous runs.
+                                </Tooltip>
+                        </FormGroup>
+                        <FormGroup row style={{ paddingLeft: 20 }}>
+                                <Label for="periodBy1" sm={3}></Label>
+                                <CustomInput type="checkbox" innerRef={(inputc) => this.correctedOnly = inputc} id="exampleCustomSwitch1" defaultChecked={false} name="customSwitch1" label="Corrected Records Only" />
+                                &nbsp;
+                                <a href="#" id="selAllInfoId1"><i class="fas fa-info-circle fa-sm"></i></a>
+                                <Tooltip placement="right" isOpen={this.state.selAllInfoc} target="selAllInfoId1" toggle={this.toggleselAllInfoc}>
+                                Select corrected records only for the print.
                                 </Tooltip>
                         </FormGroup>
                         <FormGroup row>
@@ -453,10 +505,11 @@ class PrintW2s extends React.Component {
 }
 function mapStateToProps(state) {
     return {
-        eew2data: state.eew2data
+        eew2data: state.eew2data,
+        isprintinprogress: state.printinprogress
     }
 }
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({ loadEEW2Records ,loadPeriodicData,stageRecsToPrint,getRecsToPrintCount}, dispatch)
+    return bindActionCreators({ loadEEW2Records ,loadPeriodicData,stageRecsToPrint,getRecsToPrintCount,isPrintGenerationInprogress}, dispatch)
 }
 export default connect(mapStateToProps,mapDispatchToProps)(PrintW2s);
