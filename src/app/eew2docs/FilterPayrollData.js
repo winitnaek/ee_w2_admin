@@ -746,10 +746,10 @@ class FilterPayrollData extends Component {
                                 <Label for="filterType" sm={1}></Label>
                                 <Label for="filterType" sm={2}>Action</Label>
                                 <Col sm={7}>
-                                    <Button disabled={this.state.openFromGrid} outline color="info" onClick={() => this.onActionBtnSelected(2)} active={this.state.pSelected === 2}>Generate</Button>
+                                <ButtonGroup>
+                                    <Button outline disabled={this.state.openFromGrid} color="info" onClick={() => this.onActionBtnSelected(2)} active={this.state.pSelected === 2}>Generate</Button>
                                     <Button outline disabled={this.state.divStyleGenD}  color="info" onClick={() => this.onActionBtnSelected(1)} active={this.state.pSelected === 1}>View</Button>
-                                    <Button hidden disabled={this.state.openFromGrid}  outline color="info" onClick={() => this.onActionBtnSelected(3)} active={this.state.pSelected === 3}>Publish</Button>
-                                    <Button hidden disabled={this.state.openFromGrid} outline color="info" onClick={() => this.onActionBtnSelected(4)} active={this.state.pSelected === 4}>Un-Publish</Button>
+                                </ButtonGroup>
                                 </Col>
                             </FormGroup>
                             {eew2ActionView}
