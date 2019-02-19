@@ -223,13 +223,13 @@ class PrintW2s extends React.Component {
         });
         let optSelec = this.props.optSelec;
        let printType = '';
-        if(this.state.rSelected == 1)
+        if(actionClicked == 1)
         printType = 'A';
-        else if(this.state.rSelected == 2)
+        else if(actionClicked == 2)
         printType = 'S';
-        else if(this.state.rSelected == 3)
+        else if(actionClicked== 3)
         printType = 'P';
-        else if(this.state.rSelected == 4)
+        else if(actionClicked == 4)
         printType = 'M';
 
         w2PrintRequestInput = {
@@ -241,7 +241,7 @@ class PrintW2s extends React.Component {
                "sortOrder":this.state.selectedPrintOption.value,
                 "fromEmpNo":'',
                "toEmpNo":'',
-              "isTestMode":this.testPrintOnly.checked,
+              "isTestMode":(this.testPrintOnly.checked==true) ? true:false,
               "w2RequestInputs": w2RequestInputs
              };
              console.log('stageRecordsToPrint ===>');
@@ -317,26 +317,29 @@ class PrintW2s extends React.Component {
         this.setState({ cSelected: [...this.state.cSelected] });
     }
     onRadioPrinClick(rSelected) {
+        this.setState({rSelected:rSelected});
         var eew2data = this.getRequestData(rSelected);
          console.log("Data input received:"+eew2data);
-        this.props.getRecsToPrintCount(eew2data).then(response => {
-            this.setState({ w2sselected:response.w2selected});
-  
-        return response
-    }).catch(error => {
-        throw new SubmissionError(error)
-    })
-        let w2sselected;
+         var count = 0;
+         let w2sselected;
+         eew2Api.getRecsToPrintCount(eew2data).then(response => response).then((repos) => {
+            console.log('getRecsToPrintCount : '+repos)
+            count = repos;
+            w2sselected = count;
+            this.setState({rSelected:rSelected, w2sselected:w2sselected});
+            return repos
+        });
+     /*   let w2sselected;
         if(rSelected==1){
-            w2sselected = this.state.totalRec;
+            w2sselected = count; //this.state.totalRec;
         }else if(rSelected==2){
-            w2sselected = this.state.selecRec;
+            w2sselected = count;//this.state.selecRec;
         }else if(rSelected==3){
-            w2sselected ='XYZ';
+            w2sselected =count;
         }else if(rSelected==4){
-            w2sselected = 'PQR';
-        }
-        this.setState({rSelected:rSelected, w2sselected:w2sselected});
+            w2sselected = count;
+        } */
+      
     }
     onTestPrint(selected){
        if(this.testPrintOnly.checked){

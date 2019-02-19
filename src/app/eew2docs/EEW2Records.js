@@ -411,12 +411,72 @@ class EEW2Records extends React.Component {
         }
         if(selIndexes.length >0 || this.state.allSelected){
             let totalRecordsInGrid = this.state.source.totalrecords
-           this.setState({
-                showPrint: true, selecRec:selIndexes.length,optSelec:optSelec,totalRec:totalRecordsInGrid,recordsSelected:recSelected
+           
+            var eew2data = this.getPrintRequestData(optSelec,recSelected);
+            console.log("Data input received:"+eew2data);
+            var count = 0;
+            let w2sselected;
+            eew2Api.getRecsToPrintCount(eew2data).then(response => response).then((repos) => {
+               console.log('getRecsToPrintCount : '+repos)
+               this.setState({
+                totalRec:repos
             });
+            this.setState({
+                showPrint: true, selecRec:selIndexes.length,optSelec:optSelec,recordsSelected:recSelected //,totalRec:totalRecordsInGrid
+            });
+
+               return repos
+           });
+
         }else{
             this.showAlert(true,'Print W2','Please select at least one employee record from the grid or check Select All option to Print W2s.');
         }
+    }
+    getPrintRequestData(actionClicked,recSelected){
+        var fLabel;
+      //  var eew2data={};
+        var w2PrintRequestInput ={};
+        const dataset = appDataset();
+        console.log(this.state.recordsSelected);
+        console.log("SortBY:"+this.state.selectedPrintOption);
+       var w2RequestInputs=[];
+       recSelected.forEach(function (data) {
+            console.log('requestno');
+            console.log(data.requestno);
+            if(data.empid=='All'){
+                w2RequestInputs.push({"transmitterId":data.tranFein,"companyId":data.compFein,"empId":"","allRecs":true,"requestno":data.requestno});
+            }else{
+             var  empId = data.requestno+"~"+data.compFein+"~"+data.empkey;
+                w2RequestInputs.push({"transmitterId":'',"companyId":'',"empId":empId,"allRecs":false,"requestno":data.requestno});
+            }
+        });
+        let optSelec = this.props.optSelec;
+       let printType = '';
+        if(actionClicked == 1)
+        printType = 'A';
+        else if(actionClicked == 2)
+        printType = 'S';
+        else if(actionClicked== 3)
+        printType = 'P';
+        else if(actionClicked == 4)
+        printType = 'M';
+        let grindRecInputData  = this.props.eew2data.eew2recordInput;
+        w2PrintRequestInput = {
+                 "dataset": dataset,
+                 "isLatest": true,
+                 "year": grindRecInputData.year,//data.eew2recordInput.year,
+                 "isCorrection":false,
+                 "printType":printType,
+               "sortOrder":'S',
+                "fromEmpNo":'',
+               "toEmpNo":'',
+              "isTestMode":false,
+              "w2RequestInputs": w2RequestInputs
+             };
+             console.log('stageRecordsToPrint ===>');
+             console.log(w2PrintRequestInput);
+        
+        return w2PrintRequestInput;
     }
     toggleSuccess(message){
         this.setState({
