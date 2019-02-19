@@ -11,7 +11,7 @@ import {testjnlp}  from '../comp_outputs/compViewAction';
 import eew2Api from './eew2AdminAPI';
 import Select from 'react-select';
 import AsyncSelect from 'react-select/lib/Async';
-import {divStyleep,selZindx} from '../../base/constants/AppConstants';
+import {divStyleep,selZindx,disableathing,enableathing} from '../../base/constants/AppConstants';
 import styles from '../../css/cfapp.css';
 const yearSpan = 7;
 const PRINT_PDFS = 1;
@@ -99,7 +99,8 @@ class PrintW2s extends React.Component {
                 w2sselected:w2sselected,
                 filterlabel:this.props.filterlabel,
                 year:this.props.year,
-                printIds:[]
+                printIds:[],
+                disablecancel:false
                 
                
             };
@@ -136,10 +137,12 @@ class PrintW2s extends React.Component {
                     clearInterval(this.printinterval);
                     console.log('isprintinprogress.status Failed');
                     console.log(this.props.isprintinprogress.status);
+                    this.setState({printIds:[],disableviewpdf:false,disablecancel:false});
                 }else if(this.props.isprintinprogress.status==='Processed'){
                     clearInterval(this.printinterval);
                     console.log('isprintinprogress.status Processed');
                     console.log(this.props.isprintinprogress.status);
+                    this.setState({printIds:[],disableviewpdf:false,disablecancel:false});
                     console.log('Now Launch JNLP from here ====================>');
                     this.props.testjnlp(dataset, printid).then(() => {
                     });
@@ -261,7 +264,7 @@ class PrintW2s extends React.Component {
             eew2Api.stageRecordsToPrint(eew2data).then(response => response).then((repos) => {
                 if(repos.printIds && repos.printIds.length >0){
                     console.log(repos.printIds[0])
-                    this.setState({printIds:repos.printIds[0]});
+                    this.setState({printIds:repos.printIds[0],disableviewpdf:true,disablecancel:true});
                     this.handlePrintProgress();
                     this.printinterval = setInterval(this.handlePrintProgress.bind(this), PRINTGEN_TIMER);
                 }
@@ -418,7 +421,7 @@ class PrintW2s extends React.Component {
         return (
             <div>
                 <Modal size="lg" isOpen={this.props.showPrint} backdrop="static">
-                    <ModalHeader toggle={this.toggleUIPrintCancel}>Print W2 Records</ModalHeader>
+                    <ModalHeader style={this.state.disablecancel==false ? enableathing: disableathing} toggle={this.toggleUIPrintCancel}>Print W2 Records</ModalHeader>
                     <ModalBody>
                        
                     <Form>
@@ -518,7 +521,7 @@ class PrintW2s extends React.Component {
                         </Form>
                     </ModalBody>
                     <ModalFooter>
-                        <Button color="secondary" className="btn btn-primary mr-auto" onClick={() => this.toggleUIPrintCancel()}>Cancel</Button>{' '}
+                        <Button disabled={this.state.disablecancel} color="secondary" className="btn btn-primary mr-auto" onClick={() => this.toggleUIPrintCancel()}>Cancel</Button>{' '}
                         <Button disabled={this.state.disableviewpdf} onClick={() => this.onPerformAction(1)}  color="success">Print W2s</Button>
                     </ModalFooter>
                 </Modal>
