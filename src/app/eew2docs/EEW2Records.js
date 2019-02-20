@@ -133,7 +133,7 @@ class EEW2Records extends React.Component {
             divStyleRD:false,
             hlptooltipOpen1:false
         };
-        //this.handleInProgress();
+        this.handleInProgress();
         this.interval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
        // this.interval = setInterval(this.handlePrintProgress.bind(this), PRINTGEN_TIMER);
     }
