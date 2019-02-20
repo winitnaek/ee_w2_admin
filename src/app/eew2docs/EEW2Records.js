@@ -41,7 +41,8 @@ class EEW2Records extends React.Component {
                     { name: 'empkey', type: 'string' },
                     { name: 'last4digits', type: 'string' },
                     { name: 'year', type: 'int' },
-                    { name: 'correction', type: 'boolean' }
+                    { name: 'correction', type: 'boolean' },
+                    { name: 'traceid', type: 'int' }
                 ],
                 url: getRecsUrl,
                 type: "POST",
@@ -70,6 +71,7 @@ class EEW2Records extends React.Component {
             this.toggleSelAll=this.toggleSelAll.bind(this);
             this.toggleRstAll=this.toggleRstAll.bind(this);
             this.togglePstSel=this.togglePstSel.bind(this);
+            this.togglePstSelCorr=this.togglePstSelCorr.bind(this);
             this.togglePubW2Sel=this.togglePubW2Sel.bind(this);
             this.toggleUnPubW2Sel=this.toggleUnPubW2Sel.bind(this);
             this.togglePrintW2s=this.togglePrintW2s.bind(this);
@@ -93,6 +95,7 @@ class EEW2Records extends React.Component {
             this.onViewFailedMessages = this.onViewFailedMessages.bind(this);
             this.handlePrintProgress = this.handlePrintProgress.bind(this);
             this.hlptogglettt1 = this.hlptogglettt1.bind(this);
+            this.refreshData = this.refreshData.bind(this);
             
         this.state = {
             source: source,
@@ -101,6 +104,7 @@ class EEW2Records extends React.Component {
             selectAll:false,
             resetAll:false,
             generateOutput:false,
+            generateCorrection:false,
             publishW2:false,
             unpublishW2:false,
             printW2s:false,
@@ -131,7 +135,8 @@ class EEW2Records extends React.Component {
             optSelec:'',
             recordsSelected:'',
             divStyleRD:false,
-            hlptooltipOpen1:false
+            hlptooltipOpen1:false,
+            refreshMe:false
         };
         this.handleInProgress();
         this.interval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
@@ -147,12 +152,15 @@ class EEW2Records extends React.Component {
         this.props.actions.isOutputGenerationInprogress(dataset).then(response => {
             if(this.props.isoutinprogress.status==='In-Progress'){
                 console.log('isOutputGenerationInprogress In-Progress');
-                this.setState({divStyleRD:true, outputSuccess: false});
+                this.setState({divStyleRD:true, outputSuccess: false,refreshMe:true});
             }else if(this.props.isoutinprogress.status==='Failed'){
                 console.log('isOutputGenerationInprogress Failed');
                 this.setState({divStyleRD:false,outputSuccess: false});
             }else if(!this.props.isoutinprogress.status || this.props.isoutinprogress.status==='Processed'){
-                this.setState({divStyleRD:false});
+                if(this.state.refreshMe){
+                    this.refreshData();
+                }
+                this.setState({divStyleRD:false,refreshMe:false});
                 console.log('isOutputGenerationInprogress Processed');
             }
             return response
@@ -213,6 +221,13 @@ class EEW2Records extends React.Component {
         this.state.source.data=grindRecInputData;
         this.state.source.url=this.props.eew2data.getRecsUrl;
         this.refs.eew2Grid.clearfilters();
+        this.refs.eew2Grid.updatebounddata('data');
+        this.refs.eew2Grid.clearselection();
+    }
+    refreshData(){
+        let grindRecInputData  = this.props.eew2data.eew2recordInput;
+        this.state.source.data=grindRecInputData;
+        this.state.source.url=this.props.eew2data.getRecsUrl;
         this.refs.eew2Grid.updatebounddata('data');
         this.refs.eew2Grid.clearselection();
     }
@@ -546,20 +561,56 @@ class EEW2Records extends React.Component {
                     this.handleInProgress();
                     return repos
                 });
-                /*this.props.actions.generateOutputs(eew2recordInput).then(response => {
-                    this.setState({outputSuccess: false});
-                    //this.handleInProgress();
-                    this.refs.eew2Grid.clearselection();
-                    this.toggleSuccessNew('Generation of W2s initiated for the selected Employees.', true);
-                    this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
-                    return response
-                }).catch(error => {
-                    throw new SubmissionError(error)
-                })*/
             }
        }else{
             this.showAlert(true,'Generate W2','Please select at least one employee record from the grid or check Select All option to Generate W2s.');
        }
+    }
+    generateOpCorrection(){
+        let selIndexes = this.refs.eew2Grid.getselectedrowindexes();
+        let grindRecInputData  = this.props.eew2data.eew2recordInput;
+        this.setState({outputSuccess: false});
+        if(selIndexes.length >=1 && !this.state.allSelected && grindRecInputData.latestonly){
+                this.toggleSuccessNew('Initiating W2 Generation Correction.', true);
+                 const dataset = appDataset();
+                 let taxYear = "";
+                 selIndexes.forEach(index => {
+                     let data = this.refs.eew2Grid.getrowdata(index);
+                     taxYear = data.year
+                     return;
+                 });
+                 var w2RequestInputs=[];
+                 selIndexes.forEach(index => {
+                     let data = this.refs.eew2Grid.getrowdata(index);
+                     w2RequestInputs.push({"transmitterId":data.tranFein,"companyId":data.compFein,"empkey":data.empkey,"allRecs": false,"reportId":data.reportId,"requestno": data.requestno, "traceid":data.traceid});
+                 });
+                 console.log('w2RequestInputs generateOpCorrection===>');
+                 console.log(w2RequestInputs);
+                 var eew2recordInput = {
+                     "dataset": dataset,
+                     "year": taxYear,
+                     "isCorrection":true,
+                     "w2RequestInputs": w2RequestInputs
+                 };
+                 console.log('generateOpCorrection eew2recordInput ==>');
+                 console.log(eew2recordInput);
+                 this.props.actions.generateOutputs(eew2recordInput).then(response => {
+                    this.setState({outputSuccess: false});
+                    this.refs.eew2Grid.clearselection();
+                    this.toggleSuccessNew('Generation of W2 Correction initiated for the selected Employees.',true);
+                    this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
+                    this.handleInProgress();
+                     return response
+                 }).catch(error => {
+                     throw new SubmissionError(error)
+                 })
+        }else{
+            if(selIndexes.length ==0 || this.state.allSelected){
+                this.showAlert(true,'Generate W2 Correction','Please select only one employee record from the grid to Generate W2 Correction.');
+            }else if(!grindRecInputData.latestonly){
+                this.showAlert(true,'Generate W2 Correction','This option is available only for latest W2 record.');
+            }
+        }
     }
     tick(){
         clearInterval(this.interval);
@@ -623,6 +674,11 @@ class EEW2Records extends React.Component {
     togglePstSel(){
         this.setState({
             generateOutput: !this.state.generateOutput
+        });
+    }
+    togglePstSelCorr(){
+        this.setState({
+            generateCorrection: !this.state.generateCorrection
         });
     }
     toggleUnPubW2Sel(){
@@ -916,9 +972,7 @@ class EEW2Records extends React.Component {
                     </Tooltip> 
                      &nbsp;<a target="_blank" id="_ew2_hlpttip1" href="javascript:window.open('/help/ew2','_blank');"><i class="fas fa-question-circle fa-xs pl-1"></i></a><Tooltip placement="right" isOpen={this.state.hlptooltipOpen1} target="_ew2_hlpttip1" toggle={this.hlptogglettt1}>Help</Tooltip>
                 </h3>
-                <Alert color="primary">
-                    {data.filterlabel}
-                </Alert>
+                <p>&nbsp;</p>
                 <Alert color="success" isOpen={this.state.outputSuccess}>
                     {this.state.outputMessage}
                 </Alert>
@@ -947,6 +1001,10 @@ class EEW2Records extends React.Component {
                
                 <Tooltip placement="top" isOpen={this.state.publishW2} target="publishW2" toggle={this.togglePubW2Sel}>
                    Publish W2
+                </Tooltip>
+                <a href="#" style={this.state.divStyleRD==false ? divStyleR: divStyleRDisable} onClick={() => this.generateOpCorrection()} id="generateCorrection"><i class='fab fa-contao fa-lg'></i></a>
+                <Tooltip placement="bottom" isOpen={this.state.generateCorrection} target="generateCorrection" toggle={this.togglePstSelCorr}>
+                    Generate W2 Correction
                 </Tooltip>
                 <a href="#" style={this.state.divStyleRD==false ? divStyleR: divStyleRDisable} onClick={() => this.generateOutput()} id="generateOutput"><i class='fas fa-tasks fa-lg'></i></a>
                 <Tooltip placement="left" isOpen={this.state.generateOutput} target="generateOutput" toggle={this.togglePstSel}>
