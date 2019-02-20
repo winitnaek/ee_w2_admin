@@ -133,7 +133,7 @@ class EEW2Records extends React.Component {
             divStyleRD:false,
             hlptooltipOpen1:false
         };
-        //this.handleInProgress();
+        this.handleInProgress();
         this.interval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
        // this.interval = setInterval(this.handlePrintProgress.bind(this), PRINTGEN_TIMER);
     }
@@ -893,6 +893,7 @@ class EEW2Records extends React.Component {
             let data =this.refs.eew2Grid.getrowdata(id);
             this.handleShowPDF(data);
         }
+        let grindInputData  = this.props.eew2data.eew2recordInput;
         let columns =
             [
                 { text: 'Company Name', datafield: 'compName',  cellsalign: 'center',width: 'auto', align: 'center', cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
@@ -910,8 +911,8 @@ class EEW2Records extends React.Component {
             ];
         return (
             <div>
-                <h3 class="text-bsi">Manage W2 Records 
-                    <a href="#" onClick={() => this.goToFilterPage()} id="filterDataId"><i class="fas fa-filter fa-xs" title="Filter"></i></a>
+                <h3 class="text-bsi">Manage W2 Records (<small>{grindInputData.year}</small>)
+                    &nbsp;<a href="#" onClick={() => this.goToFilterPage()} id="filterDataId"><i class="fas fa-filter fa-xs" title="Filter"></i></a>
                     <Tooltip placement="top" isOpen={this.state.filterData} target="filterDataId" toggle={this.toggleFilDat}>
                    
                     Filter

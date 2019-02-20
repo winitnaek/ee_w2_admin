@@ -109,7 +109,7 @@ class FilterPayrollData extends Component {
         this.onDismiss = this.onDismiss.bind(this);
         this.onActionDone = this.onActionDone.bind(this);
         this.hlptogglettt = this.hlptogglettt.bind(this);
-        this.interval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
+        //this.interval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
     }
     handleInProgress(){
         const dataset = appDataset();
@@ -333,7 +333,8 @@ class FilterPayrollData extends Component {
             };
             console.log('getRequestGenerateData ===>');
             console.log(eew2recordInput);
-            fLabel = 'W2 Generation Initiated for the selected companies and employees'
+            //fLabel = 'W2 Generation Initiated for the selected companies and employees'
+            fLabel = 'W2s  for the Year '+this.yearSelected.value;
             this.props.eew2data.filtertype  = this.state.pSelected;
         }else if(actionClicked==PUBLISH_W2S){
             eew2recordInput = {
@@ -380,9 +381,11 @@ class FilterPayrollData extends Component {
             var eew2data = this.getRequestData(actionClicked);
             eew2data.eew2ecords=[];
             this.props.generateOutputs(eew2data.eew2recordInput).then(response => {
-                this.toggleActAlert('Generation of W2s initiated for the selected Employees.');
-                this.alertinterval = setInterval(this.tick2.bind(this), ALERTINTERVAL);
-                this.onActionDone(GENERATE_W2S);
+                //this.toggleActAlert('Generation of W2s initiated for the selected Employees.');
+                //this.alertinterval = setInterval(this.tick2.bind(this), ALERTINTERVAL);
+                //this.onActionDone(GENERATE_W2S);
+                this.props.loadEEW2Records(eew2data);
+                renderW2AdmApplication(appAnchor(),RN_EEW2_RECORDS);
                 return response
             }).catch(error => {
                 throw new SubmissionError(error)
