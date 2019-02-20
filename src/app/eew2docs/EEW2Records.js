@@ -714,6 +714,9 @@ class EEW2Records extends React.Component {
                 allSelected: false
             });
         });
+        this.refs.eew2Grid.on('pagechanged', (event) => {
+            this.refs.eew2Grid.updatebounddata('data');
+        });
     }
     componentDidUpdate(){
         //$('.tooltipempw2').tooltip({trigger : 'hover'});
@@ -1012,6 +1015,7 @@ class EEW2Records extends React.Component {
                 </Tooltip>
                 <JqxGrid ref='eew2Grid'
                     width={'100%'} source={dataAdapter} pageable={true}
+                    pagesizeoptions={['10', '25', '50']} 
                     sortable={true} altrows={false} enabletooltips={false}
                     autoheight={true} editable={false} columns={columns}
                     filterable={true} showfilterrow={true} virtualmode={true}
