@@ -205,8 +205,7 @@ class PrintW2s extends React.Component {
      */
     getRequestData(actionClicked){
         var fLabel;
-      //  var eew2data={};
-        var w2PrintRequestInput ={};
+      var w2PrintRequestInput ={};
         const dataset = appDataset();
         console.log(this.state.w2dgridata);
         console.log("SortBY:"+this.state.selectedPrintOption);
@@ -244,7 +243,7 @@ class PrintW2s extends React.Component {
               "isTestMode":(this.testPrintOnly.checked==true) ? true:false,
               "w2RequestInputs": w2RequestInputs
              };
-             console.log('stageRecordsToPrint ===>');
+             console.log('getRequestData ===>');
              console.log(w2PrintRequestInput);
         
         return w2PrintRequestInput;
@@ -267,7 +266,7 @@ class PrintW2s extends React.Component {
                 }
                 return repos
             });
-            //renderW2AdmApplication(appAnchor(),RN_EEW2_RECORDS);
+          
     }
     /**
      * onActionDone
@@ -318,6 +317,7 @@ class PrintW2s extends React.Component {
     }
     onRadioPrinClick(rSelected) {
         this.setState({rSelected:rSelected});
+        console.log("rSelected:"+this.state.rSelected);
         var eew2data = this.getRequestData(rSelected);
          console.log("Data input received:"+eew2data);
          var count = 0;
@@ -329,16 +329,22 @@ class PrintW2s extends React.Component {
             this.setState({rSelected:rSelected, w2sselected:w2sselected});
             return repos
         });
-     /*   let w2sselected;
-        if(rSelected==1){
-            w2sselected = count; //this.state.totalRec;
-        }else if(rSelected==2){
-            w2sselected = count;//this.state.selecRec;
-        }else if(rSelected==3){
-            w2sselected =count;
-        }else if(rSelected==4){
+   
+    }
+    onCorrectedRecClick() {
+      console.log("rSelected:"+this.state.rSelected);
+        var eew2data = this.getRequestData(this.state.rSelected);
+         console.log("onCorrectedRecClick Data input received:"+eew2data);
+         var count = 0;
+         let w2sselected;
+         eew2Api.getRecsToPrintCount(eew2data).then(response => response).then((repos) => {
+            console.log('getRecsToPrintCount : '+repos)
+            count = repos;
             w2sselected = count;
-        } */
+          this.setState({ w2sselected:w2sselected});
+            return repos
+        });
+    
       
     }
     onTestPrint(selected){
@@ -474,7 +480,7 @@ class PrintW2s extends React.Component {
                         </FormGroup>
                         <FormGroup row style={{ paddingLeft: 20 }}>
                                 <Label for="periodBy1" sm={3}></Label>
-                                <CustomInput type="checkbox" innerRef={(inputc) => this.correctedOnly = inputc} id="exampleCustomSwitch1" defaultChecked={false} name="customSwitch1" label="Corrected Records Only" />
+                                <CustomInput type="checkbox" innerRef={(inputc) => this.correctedOnly = inputc} id="exampleCustomSwitch1" defaultChecked={false} name="customSwitch1" label="Corrected Records Only" onChange={() => this.onCorrectedRecClick()}/>
                                 &nbsp;
                                 <a href="#" id="selAllInfoId1"><i class="fas fa-info-circle fa-sm"></i></a>
                                 <Tooltip placement="right" isOpen={this.state.selAllInfoc} target="selAllInfoId1" toggle={this.toggleselAllInfoc}>
