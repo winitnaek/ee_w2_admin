@@ -333,7 +333,8 @@ class FilterPayrollData extends Component {
             };
             console.log('getRequestGenerateData ===>');
             console.log(eew2recordInput);
-            fLabel = 'W2 Generation Initiated for the selected companies and employees'
+            //fLabel = 'W2 Generation Initiated for the selected companies and employees'
+            fLabel = 'W2s  for the Year '+this.yearSelected.value;
             this.props.eew2data.filtertype  = this.state.pSelected;
         }else if(actionClicked==PUBLISH_W2S){
             eew2recordInput = {
