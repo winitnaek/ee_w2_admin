@@ -119,3 +119,9 @@ export const divStyleRDisable = {
     float: 'right',
     marginLeft: '20px'
 };
+export const disableathing = {
+    pointerEvents:'none',
+};
+export const enableathing = {
+    pointerEvents:'',
+};
