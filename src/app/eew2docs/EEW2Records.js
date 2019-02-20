@@ -608,7 +608,7 @@ class EEW2Records extends React.Component {
             if(selIndexes.length ==0 || this.state.allSelected){
                 this.showAlert(true,'Generate W2 Correction','Please select only one employee record from the grid to Generate W2 Correction.');
             }else if(!grindRecInputData.latestonly){
-                this.showAlert(true,'Generate W2 Correction','This option is available only for latest W2 record.');
+                this.showAlert(true,'Generate W2 Correction','This option is available for Latest W2 Records only.');
             }
         }
     }
