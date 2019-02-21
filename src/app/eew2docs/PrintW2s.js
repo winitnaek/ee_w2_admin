@@ -528,7 +528,7 @@ class PrintW2s extends React.Component {
                     </ModalBody>
                     <ModalFooter>
                         <Button disabled={this.state.disablecancel} color="secondary" className="btn btn-primary mr-auto" onClick={() => this.toggleUIPrintCancel()}>Cancel</Button>{' '}
-                        <Button disabled={this.state.disableviewpdf} onClick={() => this.onPerformAction(1)}  color="success">Print W2s</Button>
+                        <Button disabled={this.state.disableviewpdf} onClick={() => this.onPerformAction(this.state.rSelected)}  color="success">Print W2s</Button>
                     </ModalFooter>
                 </Modal>
             </div>
