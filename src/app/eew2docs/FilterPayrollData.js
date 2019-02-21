@@ -109,7 +109,10 @@ class FilterPayrollData extends Component {
         this.onDismiss = this.onDismiss.bind(this);
         this.onActionDone = this.onActionDone.bind(this);
         this.hlptogglettt = this.hlptogglettt.bind(this);
-        //this.interval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
+        if(this.props.openFromGrid){
+            this.handleInProgress();
+            this.interval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
+        }
     }
     handleInProgress(){
         const dataset = appDataset();
@@ -750,8 +753,8 @@ class FilterPayrollData extends Component {
                                 <Label for="filterType" sm={2}>Action</Label>
                                 <Col sm={7}>
                                 <ButtonGroup>
-                                    <Button outline disabled={this.state.openFromGrid} color="info" onClick={() => this.onActionBtnSelected(2)} active={this.state.pSelected === 2}>Generate</Button>
-                                    <Button outline disabled={this.state.divStyleGenD}  color="info" onClick={() => this.onActionBtnSelected(1)} active={this.state.pSelected === 1}>View</Button>
+                                    <Button outline color="info" onClick={() => this.onActionBtnSelected(1)} active={this.state.pSelected === 1}>View</Button>
+                                    <Button outline color="info" onClick={() => this.onActionBtnSelected(2)} active={this.state.pSelected === 2}>Generate</Button>
                                 </ButtonGroup>
                                 </Col>
                             </FormGroup>

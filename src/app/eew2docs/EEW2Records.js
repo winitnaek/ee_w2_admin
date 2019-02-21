@@ -197,13 +197,13 @@ class EEW2Records extends React.Component {
             });
         }else{
             this.refs.eew2Grid.clearselection();
-            this.showConfirm(true,'Select All', this.getSelAllMessage());
+            this.showConfirm(true,'Select all records', this.getSelAllMessage());
         }
         
     }
     getSelAllMessage(){
-        let grindRecInputData  = this.props.eew2data.eew2recordInput;
-        let cbody = 'Employees that satisfy the filter condition set in ‘Manage W2 Records’ modal display in this grid. From here, one can view, generate, publish and/or un-publish W2s for these Employees.';
+        //let grindRecInputData  = this.props.eew2data.eew2recordInput;
+        let cbody = 'This action will select all records based on your selection criteria. Records from all visible/non-visible pages will be selcted.';
         return cbody;
     }
     resetAll(){
@@ -536,7 +536,7 @@ class EEW2Records extends React.Component {
                 this.props.actions.generateOutputs(eew2recordInput).then(response => {
                     this.setState({outputSuccess: false});
                     this.refs.eew2Grid.clearselection();
-                    this.toggleSuccessNew('Generation of W2s initiated for the selected Employees.',true);
+                    this.toggleSuccessNew('Generation initiated for the selected employees successfully.',true);
                    this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
                    this.handleInProgress();
                     return response
@@ -906,7 +906,7 @@ class EEW2Records extends React.Component {
         let uiDelConfirm = <UIConfirm handleOk={this.handleConfirmOk} handleCancel={this.handleConfirmCancel}  showConfirm={this.state.showConfirm} cheader={this.state.cheader} cbody={this.state.cbody} okbtnlbl={'Ok'} cancelbtnlbl={'Cancel'}/>;
         let data = this.props.eew2data;
         let printW2s = <PrintW2s handleOk={this.handlePrintOk} handleCancel={this.handlePrintCancel} showPrint={this.state.showPrint} totalRec={this.state.totalRec} optSelec={this.state.optSelec} selecRec={this.state.selecRec} filterlabel={'Number of W2s selected for the print for Year '+data.eew2recordInput.year} recordsSelected={this.state.recordsSelected} year={data.eew2recordInput.year}/>
-        let cbody  = 'Select All'; //this.getSelAllMessage();
+        let cbody  = 'Select all records'; //this.getSelAllMessage();
         let selectall = <div><a href="#" style={divStyleFirst} onClick={() => this.selectAllClk()} id="selectAllid"><i class="fas fa-check-square fa-lg"></i></a>
         <Tooltip placement="top" isOpen={this.state.selectAll} target="selectAllid" toggle={this.toggleSelAll}>
             {cbody}
@@ -953,7 +953,7 @@ class EEW2Records extends React.Component {
         let columns =
             [
                 { text: 'Company Name', datafield: 'compName',  cellsalign: 'center',width: 'auto', align: 'center', cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
-                    return `<a href="#" data-toggle="tooltip" class="tooltipcomp2" title="View Company Artifacts"><div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadCompData('${ndex}')}>${rowdata.compName}</button></div></a>`;
+                    return `<a href="#" data-toggle="tooltip" class="tooltipcomp2" title="${'View '+rowdata.compName+' artifacts'}"><div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadCompData('${ndex}')}>${rowdata.compName}</button></div></a>`;
                    },filtertype: 'input'},
                 { text: 'Run Date/Time', datafield: 'generatedDateTime', width: 'auto',  cellsalign: 'center',align: 'center',  cellsformat: 'MM-dd-yyyy hh:mm:00 tt', filtertype: 'range' },
                 { text: 'First Name', cellclassname:"gridcelltxt", datafield: 'empFname', cellsalign: 'center', align: 'center',width: 'auto',filtertype: 'input' },
@@ -968,10 +968,9 @@ class EEW2Records extends React.Component {
         return (
             <div>
                 <h3 class="text-bsi">Manage W2 Records (<small>{grindInputData.year}</small>)
-                    &nbsp;<a href="#" onClick={() => this.goToFilterPage()} id="filterDataId"><i class="fas fa-filter fa-xs" title="Filter"></i></a>
+                    &nbsp;<a href="#" onClick={() => this.goToFilterPage()} id="filterDataId"><i class="fas fa-filter fa-xs" title=""></i></a>
                     <Tooltip placement="top" isOpen={this.state.filterData} target="filterDataId" toggle={this.toggleFilDat}>
-                   
-                    Filter
+                        Modify selection criteria
                     </Tooltip> 
                      &nbsp;<a target="_blank" id="_ew2_hlpttip1" href="javascript:window.open('/help/ew2','_blank');"><i class="fas fa-question-circle fa-xs pl-1"></i></a><Tooltip placement="right" isOpen={this.state.hlptooltipOpen1} target="_ew2_hlpttip1" toggle={this.hlptogglettt1}>Help</Tooltip>
                 </h3>
@@ -980,7 +979,7 @@ class EEW2Records extends React.Component {
                     {this.state.outputMessage}
                 </Alert>
                 <Alert color="success" isOpen={this.props.isoutinprogress.status==='In-Progress'}>
-                    <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner fa-spin"></i> Output Generation is In-Progress.</span>
+                    <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner fa-spin"></i> Output Generation is in progress.</span>
                 </Alert>
                 <Alert color="danger" isOpen={this.props.isoutinprogress.status==='Failed'}>
                     <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner"></i> Output Generation Failed. <Button style={{padding:'0em'}}  onClick={() => this.onViewFailedMessages(this.props.isoutinprogress.requestno,this.props.isoutinprogress.compName,this.props.isoutinprogress.compFein)} color="link">View Messages</Button></span>
@@ -988,7 +987,7 @@ class EEW2Records extends React.Component {
                 {this.state.allSelected ? selectall: selectallnone}
                 <a href="#"  style={divStyle} onClick={() => this.resetAll()} id="resetAll"><i class='fas fa-redo-alt fa-lg'></i></a>
                 <Tooltip placement="right" isOpen={this.state.resetAll} target="resetAll" toggle={this.toggleRstAll}>
-                    Reset Selection
+                    Reset filters and refresh.
                 </Tooltip>
                 <a href="#" style={this.state.divStyleRD==false ? divStyleR: divStyleRDisable} onClick={() => this.printW2s()} id="printW2s"><i class='fas fa-print fa-lg'></i></a>
                
