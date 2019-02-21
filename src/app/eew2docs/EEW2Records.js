@@ -987,7 +987,7 @@ class EEW2Records extends React.Component {
                 {this.state.allSelected ? selectall: selectallnone}
                 <a href="#"  style={divStyle} onClick={() => this.resetAll()} id="resetAll"><i class='fas fa-redo-alt fa-lg'></i></a>
                 <Tooltip placement="right" isOpen={this.state.resetAll} target="resetAll" toggle={this.toggleRstAll}>
-                    Reset filters and refresh.
+                    Reset filters and refresh
                 </Tooltip>
                 <a href="#" style={this.state.divStyleRD==false ? divStyleR: divStyleRDisable} onClick={() => this.printW2s()} id="printW2s"><i class='fas fa-print fa-lg'></i></a>
                
