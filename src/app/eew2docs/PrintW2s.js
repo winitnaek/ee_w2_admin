@@ -225,14 +225,14 @@ class PrintW2s extends React.Component {
         });
         let optSelec = this.props.optSelec;
        let printType = '';
-        if(actionClicked == 1)
-        printType = 'A';
-        else if(actionClicked == 2)
-        printType = 'S';
-        else if(actionClicked== 3)
-        printType = 'P';
-        else if(actionClicked == 4)
-        printType = 'M';
+       if(this.state.rSelected == 1)
+       printType = 'A';
+       else if(this.state.rSelected == 2)
+       printType = 'S';
+       else if(this.state.rSelected== 3)
+       printType = 'P';
+       else if(this.state.rSelected == 4)
+       printType = 'M';
 
         w2PrintRequestInput = {
                  "dataset": dataset,
