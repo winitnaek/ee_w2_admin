@@ -241,8 +241,8 @@ class PrintW2s extends React.Component {
                  "isCorrection": (this.correctedOnly.checked==true) ? true:false,
                  "printType":printType,
                "sortOrder":this.state.selectedPrintOption.value,
-                "fromEmpNo":'',
-               "toEmpNo":'',
+                "fromEmpNo":this.inputPrintFrmSel.value,
+               "toEmpNo":this.inputPrintToSel.value,
               "isTestMode":(this.testPrintOnly.checked==true) ? true:false,
               "w2RequestInputs": w2RequestInputs
              };
