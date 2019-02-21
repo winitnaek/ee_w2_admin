@@ -445,7 +445,7 @@ class PrintW2s extends React.Component {
                         <Label for="periodBy1" sm={1}></Label>
                         <Col sm={10}>
                         <Alert color="success" isOpen={this.props.isprintinprogress.status==='In-Progress'}>
-                            <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner fa-spin"></i> Print output generation is in progress.</span>
+                            <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner fa-spin"></i> Print Output Generation is in progress.</span>
                         </Alert>
                         </Col>
                         </FormGroup>
@@ -454,7 +454,7 @@ class PrintW2s extends React.Component {
                         <FormGroup row>
                         <Label for="periodBy1" sm={1}></Label>
                         <Col sm={10}><Alert color="danger" isOpen={this.props.isprintinprogress.status==='Failed'}>
-                            <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner"></i>  Print output generation failed. Please contact your system administrator.</span>
+                            <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner"></i>  Print Output Generation failed. Please contact your system administrator.</span>
                         </Alert> 
                         </Col>
                         </FormGroup>
