@@ -9,7 +9,7 @@ import FilterPayrollData from './app/eew2docs/FilterPayrollData';
 import EEW2RecordsGrid from './app/eew2docs/EEW2RecordsGrid';
 
 import * as rname from './base/constants/RenderNames';
-
+import Progress from './app/common/Progress';
 import * as manifest from '../build/_manifest';
 import * as c from './base/constants/IndexConstants';
 import {makeNavs,makeSearch} from './base/template/navGenerator';
@@ -38,11 +38,14 @@ function renderW2AdmApplication(elem, renderName) {
     setAppAnchor(elem);
     setAppDataset(dataset);
     if(renderName===rname.RN_FILTER_PAYROLL_DATA){
+       ReactDOM.render(<Provider store={store}><Progress/></Provider>,document.querySelector('#'+elem));
        store.dispatch(getTransmitters(dataset)).then((result) => {
-        renderFilterPayrollData(elem);
+        setTimeout(function() {    
+            renderFilterPayrollData(elem);
+        }.bind(this), 600)
        }).catch((error) => {
             throw new SubmissionError({_error:  error });
-       });		
+       });
     }else if(renderName===rname.RN_EEW2_RECORDS){
         renderEEW2RecordsGrid(elem)
     }
