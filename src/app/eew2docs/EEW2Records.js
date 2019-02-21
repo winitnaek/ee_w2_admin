@@ -972,7 +972,7 @@ class EEW2Records extends React.Component {
                     <Tooltip placement="top" isOpen={this.state.filterData} target="filterDataId" toggle={this.toggleFilDat}>
                         Modify selection criteria
                     </Tooltip> 
-                     &nbsp;<a target="_blank" id="_ew2_hlpttip1" href="javascript:window.open('/help/ew2','_blank');"><i class="fas fa-question-circle fa-xs pl-1"></i></a><Tooltip placement="right" isOpen={this.state.hlptooltipOpen1} target="_ew2_hlpttip1" toggle={this.hlptogglettt1}>Help</Tooltip>
+                     &nbsp;<a target="_blank" id="_ew2_hlpttip1" href="javascript:window.open('/help/eew2','_blank');"><i class="fas fa-question-circle fa-xs pl-1"></i></a><Tooltip placement="right" isOpen={this.state.hlptooltipOpen1} target="_ew2_hlpttip1" toggle={this.hlptogglettt1}>Help</Tooltip>
                 </h3>
                 <p>&nbsp;</p>
                 <Alert color="success" isOpen={this.state.outputSuccess}>
