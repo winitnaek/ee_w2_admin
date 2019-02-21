@@ -391,12 +391,6 @@ class ViewCompanyAuditFiles extends Component {
                                Download Turbo Tax File
                             </Tooltip>
                         </div>
-                        <div class={false ? 'd-none' : 'd-block p-2'}>
-                            <a href="#" style={this.state.disableMe ? divStyleDisable:divStyleFloatNone} class={false ? 'd-none' : 'd-block'}  onClick={() => this.onPrintSel()} id="printIcon"><i class='fas fa-print fa-lg'></i></a>
-                            <Tooltip className={false ? 'd-none' : 'd-block'} placement="top" isOpen={this.state.printSelTip} target="printIcon" toggle={this.togglePrintSelTip}>
-                                Print All W2 PDFs
-                            </Tooltip>
-                        </div>
                     </div>
                 <div class="d-none alert alert-danger" id="errAlrtCont" role="alert">
                         <span id="errAlrt"></span>
