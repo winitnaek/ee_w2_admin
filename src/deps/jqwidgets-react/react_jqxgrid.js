@@ -1,8 +1,9 @@
 /*
-jQWidgets v5.6.0 (2018-Feb)
-Copyright (c) 2011-2017 jQWidgets.
+jQWidgets v7.1.0 (2019-Feb)
+Copyright (c) 2011-2019 jQWidgets.
 License: https://jqwidgets.com/license/
 */
+/* eslint-disable */
 
 import React from 'react';
 
@@ -11,40 +12,46 @@ const JQXLite = window.JQXLite;
 export const jqx = window.jqx;
 
 export default class JqxGrid extends React.Component {
+    constructor(props) {
+        super(props);
+        const widgetId = 'jqxGrid' + JQXLite.generateID();
+        this.componentSelector = '#' + widgetId;
+        this.state = { id: widgetId };
+    };
     componentDidMount() {
-        let options = this.manageAttributes();
+        const options = this.manageAttributes();
         this.createComponent(options);
     };
     manageAttributes() {
-        let properties = ['altrows','altstart','altstep','autoshowloadelement','autoshowfiltericon','autoshowcolumnsmenubutton','clipboard','closeablegroups','columnsmenuwidth','columnmenuopening','columnmenuclosing','cellhover','enablekeyboarddelete','enableellipsis','enablemousewheel','enableanimations','enabletooltips','enablehover','enablebrowserselection','everpresentrowposition','everpresentrowheight','everpresentrowactions','everpresentrowactionsmode','filterrowheight','filtermode','groupsrenderer','groupcolumnrenderer','groupsexpandedbydefault','handlekeyboardnavigation','pagerrenderer','rtl','showdefaultloadelement','showfiltercolumnbackground','showfiltermenuitems','showpinnedcolumnbackground','showsortcolumnbackground','showsortmenuitems','showgroupmenuitems','showrowdetailscolumn','showheader','showgroupsheader','showaggregates','showgroupaggregates','showeverpresentrow','showfilterrow','showemptyrow','showstatusbar','statusbarheight','showtoolbar','selectionmode','updatefilterconditions','updatefilterpanel','theme','toolbarheight','autoheight','autorowheight','columnsheight','deferreddatafields','groupsheaderheight','groupindentwidth','height','pagerheight','rowsheight','scrollbarsize','scrollmode','scrollfeedback','width','autosavestate','autoloadstate','columns','columngroups','columnsmenu','columnsresize','columnsautoresize','columnsreorder','disabled','editable','editmode','filter','filterable','groupable','groups','horizontalscrollbarstep','horizontalscrollbarlargestep','initrowdetails','keyboardnavigation','localization','pagesize','pagesizeoptions','pagermode','pagerbuttonscount','pageable','rowdetails','rowdetailstemplate','ready','rendered','renderstatusbar','rendertoolbar','rendergridrows','sortable','selectedrowindex','selectedrowindexes','source','sorttogglestates','updatedelay','virtualmode','verticalscrollbarstep','verticalscrollbarlargestep'];
+        const properties = ['altrows','altstart','altstep','autoshowloadelement','autoshowfiltericon','autoshowcolumnsmenubutton','showcolumnlines','showrowlines','showcolumnheaderlines','adaptive','adaptivewidth','clipboard','closeablegroups','columnsmenuwidth','columnmenuopening','columnmenuclosing','cellhover','enablekeyboarddelete','enableellipsis','enablemousewheel','enableanimations','enabletooltips','enablehover','enablebrowserselection','everpresentrowposition','everpresentrowheight','everpresentrowactions','everpresentrowactionsmode','filterrowheight','filtermode','groupsrenderer','groupcolumnrenderer','groupsexpandedbydefault','handlekeyboardnavigation','pagerrenderer','rtl','showdefaultloadelement','showfiltercolumnbackground','showfiltermenuitems','showpinnedcolumnbackground','showsortcolumnbackground','showsortmenuitems','showgroupmenuitems','showrowdetailscolumn','showheader','showgroupsheader','showaggregates','showgroupaggregates','showeverpresentrow','showfilterrow','showemptyrow','showstatusbar','statusbarheight','showtoolbar','selectionmode','updatefilterconditions','updatefilterpanel','theme','toolbarheight','autoheight','autorowheight','columnsheight','deferreddatafields','groupsheaderheight','groupindentwidth','height','pagerheight','rowsheight','scrollbarsize','scrollmode','scrollfeedback','width','autosavestate','autoloadstate','columns','columngroups','columnsmenu','columnsresize','columnsautoresize','columnsreorder','disabled','editable','editmode','filter','filterable','groupable','groups','horizontalscrollbarstep','horizontalscrollbarlargestep','initrowdetails','keyboardnavigation','localization','pagesize','pagesizeoptions','pagermode','pagerbuttonscount','pageable','rowdetails','rowdetailstemplate','ready','rendered','renderstatusbar','rendertoolbar','rendergridrows','sortable','sortmode','selectedrowindex','selectedrowindexes','source','sorttogglestates','updatedelay','virtualmode','verticalscrollbarstep','verticalscrollbarlargestep'];
         let options = {};
         for(let item in this.props) {
-              if(item === 'settings') {
-                  for(let itemTwo in this.props[item]) {
-                      options[itemTwo] = this.props[item][itemTwo];
-                      }
-                } else {
-                      if(properties.indexOf(item) !== -1) {
-                        options[item] = this.props[item];
-                      }
+            if(item === 'settings') {
+                for(let itemTwo in this.props[item]) {
+                    options[itemTwo] = this.props[item][itemTwo];
                 }
-          }
-          return options;
-      };
+            } else {
+                if(properties.indexOf(item) !== -1) {
+                      options[item] = this.props[item];
+                }
+            }
+        }
+        return options;
+    };
     createComponent(options) {
         if(!this.style) {
-              for (let style in this.props.style) {
-                  JQXLite(this.componentSelector).css(style, this.props.style[style]);
-              }
+            for (let style in this.props.style) {
+                JQXLite(this.componentSelector).css(style, this.props.style[style]);
+            }
         }
         if(this.props.className !== undefined) {
-            let classes = this.props.className.split(' ');
+            const classes = this.props.className.split(' ');
             for (let i = 0; i < classes.length; i++ ) {
                 JQXLite(this.componentSelector).addClass(classes[i]);
             }
         }
         if(!this.template) {
-              JQXLite(this.componentSelector).html(this.props.template);
+            JQXLite(this.componentSelector).html(this.props.template);
         }
         JQXLite(this.componentSelector).jqxGrid(options);
     };
@@ -107,6 +114,41 @@ export default class JqxGrid extends React.Component {
             JQXLite(this.componentSelector).jqxGrid('autoshowcolumnsmenubutton', arg)
         } else {
             return JQXLite(this.componentSelector).jqxGrid('autoshowcolumnsmenubutton');
+        }
+    };
+    showcolumnlines(arg) {
+        if (arg !== undefined) {
+            JQXLite(this.componentSelector).jqxGrid('showcolumnlines', arg)
+        } else {
+            return JQXLite(this.componentSelector).jqxGrid('showcolumnlines');
+        }
+    };
+    showrowlines(arg) {
+        if (arg !== undefined) {
+            JQXLite(this.componentSelector).jqxGrid('showrowlines', arg)
+        } else {
+            return JQXLite(this.componentSelector).jqxGrid('showrowlines');
+        }
+    };
+    showcolumnheaderlines(arg) {
+        if (arg !== undefined) {
+            JQXLite(this.componentSelector).jqxGrid('showcolumnheaderlines', arg)
+        } else {
+            return JQXLite(this.componentSelector).jqxGrid('showcolumnheaderlines');
+        }
+    };
+    adaptive(arg) {
+        if (arg !== undefined) {
+            JQXLite(this.componentSelector).jqxGrid('adaptive', arg)
+        } else {
+            return JQXLite(this.componentSelector).jqxGrid('adaptive');
+        }
+    };
+    adaptivewidth(arg) {
+        if (arg !== undefined) {
+            JQXLite(this.componentSelector).jqxGrid('adaptivewidth', arg)
+        } else {
+            return JQXLite(this.componentSelector).jqxGrid('adaptivewidth');
         }
     };
     clipboard(arg) {
@@ -767,6 +809,13 @@ export default class JqxGrid extends React.Component {
             return JQXLite(this.componentSelector).jqxGrid('sortable');
         }
     };
+    sortmode(arg) {
+        if (arg !== undefined) {
+            JQXLite(this.componentSelector).jqxGrid('sortmode', arg)
+        } else {
+            return JQXLite(this.componentSelector).jqxGrid('sortmode');
+        }
+    };
     selectedrowindex(arg) {
         if (arg !== undefined) {
             JQXLite(this.componentSelector).jqxGrid('selectedrowindex', arg)
@@ -1133,10 +1182,8 @@ export default class JqxGrid extends React.Component {
         return JQXLite(this.componentSelector).jqxGrid('savestate');  
     };
     render() {
-        let id = 'jqxGrid' + JQXLite.generateID();
-        this.componentSelector = '#' + id;
         return (
-            <div id={id}>{this.props.value}{this.props.children}</div>
+            <div id={this.state.id}>{this.props.value}{this.props.children}</div>
         )
     };
 };

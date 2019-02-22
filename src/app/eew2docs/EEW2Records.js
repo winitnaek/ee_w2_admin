@@ -715,9 +715,6 @@ class EEW2Records extends React.Component {
                 allSelected: false
             });
         });
-        this.refs.eew2Grid.on('pagechanged', (event) => {
-            this.refs.eew2Grid.updatebounddata('data');
-        });
     }
     componentDidUpdate(){
         //$('.tooltipempw2').tooltip({trigger : 'hover'});
