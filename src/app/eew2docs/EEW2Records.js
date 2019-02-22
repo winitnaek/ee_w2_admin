@@ -93,7 +93,6 @@ class EEW2Records extends React.Component {
             this.handlePrintCancel = this.handlePrintCancel.bind(this);
             this.toggleFromGrid = this.toggleFromGrid.bind(this);
             this.onViewFailedMessages = this.onViewFailedMessages.bind(this);
-            this.handlePrintProgress = this.handlePrintProgress.bind(this);
             this.hlptogglettt1 = this.hlptogglettt1.bind(this);
             this.refreshData = this.refreshData.bind(this);
             
@@ -140,7 +139,6 @@ class EEW2Records extends React.Component {
         };
         this.handleInProgress();
         this.geninterval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
-       // this.interval = setInterval(this.handlePrintProgress.bind(this), PRINTGEN_TIMER);
     }
      hlptogglettt1() {
         this.setState({
@@ -174,10 +172,6 @@ class EEW2Records extends React.Component {
             console.log('Generate Output interval is cleared.');
             console.log(error);
         });
-    }
-    handlePrintProgress(){
-        const dataset = appDataset();
-        this.props.actions.isPrintGenerationInprogress(dataset)
     }
     hoverOn(){
         this.setState({ hover: true });

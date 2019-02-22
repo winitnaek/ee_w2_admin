@@ -135,17 +135,17 @@ export function isPrintGenerationInprogress(dataset,printid) {
         const state = getState();
         return eew2AdminAPI.isPrintGenerationInprogress(dataset,printid).then(printinprogress => {
             if(printinprogress.status && printinprogress.message){
-                let arr = [];
-                arr.push([]);
+                let arr = {"status" :printinprogress.status, "message":printinprogress.message};
                 dispatch(isPrintGenerationFailed(arr));
-                throw printinprogress;
+                //throw printinprogress;
             }else{
                 if(printinprogress){
                    dispatch(isPrintGenerationSuccess(printinprogress));
                 }
             }
         }).catch(error => {
-            generateAppErrorEvent(error.type,error.status,error.message,error);
+            return error;
+            //generateAppErrorEvent(error.type,error.status,error.message,error);
         });
     };
 }

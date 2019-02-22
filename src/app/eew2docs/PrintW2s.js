@@ -130,7 +130,11 @@ class PrintW2s extends React.Component {
         console.log(printid);
         if(this.state.printIds && this.state.printIds > 0){
             this.props.isPrintGenerationInprogress(dataset,printid).then(response => {
-                if(this.props.isprintinprogress.status==='In-Progress'){
+                if(this.props.isprintinprogress && this.props.isprintinprogress.message && this.props.isprintinprogress.status){
+                    console.log('Error Occured In PrintW2s handlePrintProgress');
+                    clearInterval(this.printinterval);
+                    console.log('Print interval is cleared.');
+                }else if(this.props.isprintinprogress.status==='In-Progress'){
                     console.log('isprintinprogress.status In-Progress');
                     console.log(this.props.isprintinprogress.status);
                 }else if(this.props.isprintinprogress.status==='Failed'){

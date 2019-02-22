@@ -59,7 +59,7 @@ class eew2AdminAPI {  static geteew2records(eew2recordInput) {
           return response.json();
         }else{
           var errorCode =  response.status;
-          var errorMsg  =  'Unable to post EE W2 Generate Outputs. '+ADMIN_ERROR_MSG;
+          var errorMsg  =  'Unable to generate w2s. '+ADMIN_ERROR_MSG;
           return new AppError(errorMsg, errorCode);
         } 
       })
