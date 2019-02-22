@@ -139,7 +139,7 @@ class EEW2Records extends React.Component {
             refreshMe:false
         };
         this.handleInProgress();
-        this.interval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
+        this.geninterval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
        // this.interval = setInterval(this.handlePrintProgress.bind(this), PRINTGEN_TIMER);
     }
      hlptogglettt1() {
@@ -165,7 +165,7 @@ class EEW2Records extends React.Component {
             }
             return response
         }).catch(error => {
-            throw new SubmissionError(error)
+            clearInterval(this.geninterval);
         });
     }
     handlePrintProgress(){
@@ -277,7 +277,7 @@ class EEW2Records extends React.Component {
                         });
                         this.refs.eew2Grid.updatebounddata('data');
                         this.toggleSuccess('Employee W2 Output Un-Published Successfully!');
-                        this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
+                        this.alertinterval = setInterval(this.tick.bind(this), TICK_TIMER);
                         return response
                     }).catch(error => {
                         throw new SubmissionError(error)
@@ -308,7 +308,7 @@ class EEW2Records extends React.Component {
                     //this.refs.eew2Grid.clearselection();
                     this.refs.eew2Grid.updatebounddata('data');
                     this.toggleSuccess('Employee W2 Output Un-Published Successfully!');
-                    this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
+                    this.alertinterval = setInterval(this.tick.bind(this), TICK_TIMER);
                     return response
                 }).catch(error => {
                     throw new SubmissionError(error)
@@ -365,7 +365,7 @@ class EEW2Records extends React.Component {
                         });
                         this.refs.eew2Grid.updatebounddata('data');
                         this.toggleSuccess('Employee W2 Output Published Successfully!');
-                        this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
+                        this.alertinterval = setInterval(this.tick.bind(this), TICK_TIMER);
                         return response
                     }).catch(error => {
                         throw new SubmissionError(error)
@@ -395,7 +395,7 @@ class EEW2Records extends React.Component {
                     });
                     this.refs.eew2Grid.updatebounddata('data');
                     this.toggleSuccess('Employee W2 Output Published Successfully!');
-                    this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
+                    this.alertinterval = setInterval(this.tick.bind(this), TICK_TIMER);
                     return response
                 }).catch(error => {
                     throw new SubmissionError(error)
@@ -537,7 +537,7 @@ class EEW2Records extends React.Component {
                     this.setState({outputSuccess: false});
                     this.refs.eew2Grid.clearselection();
                     this.toggleSuccessNew('Generation initiated for the selected employees successfully.',true);
-                   this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
+                   this.alertinterval = setInterval(this.tick.bind(this), TICK_TIMER);
                    this.handleInProgress();
                     return response
                 }).catch(error => {
@@ -557,7 +557,7 @@ class EEW2Records extends React.Component {
                     this.setState({outputSuccess: false});
                     this.toggleSuccessNew('Generation of W2s initiated for the selected Employees.', true);
                     this.refs.eew2Grid.clearselection();
-                    this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
+                    this.alertinterval = setInterval(this.tick.bind(this), TICK_TIMER);
                     this.handleInProgress();
                     return repos
                 });
@@ -598,7 +598,7 @@ class EEW2Records extends React.Component {
                     this.setState({outputSuccess: false});
                     this.refs.eew2Grid.clearselection();
                     this.toggleSuccessNew('Generation of W2 Correction initiated for the selected Employees.',true);
-                    this.interval = setInterval(this.tick.bind(this), TICK_TIMER);
+                    this.alertinterval = setInterval(this.tick.bind(this), TICK_TIMER);
                     this.handleInProgress();
                      return response
                  }).catch(error => {
@@ -613,7 +613,7 @@ class EEW2Records extends React.Component {
         }
     }
     tick(){
-        clearInterval(this.interval);
+        clearInterval(this.alertinterval);
         this.toggleSuccess('');
     }
     componentWillReceiveProps(nextProps) {
