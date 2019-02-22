@@ -117,20 +117,7 @@ class ViewCompanyAuditFiles extends Component {
             $('#errAlrtCont').removeClass('d-none');
         });
     }
-    handlePrint() {
-       
-       // var eew2printInput= {"dataset":printdataset,"printIds":printId}
-       // compApi.printjnlp(eew2printInput); 
-        //compApi.testjnlp(printdataset,printId);
-       this.props.actions.testjnlp(printdataset, printId).then(() => {
-            //this.renderJnlp(output);
-      });
-     // this.props.actions.printjnlp(eew2printInput).then(() => {
-            //this.renderJnlp(output);
-       //});
-
-
-    }
+    
     flipPdfAnchor(isPdf) {
         if (isPdf) {
             document.getElementById(PDF_ANCHOR_ID).classList.remove('d-none');
