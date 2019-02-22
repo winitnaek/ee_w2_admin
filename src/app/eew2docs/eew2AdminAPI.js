@@ -282,5 +282,27 @@ class eew2AdminAPI {  static geteew2records(eew2recordInput) {
         return error;
       });
   }
+
+  static getRecsToPrintjnlp(dataset, printId) {
+    let paramurl = `${'?dataset='}${dataset}${'&printIds='}${printId}`;
+    var svcs_url = `${svcs.GET_RECSTO_PRINT_JNLP}${paramurl}`;
+    return fetch(URLUtils.buildURL(svcs_url), {
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if(response.ok){
+            return new Response(response.body);
+          }else{
+            var errorCode =  response.status;
+            var errorMsg  =  'Unable to open  jnlp. '+ADMIN_ERROR_MSG;
+            return new AppError(errorMsg, errorCode);
+          } 
+    })
+    .then(response => response.blob())
+    
+    .catch(error => {
+        return error;
+    });
+}
 }
 export default eew2AdminAPI;

@@ -6,8 +6,7 @@ import JqxGrid from '../../deps/jqwidgets-react/react_jqxgrid.js';
 import {RN_EEW2_RECORDS} from '../../base/constants/RenderNames';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {loadPeriodicData,loadEEW2Records,stageRecsToPrint,getRecsToPrintCount,isPrintGenerationInprogress}  from './eew2AdminAction';
-import {testjnlp}  from '../comp_outputs/compViewAction';
+import {loadPeriodicData,loadEEW2Records,stageRecsToPrint,getRecsToPrintCount,isPrintGenerationInprogress,getRecsToPrintjnlp}  from './eew2AdminAction';
 import eew2Api from './eew2AdminAPI';
 import Select from 'react-select';
 import AsyncSelect from 'react-select/lib/Async';
@@ -148,7 +147,7 @@ class PrintW2s extends React.Component {
                     console.log(this.props.isprintinprogress.status);
                     this.setState({printIds:[],disableviewpdf:false,disablecancel:false});
                     console.log('Now Launch JNLP from here ====================>');
-                    this.props.testjnlp(dataset, printid).then(() => {
+                    this.props.getRecsToPrintjnlp(dataset, printid).then(() => {
                     });
                 }
                 return response
@@ -348,7 +347,10 @@ class PrintW2s extends React.Component {
             console.log('getRecsToPrintCount : '+repos)
             count = repos;
             w2sselected = count;
-          this.setState({ w2sselected:w2sselected});
+            if(w2sselected == 0)
+            this.setState({w2sselected:w2sselected,disableviewpdf:true});
+            else
+          this.setState({ w2sselected:w2sselected,disableviewpdf:false});
             return repos
         });
     
@@ -375,7 +377,7 @@ class PrintW2s extends React.Component {
             disableMeSel = true;
         }
         this.setState({
-            disableMe:isEnabled,disableMeSel:disableMeSel,isDisabledOpt: isEnabled,disableviewpdf:false,rSelected:1,w2sselected:w2sselected
+            disableMe:isEnabled,disableMeSel:disableMeSel,isDisabledOpt: isEnabled,disableviewpdf:false,w2sselected:w2sselected //,rSelected:1
         }); 
         this.inputPrintFrmSel.disabled=isEnabled;
         this.inputPrintToSel.disabled=isEnabled;
@@ -546,6 +548,6 @@ function mapStateToProps(state) {
     }
 }
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({ loadEEW2Records ,loadPeriodicData,stageRecsToPrint,getRecsToPrintCount,isPrintGenerationInprogress,testjnlp}, dispatch)
+    return bindActionCreators({ loadEEW2Records ,loadPeriodicData,stageRecsToPrint,getRecsToPrintCount,isPrintGenerationInprogress,getRecsToPrintjnlp}, dispatch)
 }
 export default connect(mapStateToProps,mapDispatchToProps)(PrintW2s);

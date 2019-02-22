@@ -280,3 +280,39 @@ export function getRecsToPrintCountSuccess(w2selected) {
 export function getRecsToPrintCountFailed(w2selected) {
     return { type: types.POST_STAGE_PRINT_ERROR, w2selected };
 }
+
+export function getRecsToPrintjnlp(dataset, printId) {
+    return function (dispatch, getState) {
+        return eew2AdminAPI.getRecsToPrintjnlp(dataset, printId).then(output => {
+            if (output) {
+               
+                const data = window.URL.createObjectURL(output);
+                var link = document.createElement('a');
+                link.href = data;
+                link.download = "print.jnlp";
+                link.click();
+               
+                setTimeout(function () {
+                    // For Firefox it is necessary to delay revoking the ObjectURL
+
+                    window.URL.revokeObjectURL(data);
+                }, 100);
+                    dispatch(getRecsToPrintJnlpSuccess(output));
+                
+            } else {
+                throw output;
+            }
+        }).catch(error => {
+            generateAppErrorEvent(error.type, error.status, error.message, error);
+        });
+    };
+}
+
+
+
+export function getRecsToPrintJnlpSuccess(outputDoc) {
+    return {
+        type: types.GET_RECSTO_PRINT_JNLP_SUCCESS,
+        outputDoc
+    };
+}
