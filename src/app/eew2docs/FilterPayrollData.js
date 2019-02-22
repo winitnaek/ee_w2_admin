@@ -120,7 +120,11 @@ class FilterPayrollData extends Component {
     handleInProgress(){
         const dataset = appDataset();
         this.props.isOutputGenerationInprogress(dataset).then(response => {
-            if(this.props.isoutinprogress.status==='In-Progress'){
+            if(this.props.isoutinprogress && this.props.isoutinprogress.message && this.props.isoutinprogress.status){
+                console.log('Error Occured In EEW2Records handleInProgress');
+                clearInterval(this.interval);
+                console.log('Generate Output interval is cleared.');
+            }else if(this.props.isoutinprogress.status==='In-Progress'){
                 console.log('isOutputGenerationInprogress In-Progress');
                 this.setState({divStyleGenD:true, showActionAlert: false});
             }else if(this.props.isoutinprogress.status==='Failed'){

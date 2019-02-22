@@ -150,7 +150,11 @@ class EEW2Records extends React.Component {
     handleInProgress(){
         const dataset = appDataset();
         this.props.actions.isOutputGenerationInprogress(dataset).then(response => {
-            if(this.props.isoutinprogress.status==='In-Progress'){
+            if(this.props.isoutinprogress && this.props.isoutinprogress.message && this.props.isoutinprogress.status){
+                console.log('Error Occured In EEW2Records handleInProgress');
+                clearInterval(this.geninterval);
+                console.log('Generate Output interval is cleared.');
+            }else if(this.props.isoutinprogress.status==='In-Progress'){
                 console.log('isOutputGenerationInprogress In-Progress');
                 this.setState({divStyleRD:true, outputSuccess: false,refreshMe:true});
             }else if(this.props.isoutinprogress.status==='Failed'){
@@ -165,7 +169,10 @@ class EEW2Records extends React.Component {
             }
             return response
         }).catch(error => {
+            console.log('Error Occured In EEW2Records handleInProgress In side cache error');
             clearInterval(this.geninterval);
+            console.log('Generate Output interval is cleared.');
+            console.log(error);
         });
     }
     handlePrintProgress(){
@@ -606,7 +613,7 @@ class EEW2Records extends React.Component {
                  })
         }else{
             if(selIndexes.length ==0 || this.state.allSelected){
-                this.showAlert(true,'Generate W2 Correction','Please select only one employee record from the grid to Generate W2 Correction.');
+                this.showAlert(true,'Generate W2 Correction','Please select at least one employee record from the grid to Generate W2 Correction.');
             }else if(!grindRecInputData.latestonly){
                 this.showAlert(true,'Generate W2 Correction','This option is available for Latest W2 Records only.');
             }

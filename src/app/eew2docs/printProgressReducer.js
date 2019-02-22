@@ -7,9 +7,7 @@ export default function inProgressReducer(state = initialState.printinprogress,a
       return state = action.printinprogress
     }
     case types.GET_PRINT_INPROGRESS_ERROR:{
-      return Object.assign({}, ...state, {
-        printinprogress:action.printinprogress
-      });   
+      return state = action.printinprogress
     }
     default: 
       return state;

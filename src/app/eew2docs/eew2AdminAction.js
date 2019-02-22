@@ -110,17 +110,17 @@ export function isOutputGenerationInprogress(dataset) {
         const state = getState();
         return eew2AdminAPI.isOutputGenerationInprogress(dataset).then(outputgeninprogress => {
             if(outputgeninprogress.status && outputgeninprogress.message){
-                let arr = [];
-                arr.push([]);
+                let arr = {"status" :outputgeninprogress.status, "message":outputgeninprogress.message};
                 dispatch(isOutputGenerationFailed(arr));
-                throw outputgeninprogress;
+                //throw outputgeninprogress;
             }else{
                 if(outputgeninprogress){
                    dispatch(isOutputGenerationSuccess(outputgeninprogress));
                 }
             }
         }).catch(error => {
-            generateAppErrorEvent(error.type,error.status,error.message,error);
+            return error;
+            //generateAppErrorEvent(error.type,error.status,error.message,error);
         });
     };
 }

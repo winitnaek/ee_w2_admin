@@ -7,9 +7,7 @@ export default function inProgressReducer(state = initialState.outputgeninprogre
       return state = action.outputgeninprogress
     }
     case types.POST_OUTPUTGEN_INPROGRESS_ERROR:{
-      return Object.assign({}, ...state, {
-        outputgeninprogress:action.outputgeninprogress
-      });   
+      return state = action.outputgeninprogress 
     }
     default: 
       return state;
