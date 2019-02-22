@@ -90,32 +90,7 @@ export function testjnlp(dataset, printId) {
     };
 }
 
-export function printjnlp(eew2printInput) {
-    return function (dispatch, getState) {
-        return compdataApi.printjnlp(eew2printInput).then(output => {
-            if (output) {
-                //FileSaver.saveAs(output, 'print.jnlp');
-                const data = window.URL.createObjectURL(output);
-                var link = document.createElement('a');
-                link.href = data;
-                link.download = "print.jnlp";
-                link.click();
-               
-                setTimeout(function () {
-                    // For Firefox it is necessary to delay revoking the ObjectURL
 
-                    window.URL.revokeObjectURL(data);
-                }, 100);
-                    //dispatch(getTestJnlpSuccess(output));
-                
-            } else {
-                throw output;
-            }
-        }).catch(error => {
-            generateAppErrorEvent(error.type, error.status, error.message, error);
-        });
-    };
-}
 
 export function getTestJnlpSuccess(outputDoc) {
     return {

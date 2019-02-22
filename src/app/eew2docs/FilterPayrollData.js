@@ -36,9 +36,11 @@ class FilterPayrollData extends Component {
         let isOpenFromGrid=false;
         let isTrmSelDisabled=false;
         let isEmpSelDisabled=true;
+        let isWarningopn=false;
         if(this.props.openFromGrid){
             data=this.props.initgridData;
             if(data.length >0){
+                isWarningopn=true;
                 isOpenFromGrid=true;
                 isTrmSelDisabled=true;
                 isEmpSelDisabled=true;  
@@ -88,7 +90,8 @@ class FilterPayrollData extends Component {
             openFromGrid:isOpenFromGrid,
             isTrmSelDisabled:isTrmSelDisabled,
             hlptooltipOpen:false,
-            divStyleGenD:false
+            divStyleGenD:false,
+            isWarningopn:isWarningopn
         };
         this.toggle = this.toggle.bind(this);
         this.toggleaddEmpsSel = this.toggleaddEmpsSel.bind(this);
@@ -439,7 +442,7 @@ class FilterPayrollData extends Component {
      * @param {*} actionClicked 
      */
     onResetSelection(actionClicked){
-        this.setState({w2dgridata:[], isTrmSelDisabled:false, selectedTransmitter: null , selectedCompany: null, selectedEmployees: null,disableaddemp:true,addEmps:false,gridHasData:false,disableviewpdf:true,disablegenpdf:true,disablepubpdf:true,disableunpubpdf:true,isEmpSelDisabled:true});
+        this.setState({w2dgridata:[], isTrmSelDisabled:false, selectedTransmitter: null , selectedCompany: null, selectedEmployees: null,disableaddemp:true,addEmps:false,gridHasData:false,disableviewpdf:true,disablegenpdf:true,disablepubpdf:true,disableunpubpdf:true,isEmpSelDisabled:true,isWarningopn:false});
         this.yearSelected.disabled=false;
         this.yearSelected.value=(CURRENT_YR-1);
         this.latestOnly.checked=true;
@@ -745,6 +748,12 @@ class FilterPayrollData extends Component {
                             <FormGroup row><Label for="periodBy1" sm={1}></Label><Col sm={10}>
                             <Alert color="success" isOpen={this.props.isoutinprogress.status==='In-Progress'}>
                                 <span href="#" id="inProgressSpinner"> <i class="fas fa-spinner fa-spin"></i> Output Generation is In-Progress.</span>
+                            </Alert>
+                            </Col></FormGroup></Form>) : null}
+                            {this.state.isWarningopn==true ?(<Form>
+                            <FormGroup row><Label for="periodBy1" sm={1}></Label><Col sm={10}>
+                            <Alert color="warning" isOpen={this.state.isWarningopn}>
+                                Please click reset to change selection criteria.
                             </Alert>
                             </Col></FormGroup></Form>) : null}
                             <Form>
