@@ -283,7 +283,7 @@ export function getRecsToPrintCountFailed(w2selected) {
 
 export function getRecsToPrintjnlp(dataset, printId) {
     return function (dispatch, getState) {
-        return compdataApi.getRecsToPrintjnlp(dataset, printId).then(output => {
+        return eew2AdminAPI.getRecsToPrintjnlp(dataset, printId).then(output => {
             if (output) {
                
                 const data = window.URL.createObjectURL(output);
