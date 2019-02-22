@@ -344,7 +344,10 @@ class PrintW2s extends React.Component {
             console.log('getRecsToPrintCount : '+repos)
             count = repos;
             w2sselected = count;
-          this.setState({ w2sselected:w2sselected});
+            if(w2sselected == 0)
+            this.setState({w2sselected:w2sselected,disableviewpdf:true});
+            else
+          this.setState({ w2sselected:w2sselected,disableviewpdf:false});
             return repos
         });
     
@@ -371,7 +374,7 @@ class PrintW2s extends React.Component {
             disableMeSel = true;
         }
         this.setState({
-            disableMe:isEnabled,disableMeSel:disableMeSel,isDisabledOpt: isEnabled,disableviewpdf:false,rSelected:1,w2sselected:w2sselected
+            disableMe:isEnabled,disableMeSel:disableMeSel,isDisabledOpt: isEnabled,disableviewpdf:false,w2sselected:w2sselected //,rSelected:1
         }); 
         this.inputPrintFrmSel.disabled=isEnabled;
         this.inputPrintToSel.disabled=isEnabled;
