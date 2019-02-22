@@ -277,7 +277,7 @@ class EEW2Records extends React.Component {
                             });
                         });
                         this.refs.eew2Grid.updatebounddata('data');
-                        this.toggleSuccess('Employee W2 Output Un-Published Successfully!');
+                        this.toggleSuccess('Employee W2 Output Un-Published Successfully!',true);
                         this.alertinterval = setInterval(this.tick.bind(this), TICK_TIMER);
                         return response
                     }).catch(error => {
@@ -308,7 +308,7 @@ class EEW2Records extends React.Component {
                     });
                     //this.refs.eew2Grid.clearselection();
                     this.refs.eew2Grid.updatebounddata('data');
-                    this.toggleSuccess('Employee W2 Output Un-Published Successfully!');
+                    this.toggleSuccess('Employee W2 Output Un-Published Successfully!',true);
                     this.alertinterval = setInterval(this.tick.bind(this), TICK_TIMER);
                     return response
                 }).catch(error => {
@@ -317,7 +317,7 @@ class EEW2Records extends React.Component {
 
             }
         }else{
-            this.showAlert(true,'Publish W2','Please select at least one employee record from the grid or check Select All option to Un-Publish W2 output.');
+            this.showAlert(true,'Un-Publish W2','Please select at least one employee record from the grid or check Select All option to Un-Publish W2 output.');
         }
     }
     publishW2(){
@@ -365,7 +365,7 @@ class EEW2Records extends React.Component {
                             });
                         });
                         this.refs.eew2Grid.updatebounddata('data');
-                        this.toggleSuccess('Employee W2 Output Published Successfully!');
+                        this.toggleSuccess('Employee W2 Output Published Successfully!',true);
                         this.alertinterval = setInterval(this.tick.bind(this), TICK_TIMER);
                         return response
                     }).catch(error => {
@@ -395,7 +395,7 @@ class EEW2Records extends React.Component {
                         });
                     });
                     this.refs.eew2Grid.updatebounddata('data');
-                    this.toggleSuccess('Employee W2 Output Published Successfully!');
+                    this.toggleSuccess('Employee W2 Output Published Successfully!',true);
                     this.alertinterval = setInterval(this.tick.bind(this), TICK_TIMER);
                     return response
                 }).catch(error => {
@@ -494,9 +494,9 @@ class EEW2Records extends React.Component {
         
         return w2PrintRequestInput;
     }
-    toggleSuccess(message){
+    toggleSuccess(message, isShowOn){
         this.setState({
-            outputSuccess: !this.state.outputSuccess,
+            outputSuccess: isShowOn,
             outputMessage:message
         });
     }
@@ -615,7 +615,7 @@ class EEW2Records extends React.Component {
     }
     tick(){
         clearInterval(this.alertinterval);
-        this.toggleSuccess('');
+        this.toggleSuccess('',false);
     }
     componentWillReceiveProps(nextProps) {
         if (nextProps.w2data && nextProps.w2data.loadeew2) {
