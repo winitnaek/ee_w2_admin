@@ -290,12 +290,15 @@ export function getRecsToPrintjnlp(dataset, printId) {
                 var link = document.createElement('a');
                 link.href = data;
                 link.download = "print.jnlp";
+                document.body.appendChild(link);
                 link.click();
-               
-                setTimeout(function () {
+               // if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                //    window.navigator.msSaveOrOpenBlob(data, "print.jnlp");
+                //}
+               setTimeout(function () {
                     // For Firefox it is necessary to delay revoking the ObjectURL
-
-                    window.URL.revokeObjectURL(data);
+                document.body.removeChild(link);
+                 window.URL.revokeObjectURL(data);
                 }, 100);
                     dispatch(getRecsToPrintJnlpSuccess(output));
                 
