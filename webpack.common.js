@@ -55,7 +55,6 @@ module.exports = {
         'react-dom': 'ReactDOM',
         redux: 'Redux',
         'react-redux': 'ReactRedux',
-        'redux-form': 'ReduxForm',
         'redux-thunk': 'ReduxThunk',
         'prop-types': 'PropTypes'
     },
