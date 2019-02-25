@@ -339,6 +339,14 @@ class PrintW2s extends React.Component {
    
     }
     onCorrectedRecClick() {
+      if(this.correctedOnly.checked){
+        this.latestOnly.checked=false;
+        this.latestOnly.disabled=true;
+      }else{
+        this.latestOnly.disabled=false;
+      } 
+      
+
       console.log("rSelected:"+this.state.rSelected);
         var eew2data = this.getRequestData(this.state.rSelected);
          console.log("onCorrectedRecClick Data input received:"+eew2data);
@@ -481,7 +489,7 @@ class PrintW2s extends React.Component {
                         </FormGroup>
                         <FormGroup row style={{ paddingLeft: 20 }}>
                                 <Label for="periodBy1" sm={3}></Label>
-                                <CustomInput type="checkbox" innerRef={(input) => this.latestOnly = input} id="exampleCustomSwitch" defaultChecked={true} name="customSwitch" label="Select Latest Records" />
+                                <CustomInput type="checkbox" innerRef={(input) => this.latestOnly = input} id="exampleCustomSwitch" defaultChecked={true} name="customSwitch" label="Select Latest Records (W2)" />
                                 &nbsp;
                                 <a href="#" id="selAllInfoId"><i class="fas fa-info-circle fa-sm"></i></a>
                                 <Tooltip placement="right" isOpen={this.state.selAllInfo} target="selAllInfoId" toggle={this.toggleselAllInfo}>
@@ -490,7 +498,7 @@ class PrintW2s extends React.Component {
                         </FormGroup>
                         <FormGroup row style={{ paddingLeft: 20 }}>
                                 <Label for="periodBy1" sm={3}></Label>
-                                <CustomInput type="checkbox" innerRef={(inputc) => this.correctedOnly = inputc} id="exampleCustomSwitch1" defaultChecked={false} name="customSwitch1" label="Corrected Records Only" onChange={() => this.onCorrectedRecClick()}/>
+                                <CustomInput type="checkbox" innerRef={(inputc) => this.correctedOnly = inputc} id="exampleCustomSwitch1" defaultChecked={false} name="customSwitch1" label="Corrected Records Only (W2C)" onChange={() => this.onCorrectedRecClick()}/>
                                 &nbsp;
                                 <a href="#" id="selAllInfoId1"><i class="fas fa-info-circle fa-sm"></i></a>
                                 <Tooltip placement="right" isOpen={this.state.selAllInfoc} target="selAllInfoId1" toggle={this.toggleselAllInfoc}>

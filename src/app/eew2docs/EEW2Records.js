@@ -426,6 +426,13 @@ class EEW2Records extends React.Component {
             }
         }
         if(selIndexes.length >0 || this.state.allSelected){
+            let allLatestRecord = 0;
+            selIndexes.forEach(index => {
+                let data = this.refs.eew2Grid.getrowdata(index);
+                if(!data.correction){
+                    allLatestRecord++;
+                }
+            });
             let totalRecordsInGrid = this.state.source.totalrecords
            
             var eew2data = this.getPrintRequestData(optSelec,recSelected);
@@ -438,7 +445,7 @@ class EEW2Records extends React.Component {
                 totalRec:repos
             });
             this.setState({
-                showPrint: true, selecRec:selIndexes.length,optSelec:optSelec,recordsSelected:recSelected //,totalRec:totalRecordsInGrid
+                showPrint: true, selecRec:allLatestRecord,optSelec:optSelec,recordsSelected:recSelected //,totalRec:totalRecordsInGrid
             });
 
                return repos
@@ -955,7 +962,7 @@ class EEW2Records extends React.Component {
                    },filtertype: 'input'},
                 { text: 'Run Date/Time', datafield: 'generatedDateTime', width: 'auto',  cellsalign: 'center',align: 'center',  cellsformat: 'MM-dd-yyyy hh:mm:00 tt', filtertype: 'range' },
                 { text: 'First Name', cellclassname:"gridcelltxt", datafield: 'empFname', cellsalign: 'center', align: 'center',width: 'auto',filtertype: 'input' },
-                   { text: 'Last Name', datafield: 'lastName', cellsalign: 'center', align: 'center',width: 'auto',cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
+                   { text: 'Last Name', datafield: 'empLname', cellsalign: 'center', align: 'center',width: 'auto',cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
                     return `<a href="#" data-toggle="tooltip" class="tooltipempw2" title="View W2 PDF"><div style="text-align:center;" class="align-self-center align-middle"><button type="button" style="padding-top:0.1rem;" class="btn btn-link align-self-center" onClick={onloadPdfData('${ndex}')}>${rowdata.empLname}</button></div></a>`;
                    },filtertype: 'input'},
                 { text: '  SSN  ', datafield: 'last4digits', cellsalign: 'center', align: 'center', width: 'auto', filterable: false, sortable: false },
