@@ -52,7 +52,18 @@ class compdataAPI {
         return fetch(URLUtils.buildURL(svcs_url), fetchOpts)
         .then(response => {
             if (response.ok) {
-                return OUTPUT_MESSAGES === fileType ? response.json() : new Response(response.body);
+                var isFirefox = typeof InstallTrigger !== 'undefined';
+                console.log('isFirefox : ' +isFirefox);
+                if(isFirefox){
+                    console.log('Here 1========>');
+                    console.log('response')
+                    console.log(response)
+                    return OUTPUT_MESSAGES === fileType ? response.json() : new Response(response.body);
+                }else{
+                    console.log('Here 0========>No FF, Chrome or Edge===>');
+                    return OUTPUT_MESSAGES === fileType ? response.json() : response;
+                }
+               
             } else {
                 var errorCode = response.status;
                 var errorMsg = 'Failed to get Company Audit Document. ' + ADMIN_ERROR_MSG;
@@ -60,6 +71,7 @@ class compdataAPI {
             }
         })
         .then(response => { 
+            console.log('Here 2========>');
             return OUTPUT_MESSAGES === fileType ? response : response.blob(); 
         })
         .catch(error => {

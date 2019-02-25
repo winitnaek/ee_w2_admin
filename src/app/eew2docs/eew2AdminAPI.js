@@ -291,7 +291,17 @@ class eew2AdminAPI {  static geteew2records(eew2recordInput) {
     })
     .then(response => {
         if(response.ok){
-            return new Response(response.body);
+            var isFirefox = typeof InstallTrigger !== 'undefined';
+            console.log('isFirefox : getRecsToPrintjnlp ' +isFirefox);
+            if(isFirefox){
+              console.log('Here 1========>');
+              console.log('response')
+              console.log(response)
+              return new Response(response.body);
+          }else{
+              console.log('Here 0========>No FF, Chrome or Edge===>');
+              return response;
+          }
           }else{
             var errorCode =  response.status;
             var errorMsg  =  'Unable to open  jnlp. '+ADMIN_ERROR_MSG;

@@ -128,25 +128,30 @@ class ViewCompanyAuditFiles extends Component {
         }
     }
     downloadAuditZip(output) {
-        const data = window.URL.createObjectURL(output);
-        var link = document.createElement('a');
-        link.href = data;
-        link.download = "Audits.zip";
-        link.click();
+
+        var anchor = document.createElement('a');
+        var url = window.URL || window.webkitURL;
+        anchor.href = url.createObjectURL(output);
+        anchor.download = "Audits.zip";
+        document.body.append(anchor);
+        anchor.click();
+
         setTimeout(function () {
-            // For Firefox it is necessary to delay revoking the ObjectURL
-            window.URL.revokeObjectURL(data);
+            document.body.removeChild(anchor);
+            url.revokeObjectURL(anchor.href);
         }, 100);
     }
     downloadTurboTaxFile(output) {
-        const data = window.URL.createObjectURL(output);
-        var link = document.createElement('a');
-        link.href = data;
-        link.download = "TurboTax.zip";
-        link.click();
+        var anchor = document.createElement('a');
+        var url = window.URL || window.webkitURL;
+        anchor.href = url.createObjectURL(output);
+        anchor.download =  "TurboTax.zip";
+        document.body.append(anchor);
+        anchor.click();
+
         setTimeout(function () {
-            // For Firefox it is necessary to delay revoking the ObjectURL
-            window.URL.revokeObjectURL(data);
+            document.body.removeChild(anchor);
+            url.revokeObjectURL(anchor.href);
         }, 100);
     }
     renderPDFData(output) {
