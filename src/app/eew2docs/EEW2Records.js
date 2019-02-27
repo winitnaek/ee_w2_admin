@@ -95,7 +95,8 @@ class EEW2Records extends React.Component {
             this.onViewFailedMessages = this.onViewFailedMessages.bind(this);
             this.hlptogglettt1 = this.hlptogglettt1.bind(this);
             this.refreshData = this.refreshData.bind(this);
-            
+            this.checkForMobile = this.checkForMobile.bind(this);
+            let isMobileDevice = this.checkForMobile();   
         this.state = {
             source: source,
             exptoExlTip:false,
@@ -135,11 +136,20 @@ class EEW2Records extends React.Component {
             recordsSelected:'',
             divStyleRD:false,
             hlptooltipOpen1:false,
-            refreshMe:false
+            refreshMe:false,
+            isMobileDevice:isMobileDevice
         };
         this.handleInProgress();
         this.geninterval = setInterval(this.handleInProgress.bind(this), PRINTGEN_TIMER);
     }
+    checkForMobile(){
+        let isMobileDevice = false;
+        if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+            isMobileDevice = true;
+        }
+        return isMobileDevice;
+    }
+    
      hlptogglettt1() {
         this.setState({
           hlptooltipOpen1: !this.state.hlptooltipOpen1
@@ -717,6 +727,9 @@ class EEW2Records extends React.Component {
     componentDidMount() {
         //$('.tooltipempw2').tooltip({trigger : 'hover'});
         //$('.tooltipcomp2').tooltip({trigger : 'hover'});
+        if(this.state.isMobileDevice){
+            $('#printW2s').hide();
+        }
         this.refs.eew2Grid.on('rowclick', (event) => {
             this.setState({
                 allSelected: false
@@ -724,6 +737,9 @@ class EEW2Records extends React.Component {
         });
     }
     componentDidUpdate(){
+        if(this.state.isMobileDevice){
+            $('#printW2s').hide();
+        }
         //$('.tooltipempw2').tooltip({trigger : 'hover'});
         //$('.tooltipcomp2').tooltip({trigger : 'hover'});
     }

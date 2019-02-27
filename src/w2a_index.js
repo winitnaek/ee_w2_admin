@@ -24,8 +24,8 @@ let store = configureStore();
 //sessionStorage.setItem("up", userProfile);
 //==============================================================================
 let usrobj = JSON.parse(sessionStorage.getItem('up'));
-console.log('setUserProfile usrobj');
-console.log(usrobj);
+//console.log('setUserProfile usrobj');
+//console.log(usrobj);
 var dataset = usrobj.dataset;
 var empId = usrobj.userId;
 /**
