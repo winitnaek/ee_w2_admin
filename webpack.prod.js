@@ -12,7 +12,11 @@ module.exports = merge(baseConfig, {
   devtool: '',
   plugins: [
     // Minify JS
-    new UglifyJsPlugin(),
+    new UglifyJsPlugin({
+      uglifyOptions: {
+        compress: {drop_console: true}
+      }
+    }),
     // Minify CSS
     new webpack.LoaderOptionsPlugin({
       minimize: true,

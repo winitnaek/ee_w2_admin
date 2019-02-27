@@ -143,15 +143,15 @@ eew2auth = ()=> {
  **/
 if (process.env.NODE_ENV === development || process.env.NODE_ENV === production) {
     var express = require('express')
-    const port = 8080;
+    const port = 6060;
     var app = express()
     app.use('/', express.static(BUILD_DIR))
     app.use(bodyParser.json()); // support json encoded bodies
     app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
-    app.use(cors({origin: 'http://localhost:8080'}));
+    app.use(cors({origin: 'http://172.16.0.19:6060'}));
     app.listen(port);
     console.log('======================================================>');
-    console.log('Starting Web server at http://localhost:' + port + '/');
+    console.log('Starting Web server at http://172.16.0.19:' + port + '/');
     console.log('======================================================>');
     approuter(app);
 }
